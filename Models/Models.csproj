@@ -21,8 +21,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Configrations\" />
     <Folder Include="Enums\" />
   </ItemGroup>
 
