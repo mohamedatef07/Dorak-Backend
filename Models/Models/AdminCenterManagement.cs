@@ -6,7 +6,7 @@ namespace Models.Models
 {
     public class AdminCenterManagement
     {
-        public int Id { get; set; }
+        public int AdminCenterManagementID { get; set; }
         public int AdminID { get; set; }
         public virtual User User { get; set; }
         public int CenterID { get; set; }

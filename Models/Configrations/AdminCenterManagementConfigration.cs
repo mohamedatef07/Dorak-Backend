@@ -1,9 +1,16 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Models.Models;
 
 
 namespace Models.Configrations
 {
-    public class AdminCenterManagementConfigration
+    public class AdminCenterManagementConfigration :IEntityTypeConfiguration<AdminCenterManagement>
     {
+        public void Configure(EntityTypeBuilder<AdminCenterManagement> builder)
+        {
+            //Primary Key
+            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementID);
+        }
     }
 }
