@@ -54,15 +54,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
             },
             {
               "$type": "Document",
@@ -84,7 +80,7 @@
               "RelativeDocumentMoniker": "Models\\Configurations\\ServiceConfiguration.cs",
               "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\ServiceConfiguration.cs",
               "RelativeToolTip": "Models\\Configurations\\ServiceConfiguration.cs",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAuwA8AAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAABAAAAAAAAAAAAAQwA8AAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-20T21:38:47.249Z",
               "EditorCaption": ""
@@ -99,8 +95,7 @@
               "RelativeToolTip": "Models\\Models\\CenterService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAA0AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:36:04.217Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-20T21:36:04.217Z"
             },
             {
               "$type": "Document",
@@ -136,8 +131,7 @@
               "RelativeToolTip": "Models\\Configurations\\AdminCenterManagementConfiguration.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:31:30.411Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-20T21:31:30.411Z"
             },
             {
               "$type": "Document",
@@ -149,8 +143,7 @@
               "RelativeToolTip": "Models\\Models\\AdminCenterManagement.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAoAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:36:25.069Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-20T21:36:25.069Z"
             },
             {
               "$type": "Document",
