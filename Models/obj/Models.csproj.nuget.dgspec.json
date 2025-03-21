@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak Backend\\Models\\Models.csproj": {}
+    "F:\\Dorak\\Dorak-Backend\\Models\\Models.csproj": {}
   },
   "projects": {
-    "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak Backend\\Models\\Models.csproj": {
+    "F:\\Dorak\\Dorak-Backend\\Models\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak Backend\\Models\\Models.csproj",
+        "projectUniqueName": "F:\\Dorak\\Dorak-Backend\\Models\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak Backend\\Models\\Models.csproj",
-        "packagesPath": "C:\\Users\\muham\\.nuget\\packages\\",
-        "outputPath": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak Backend\\Models\\obj\\",
+        "projectPath": "F:\\Dorak\\Dorak-Backend\\Models\\Models.csproj",
+        "packagesPath": "C:\\Users\\Fatma\\.nuget\\packages\\",
+        "outputPath": "F:\\Dorak\\Dorak-Backend\\Models\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\muham\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Fatma\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -42,9 +42,9 @@
         "restoreAuditProperties": {
           "enableAudit": "true",
           "auditLevel": "low",
-          "auditMode": "direct"
+          "auditMode": "all"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "9.0.100"
       },
       "frameworks": {
         "net8.0": {
@@ -91,7 +91,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.201/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

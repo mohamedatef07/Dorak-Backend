@@ -16,6 +16,9 @@ namespace Models.Models
         public string MapURL { get; set; }
         public virtual ICollection<AdminCenterManagement> AdminCenterManagements { get; set; }
         public virtual ICollection<CenterService> CenterServices { get; set; }
+        public virtual ICollection<ProviderAssignment> ProviderAssignment { get; set; }
+
+
 
     }
 }
