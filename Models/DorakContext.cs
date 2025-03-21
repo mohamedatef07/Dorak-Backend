@@ -15,6 +15,9 @@ namespace Models
         public virtual DbSet<Appointment> Appointments { get; set; }
         public virtual DbSet<Shift> Shifts { get; set; }
         public virtual DbSet<LiveQueue> LiveQueues { get; set; }
+        public virtual DbSet<Payment> Payments { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
+        public virtual DbSet<Wallet> Wallets { get; set; }
 
         //Connect With database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,6 +34,9 @@ namespace Models
             builder.ApplyConfiguration(new LiveQueueConfiguration { });
             builder.ApplyConfiguration(new AppointmentConfiguration { });
             builder.ApplyConfiguration(new ShiftConfiguration { });
+            builder.ApplyConfiguration(new PaymentConfiguration { });
+            builder.ApplyConfiguration(new NotificationConfiguration { });
+            builder.ApplyConfiguration(new WalletConfiguration { });
         }
 
     }
