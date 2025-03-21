@@ -17,5 +17,8 @@ namespace Models.Models
         public virtual ICollection<AdminCenterManagement> AdminCentersManagement { get; set; }
         public virtual ICollection<CenterService> CenterServices { get; set; }
 
+
+        
+
     }
 }

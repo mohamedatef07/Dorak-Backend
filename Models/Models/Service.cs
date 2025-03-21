@@ -12,5 +12,10 @@ namespace Models.Models
         public ServicePriority Priority { get; set; }
         public decimal BasePrice { get; set; }
         public virtual ICollection<CenterService> CenterServices { get; set; } = new List<CenterService>();
+
+
+        //Amgad
+
+        public Appointment Appointment { get; set; }
     }
 }

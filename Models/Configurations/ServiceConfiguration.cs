@@ -4,7 +4,7 @@ using Models.Models;
 
 
 
-namespace Models.Configrations
+namespace Models.Configurations
 {
     public class ServiceConfiguration : IEntityTypeConfiguration<Service>
     {
