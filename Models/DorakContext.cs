@@ -13,7 +13,7 @@ namespace Models
         public virtual DbSet<Service> Services { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;")
+            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
