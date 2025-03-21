@@ -1,25 +1,49 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\",
+  "WorkspaceRootPath": "D:\\Dorak Back-End\\Dorak-Backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|e:\\iti9month\\finalproj\\backend 2\\dorak-backend\\models\\dorakcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\dorakcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\dorakcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|e:\\iti9month\\finalproj\\backend 2\\dorak-backend\\models\\configurations\\appointmentconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\configurations\\notificationconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\notificationconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\configurations\\paymentconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\paymentconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\configurations\\walletconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\walletconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\models\\wallet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\models\\wallet.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\models\\payment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\models\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\models\\notification.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\configurations\\appointmentconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\appointmentconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|e:\\iti9month\\finalproj\\backend 2\\dorak-backend\\models\\models\\appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\models\\appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\models\\appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|e:\\iti9month\\finalproj\\backend 2\\dorak-backend\\models\\configurations\\centerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\configurations\\centerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\centerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|e:\\iti9month\\finalproj\\backend 2\\dorak-backend\\models\\models\\center.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\dorak back-end\\dorak-backend\\models\\models\\center.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\models\\center.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -30,69 +54,143 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 10,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "Center.cs",
-              "DocumentMoniker": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models\\Center.cs",
-              "RelativeDocumentMoniker": "Models\\Models\\Center.cs",
-              "ToolTip": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models\\Center.cs",
-              "RelativeToolTip": "Models\\Models\\Center.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-21T13:10:09.144Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "CenterConfiguration.cs",
-              "DocumentMoniker": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Configurations\\CenterConfiguration.cs",
-              "RelativeDocumentMoniker": "Models\\Configurations\\CenterConfiguration.cs",
-              "ToolTip": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Configurations\\CenterConfiguration.cs",
-              "RelativeToolTip": "Models\\Configurations\\CenterConfiguration.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Title": "WalletConfiguration.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\WalletConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\WalletConfiguration.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\WalletConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\WalletConfiguration.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-21T13:10:08.097Z",
+              "WhenOpened": "2025-03-21T14:44:41.831Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "Appointment.cs",
-              "DocumentMoniker": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models\\Appointment.cs",
-              "RelativeDocumentMoniker": "Models\\Models\\Appointment.cs",
-              "ToolTip": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models\\Appointment.cs",
-              "RelativeToolTip": "Models\\Models\\Appointment.cs",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAACcAAAA0AAAAAAAAAA==",
+              "Title": "PaymentConfiguration.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\PaymentConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\PaymentConfiguration.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\PaymentConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\PaymentConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-21T13:06:44.575Z",
+              "WhenOpened": "2025-03-21T14:44:41.788Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "NotificationConfiguration.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\NotificationConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\NotificationConfiguration.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\NotificationConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\NotificationConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T14:44:41.737Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Wallet.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Wallet.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\Wallet.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Wallet.cs",
+              "RelativeToolTip": "Models\\Models\\Wallet.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T14:44:41.665Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Payment.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Payment.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\Payment.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Payment.cs",
+              "RelativeToolTip": "Models\\Models\\Payment.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T14:44:41.553Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Notification.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Notification.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\Notification.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Notification.cs",
+              "RelativeToolTip": "Models\\Models\\Notification.cs",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T14:44:35.28Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "Center.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Center.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\Center.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Center.cs",
+              "RelativeToolTip": "Models\\Models\\Center.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T13:10:09.144Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CenterConfiguration.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\CenterConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\CenterConfiguration.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\CenterConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\CenterConfiguration.cs",
+              "ViewState": "AgIAAAwAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T13:10:08.097Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Appointment.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Appointment.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\Appointment.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models\\Appointment.cs",
+              "RelativeToolTip": "Models\\Models\\Appointment.cs",
+              "ViewState": "AgIAACoAAAAAAAAAAAAAACcAAAA0AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T13:06:44.575Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
               "Title": "AppointmentConfiguration.cs",
-              "DocumentMoniker": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Configurations\\AppointmentConfiguration.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\AppointmentConfiguration.cs",
               "RelativeDocumentMoniker": "Models\\Configurations\\AppointmentConfiguration.cs",
-              "ToolTip": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Configurations\\AppointmentConfiguration.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Configurations\\AppointmentConfiguration.cs",
               "RelativeToolTip": "Models\\Configurations\\AppointmentConfiguration.cs",
               "ViewState": "AgIAAAwAAAAAAAAAAAAAACEAAAA5AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-21T13:05:07.736Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-21T13:05:07.736Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "DorakContext.cs",
-              "DocumentMoniker": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\DorakContext.cs",
+              "DocumentMoniker": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\DorakContext.cs",
               "RelativeDocumentMoniker": "Models\\DorakContext.cs",
-              "ToolTip": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\DorakContext.cs",
+              "ToolTip": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\DorakContext.cs",
               "RelativeToolTip": "Models\\DorakContext.cs",
-              "ViewState": "AgIAABUAAAAAAAAAAAAAACMAAAAFAAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAA0wBIAAABGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-14T10:59:52.292Z",
               "EditorCaption": ""

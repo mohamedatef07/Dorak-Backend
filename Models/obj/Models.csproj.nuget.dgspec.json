@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj": {}
+    "D:\\DATA\\.QUEUE MANAGEMENT SYSTEM\\New\\Dorak-Backend\\Models\\Models.csproj": {}
   },
   "projects": {
-    "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj": {
+    "D:\\DATA\\.QUEUE MANAGEMENT SYSTEM\\New\\Dorak-Backend\\Models\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj",
+        "projectUniqueName": "D:\\DATA\\.QUEUE MANAGEMENT SYSTEM\\New\\Dorak-Backend\\Models\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj",
-        "packagesPath": "C:\\Users\\hamr9\\.nuget\\packages\\",
-        "outputPath": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\obj\\",
+        "projectPath": "D:\\DATA\\.QUEUE MANAGEMENT SYSTEM\\New\\Dorak-Backend\\Models\\Models.csproj",
+        "packagesPath": "C:\\Users\\mahmo\\.nuget\\packages\\",
+        "outputPath": "D:\\DATA\\.QUEUE MANAGEMENT SYSTEM\\New\\Dorak-Backend\\Models\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\hamr9\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\mahmo\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
