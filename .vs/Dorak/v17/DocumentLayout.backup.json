@@ -3,20 +3,24 @@
   "WorkspaceRootPath": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configrations\\serviceconfigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configrations\\serviceconfigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configurations\\admincentermanagementconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\admincentermanagementconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configrations\\centerconfigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configrations\\centerconfigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configurations\\centerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\centerconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configurations\\centerserviceconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\centerserviceconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configurations\\serviceconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configurations\\serviceconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\models\\service.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\models\\service.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\configrations\\admincentermanagementconfigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|solutionrelative:models\\configrations\\admincentermanagementconfigration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{25775FF0-28B2-4AE9-B2DB-AF046D0AE187}|Models\\Models.csproj|d:\\mohamed atef\\programming\\github repos\\dorak-backend\\models\\dorakcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -50,63 +54,54 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 7,
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CenterServiceConfiguration.cs",
+              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\CenterServiceConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\CenterServiceConfiguration.cs",
+              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\CenterServiceConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\CenterServiceConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-21T10:55:59.28Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "CenterConfigration.cs",
-              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configrations\\CenterConfigration.cs",
-              "RelativeDocumentMoniker": "Models\\Configrations\\CenterConfigration.cs",
-              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configrations\\CenterConfigration.cs",
-              "RelativeToolTip": "Models\\Configrations\\CenterConfigration.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAAwA4AAAAYAAAAAAAAAA==",
+              "Title": "CenterConfiguration.cs",
+              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\CenterConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\CenterConfiguration.cs",
+              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\CenterConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\CenterConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-20T21:52:05.383Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "Center.cs",
-              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\Center.cs",
-              "RelativeDocumentMoniker": "Models\\Models\\Center.cs",
-              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\Center.cs",
-              "RelativeToolTip": "Models\\Models\\Center.cs",
-              "ViewState": "AgIAAAcAAAAAAAAAAAAzwBAAAABGAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:44:02.936Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ServiceConfigration.cs",
-              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configrations\\ServiceConfigration.cs",
-              "RelativeDocumentMoniker": "Models\\Configrations\\ServiceConfigration.cs",
-              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configrations\\ServiceConfigration.cs",
-              "RelativeToolTip": "Models\\Configrations\\ServiceConfigration.cs",
-              "ViewState": "AgIAAAoAAAAAAAAAAAAzwA8AAAAjAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "ServiceConfiguration.cs",
+              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\ServiceConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\ServiceConfiguration.cs",
+              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\ServiceConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\ServiceConfiguration.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAAAwA8AAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-20T21:38:47.249Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "AdminCenterManagement.cs",
-              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\AdminCenterManagement.cs",
-              "RelativeDocumentMoniker": "Models\\Models\\AdminCenterManagement.cs",
-              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\AdminCenterManagement.cs",
-              "RelativeToolTip": "Models\\Models\\AdminCenterManagement.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAoAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:36:25.069Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "CenterService.cs",
               "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\CenterService.cs",
               "RelativeDocumentMoniker": "Models\\Models\\CenterService.cs",
@@ -114,12 +109,11 @@
               "RelativeToolTip": "Models\\Models\\CenterService.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAwAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:36:04.217Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-20T21:36:04.217Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "DorakContext.cs",
               "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\DorakContext.cs",
               "RelativeDocumentMoniker": "Models\\DorakContext.cs",
@@ -132,7 +126,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Service.cs",
               "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\Service.cs",
               "RelativeDocumentMoniker": "Models\\Models\\Service.cs",
@@ -140,25 +134,48 @@
               "RelativeToolTip": "Models\\Models\\Service.cs",
               "ViewState": "AgIAAAYAAAAAAAAAAAAAAAwAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:42:22.773Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-20T21:42:22.773Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AdminCenterManagementConfigration.cs",
-              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configrations\\AdminCenterManagementConfigration.cs",
-              "RelativeDocumentMoniker": "Models\\Configrations\\AdminCenterManagementConfigration.cs",
-              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configrations\\AdminCenterManagementConfigration.cs",
-              "RelativeToolTip": "Models\\Configrations\\AdminCenterManagementConfigration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 0,
+              "Title": "AdminCenterManagementConfiguration.cs",
+              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\AdminCenterManagementConfiguration.cs",
+              "RelativeDocumentMoniker": "Models\\Configurations\\AdminCenterManagementConfiguration.cs",
+              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Configurations\\AdminCenterManagementConfiguration.cs",
+              "RelativeToolTip": "Models\\Configurations\\AdminCenterManagementConfiguration.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-20T21:31:30.411Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 6,
+              "Title": "AdminCenterManagement.cs",
+              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\AdminCenterManagement.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\AdminCenterManagement.cs",
+              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\AdminCenterManagement.cs",
+              "RelativeToolTip": "Models\\Models\\AdminCenterManagement.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-20T21:36:25.069Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Center.cs",
+              "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\Center.cs",
+              "RelativeDocumentMoniker": "Models\\Models\\Center.cs",
+              "ToolTip": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Models\\Center.cs",
+              "RelativeToolTip": "Models\\Models\\Center.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAzwBAAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-03-20T21:44:02.936Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "UserStatus.cs",
               "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Enums\\UserStatus.cs",
               "RelativeDocumentMoniker": "Models\\Enums\\UserStatus.cs",
@@ -166,12 +183,11 @@
               "RelativeToolTip": "Models\\Enums\\UserStatus.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:47:57.682Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-20T21:47:57.682Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "ServicePriority.cs",
               "DocumentMoniker": "D:\\Mohamed Atef\\Programming\\GitHub Repos\\Dorak-Backend\\Models\\Enums\\ServicePriority.cs",
               "RelativeDocumentMoniker": "Models\\Enums\\ServicePriority.cs",
@@ -179,12 +195,7 @@
               "RelativeToolTip": "Models\\Enums\\ServicePriority.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-20T21:47:25.292Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+              "WhenOpened": "2025-03-20T21:47:25.292Z"
             }
           ]
         }
