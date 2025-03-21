@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Models.Configrations;
 using Models.Configurations;
 using Models.Models;
 
 namespace Models
 {
-    public class DorakContext : IdentityDbContext
+    public class DorakContext : IdentityDbContext<User>
     {
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
@@ -18,8 +19,12 @@ namespace Models
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Wallet> Wallets { get; set; }
-        public virtual DbSet<ProviderServices> ProviderServices { get; set }
-        public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set }
+        public virtual DbSet<ProviderService> ProviderServices { get; set; }
+        public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set; }
+        public virtual DbSet<Client> Clients { get; set; }
+        public virtual DbSet<Provider> Providers { get; set; }
+        public virtual DbSet<ProviderCertifications> ProviderCertifications { get; set; }
+        public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
 
         //Connect With database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -41,7 +46,12 @@ namespace Models
             builder.ApplyConfiguration(new WalletConfiguration { });
             builder.ApplyConfiguration(new ProviderAssignmentConfiguration { });
             builder.ApplyConfiguration(new ProviderServicesConfiguration { });
+            builder.ApplyConfiguration(new ProviderCertificationsConfiguration { });
+            builder.ApplyConfiguration(new ProviderConfiguration { });
+            builder.ApplyConfiguration(new ClientConfiguration { });
+            builder.ApplyConfiguration(new TemporaryClientConfiguration { });
 
+            base.OnModelCreating(builder);
         }
 
     }
