@@ -11,13 +11,22 @@ namespace Models
         public virtual DbSet<AdminCenterManagement> AdminCenterManagement { get; set; }
         public virtual DbSet<CenterService> CenterServices { get; set; }
         public virtual DbSet<Service> Services { get; set; }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public virtual DbSet<ProviderServices> ProviderServices {get ; set }
+        public virtual DbSet<ProviderAssignment> ProviderAssignments {get ; set }
+}
+
+
+protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;")
+    optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
         }
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            
+            builder.ApplyConfiguration(new ProviderAssignmentConfiguration { });
+            builder.ApplyConfiguration(new ProviderServicesConfiguration { });
+
+
+
         }
 
     }
