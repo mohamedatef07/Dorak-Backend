@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models.csproj": {}
+    "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj": {}
   },
   "projects": {
-    "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models.csproj": {
+    "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models.csproj",
+        "projectUniqueName": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj",
         "projectName": "Models",
-        "projectPath": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\Models.csproj",
-        "packagesPath": "C:\\Users\\amgad\\.nuget\\packages\\",
-        "outputPath": "E:\\iti9month\\finalproj\\Backend 2\\Dorak-Backend\\Models\\obj\\",
+        "projectPath": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\Models.csproj",
+        "packagesPath": "C:\\Users\\hamr9\\.nuget\\packages\\",
+        "outputPath": "D:\\Dorak Back-End\\Dorak-Backend\\Models\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\amgad\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\hamr9\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
