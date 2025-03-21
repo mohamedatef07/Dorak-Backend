@@ -8,7 +8,7 @@ namespace Models.Models
 {
     public class ProviderCertifications
     {
-        public int ID { get; set; }
+        public int ProviderCertificationsID { get; set; }
         public string Certification {  get; set; }
         public int ProviderID { get; set; }
         public virtual Provider Provider { get; set; }

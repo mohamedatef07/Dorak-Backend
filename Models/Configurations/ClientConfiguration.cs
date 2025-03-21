@@ -15,10 +15,13 @@ namespace Models.Configrations
         public void Configure(EntityTypeBuilder<Client> builder)
         {
             //Primary Key
-            builder.HasKey(client => client.ClientId);
+            builder.HasKey(client => client.UserID);
 
             //Relations 
-        
+            builder.HasOne(c => c.User)
+                .WithOne(u => u.Client)
+                .HasForeignKey<Client>(c => c.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
         
             //Properties
             builder.Property(c => c.FirstName)
@@ -44,10 +47,6 @@ namespace Models.Configrations
             builder.Property(c => c.BirthDate)   
                 .HasColumnType("DATE") 
                 .IsRequired();
-
-
-
-
         }
         
 

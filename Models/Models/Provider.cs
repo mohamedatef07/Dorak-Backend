@@ -4,12 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Models.Enums;
+using Models.Models;
 
 namespace Models.Models
 {
     public class Provider
     {
-        public int ProviderId { get; set; }
+        public string UserID { get; set; }
+        public virtual User User { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Specialization { get; set; }

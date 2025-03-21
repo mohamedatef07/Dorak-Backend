@@ -14,10 +14,14 @@ namespace Models.Configrations
         public void Configure(EntityTypeBuilder<Provider> builder)
         {
             //PrimaryKey
-            builder.HasKey(provider=>provider.ProviderId);
-
+            builder.HasKey(provider=>provider.UserID);
 
             //Relations
+            builder.HasOne(p => p.User)
+                .WithOne(u => u.Provider)
+                .HasForeignKey<Provider>(p => p.UserID)
+                .OnDelete(DeleteBehavior.Cascade);
+
             builder.HasMany(p=>p.Certifications)
                 .WithOne(c=>c.Provider)
                 .HasForeignKey(c=>c.ProviderID)
@@ -68,7 +72,7 @@ namespace Models.Configrations
 
             builder.Property(p => p.BirthDate)
                 .HasColumnType("DATE")
-                .IsRequired();
+                .IsRequired(true);
         }
     }
 }

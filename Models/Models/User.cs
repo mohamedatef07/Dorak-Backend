@@ -9,6 +9,9 @@ namespace Models.Models
 {
     public class User : IdentityUser
     {
-         
+        public virtual Client? Client { get; set; }
+        public virtual Provider? Provider { get; set; }
+
+
     }
 }

@@ -9,7 +9,9 @@ namespace Models.Models
 {
     public class Client
     {
-        public int ClientId { get; set; }
+        public string UserID { get; set; }
+        public virtual User User { get; set; }
+        
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public GenderType Gender { get; set; }
@@ -22,7 +24,5 @@ namespace Models.Models
         public DateOnly BirthDate { get; set; }
         public string? Image {  get; set; }
         
-        public int UserID { get; set; }
-        public virtual User User { get; set; }
     }
 }
