@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models.Models;
 
 
-namespace Models.Configrations
+namespace Models.Configurations
 {
-    public class AdminCenterManagementConfigration :IEntityTypeConfiguration<AdminCenterManagement>
+    public class AdminCenterManagementConfiguration :IEntityTypeConfiguration<AdminCenterManagement>
     {
         public void Configure(EntityTypeBuilder<AdminCenterManagement> builder)
         {

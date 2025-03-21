@@ -21,10 +21,10 @@ namespace Models
         //Apply Configurations
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.ApplyConfiguration(new CenterConfigration { });
-            builder.ApplyConfiguration(new CenterServiceConfigration { });
-            builder.ApplyConfiguration(new ServiceConfigration { });
-            builder.ApplyConfiguration(new AdminCenterManagementConfigration { });
+            builder.ApplyConfiguration(new CenterConfiguration { });
+            builder.ApplyConfiguration(new CenterServiceConfiguration { });
+            builder.ApplyConfiguration(new ServiceConfiguration { });
+            builder.ApplyConfiguration(new AdminCenterManagementConfiguration { });
         }
 
     }

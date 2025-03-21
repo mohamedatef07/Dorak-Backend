@@ -6,7 +6,7 @@ using Models.Models;
 
 namespace Models.Configrations
 {
-    public class ServiceConfigration : IEntityTypeConfiguration<Service>
+    public class ServiceConfiguration : IEntityTypeConfiguration<Service>
     {
         public void Configure(EntityTypeBuilder<Service> builder)
         {

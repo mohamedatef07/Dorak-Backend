@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models.Models;
 
 
-namespace Models.Configrations
+namespace Models.Configurations
 {
-    public class CenterServiceConfigration : IEntityTypeConfiguration<CenterService>
+    public class CenterServiceConfiguration : IEntityTypeConfiguration<CenterService>
     {
         public void Configure(EntityTypeBuilder<CenterService> builder)
         {
