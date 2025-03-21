@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Models.Configrations;
+using Models.Configurations;
 using Models.Models;
 
 namespace Models
@@ -12,11 +12,14 @@ namespace Models
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
         public virtual DbSet<CenterService> CenterServices { get; set; }
         public virtual DbSet<Service> Services { get; set; }
+        public virtual DbSet<Appointment> Appointments { get; set; }
+        public virtual DbSet<Shift> Shifts { get; set; }
+        public virtual DbSet<LiveQueue> LiveQueues { get; set; }
 
         //Connect With database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;")
+            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
         }
         //Apply Configurations
         protected override void OnModelCreating(ModelBuilder builder)
@@ -25,6 +28,9 @@ namespace Models
             builder.ApplyConfiguration(new CenterServiceConfiguration { });
             builder.ApplyConfiguration(new ServiceConfiguration { });
             builder.ApplyConfiguration(new AdminCenterManagementConfiguration { });
+            builder.ApplyConfiguration(new LiveQueueConfiguration { });
+            builder.ApplyConfiguration(new AppointmentConfiguration { });
+            builder.ApplyConfiguration(new ShiftConfiguration { });
         }
 
     }
