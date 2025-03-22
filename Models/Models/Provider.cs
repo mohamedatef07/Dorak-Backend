@@ -18,7 +18,7 @@ namespace Models.Models
         public string Description { get; set; }
         public int? ExperienceYears { get; set; }
         public string LicenseNumber {  get; set; }
-        public GenderType Gender { get; set; }
+        public Gender Gender { get; set; }
         public string Address { get; set; }
         //public string Street { get; set; } 
         //public string City { get; set; }   
@@ -31,6 +31,8 @@ namespace Models.Models
         public decimal Rate { get; set; }
 
         public virtual ICollection<ProviderCertifications> Certifications { get; set; }
+
+
 
     }
 }

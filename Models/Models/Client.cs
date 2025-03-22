@@ -14,7 +14,7 @@ namespace Models.Models
         
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public GenderType Gender { get; set; }
+        public Gender Gender { get; set; }
         public string Address { get; set; }
         //public string Street { get; set; } 
         //public string City { get; set; }   

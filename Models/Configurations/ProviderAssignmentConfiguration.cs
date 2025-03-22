@@ -1,3 +1,4 @@
+using System.Reflection.Emit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models.Models;
@@ -12,23 +13,23 @@ namespace Models.Configrations
 
 			builder.HasKey(ProviderAssignment => ProviderAssignment.AssignmentID);
 
-        
-
-
-            builder.HasMany(provider => provider.ProviderAssignments)
-              WithOne(providerAssignment => providerAssignment.Provider)  
-             .HasForeignKey(providerAssignment => providerAssignment.ProviderID)
-
-
-            builder..HasMany(Center => center.ProviderAssignments)
-              .WithOne(providerAssignment => providerAssignment.Center)  
-             .HasForeignKey(providerAssignment => providerAssignment.CenterID)  
 
 
 
+            //Relations
+
+           
 
 
 
+            //Property
+            builder.Property(pa => pa.StartDate)
+               .IsRequired()
+               .HasColumnType("timestamp");
+
+            builder.Property(pa => pa.EndDate)
+                .HasColumnType("timestamp")
+                .IsRequired(false); 
 
 
         }

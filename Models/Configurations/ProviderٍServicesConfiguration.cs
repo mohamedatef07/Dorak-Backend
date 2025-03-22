@@ -1,27 +1,32 @@
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 using Models.Models;
 
-
-namespace Models.Configrations
+namespace Models.Configurations
 {
-    public class ProviderServicesConfiguration : IEntityTypeConfiguration<ProviderServices>
+    public class ProviderServicesConfiguration : IEntityTypeConfiguration<ProviderService>
     {
+
         public void Configure(EntityTypeBuilder<ProviderService> builder)
         {
+            //Primary Key
             builder.HasKey(ProviderServices => ProviderServices.ID);
 
+            //Relations Many To one
+
+;
 
 
-			builder.HasMany(provider => provider.ProviderServices)
-				WithOne(providerService => providerService.Provider)
-			  .HasForeignKey(providerService => providerService.ProviderID) 
-
-			builder.HasMany(service => service.ProviderServices)
-				.WithOne(providerService => providerService.Service)  
-				.HasForeignKey(providerService => providerService.ServiceID)  
+            //Property
+            builder.Property(ps => ps.CustomPrice)
+                   .HasColumnType("decimal(18,2)");
 
 
-		}
-	}
+        }
+    }
 }

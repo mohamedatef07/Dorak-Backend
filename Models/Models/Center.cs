@@ -15,10 +15,12 @@ namespace Models.Models
         public decimal Longitude { get; set; }
         public string MapURL { get; set; }
         public virtual ICollection<AdminCenterManagement> AdminCentersManagement { get; set; }
-        public virtual ICollection<CenterService> CenterServices { get; set; }
 
 
-        
+
+
+
+
 
     }
 }

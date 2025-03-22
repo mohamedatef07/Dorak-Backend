@@ -21,6 +21,8 @@ namespace Models.Configurations
                 .WithOne(centerService => centerService.Center)
                 .HasForeignKey(centerService => centerService.CenterID);
 
+            
+
             //Properties
             builder.Property(center => center.CenterName)
                 .IsRequired(true);

@@ -27,7 +27,11 @@ namespace Models.Configrations
                 .HasForeignKey(c=>c.ProviderID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //Properties
+
+
+            
+
+            //Properties 
             builder.Property(p => p.FirstName)
                 .HasMaxLength(50)
                 .HasColumnName("First Name")
@@ -69,7 +73,7 @@ namespace Models.Configrations
                 .HasColumnName("Gender")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
-
+             
             builder.Property(p => p.BirthDate)
                 .HasColumnType("DATE")
                 .IsRequired(true);

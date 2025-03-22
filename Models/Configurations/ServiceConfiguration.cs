@@ -13,10 +13,9 @@ namespace Models.Configurations
             //Primary Key
             builder.HasKey(service => service.ServiceID);
 
-            //Relations Many To one
-            builder.HasMany(service => service.CenterServices)
-                .WithOne(centerService => centerService.Service)
-                .HasForeignKey(centerService => centerService.ServiceID);
+          
+
+            
 
             //Properties
             builder.Property(service => service.ServiceName).IsRequired(true);
