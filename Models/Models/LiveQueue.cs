@@ -19,7 +19,8 @@ namespace Models.Models
 
 
         /////////////////////////
-        
+        public int OperatorID { get; set; }
+        public virtual Operator Operator { get; set; }
         public virtual Appointment Appointment { get; set; }
     }
 }

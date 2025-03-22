@@ -9,9 +9,9 @@ namespace Models.Models
     public class TemporaryClient
     {
         public int TempClientID {  get; set; }
-        public string ContactInfo { get; set; }
+        public string? ContactInfo { get; set; }
         public string TempCode { get; set; }
 
-        public ICollection<Appointment> Appointments { get; set; }
+        public virtual ICollection<Appointment> Appointments { get; set; }
     }
 }

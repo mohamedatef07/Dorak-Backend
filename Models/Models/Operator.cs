@@ -7,20 +7,16 @@ using Models.Enums;
 
 namespace Models.Models
 {
-    public class Client
+    public class Operator
     {
-        public string ClientID { get; set; }
+        public string OperatorID { get; set; }
         public virtual User User { get; set; }
-        
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public Gender Gender { get; set; }
-        public string? Street { get; set; }
-        public string? City { get; set; }
-        public string? Governorate { get; set; }
-        public string? Country { get; set; }
-        public DateOnly BirthDate { get; set; }
-        public string? Image {  get; set; }
-        
+        public string? Image { get; set; }
+        public virtual ICollection<LiveQueue> LiveQueues { get; set; }
+        public virtual ICollection<Shift> Shifts { get; set; }
+        public virtual ICollection<Appointment> Appointments { get; set; }
     }
 }

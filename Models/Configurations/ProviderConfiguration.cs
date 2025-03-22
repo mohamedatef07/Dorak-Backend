@@ -14,18 +14,29 @@ namespace Models.Configrations
         public void Configure(EntityTypeBuilder<Provider> builder)
         {
             //PrimaryKey
-            builder.HasKey(provider=>provider.UserID);
+            builder.HasKey(provider=>provider.ProviderID);
 
             //Relations
             builder.HasOne(p => p.User)
                 .WithOne(u => u.Provider)
-                .HasForeignKey<Provider>(p => p.UserID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey<Provider>(p => p.ProviderID);
 
             builder.HasMany(p=>p.Certifications)
                 .WithOne(c=>c.Provider)
                 .HasForeignKey(c=>c.ProviderID)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(p => p.ProviderAssignments)
+                .WithOne(pa => pa.Provider)
+                .HasForeignKey(pa => pa.ProviderID);
+
+            builder.HasMany(p => p.ProviderServices)
+                .WithOne(ps => ps.Provider)
+                .HasForeignKey(ps => ps.ProviderID);
+
+            builder.HasMany(p => p.Appointments)
+                .WithOne(app => app.Provider)
+                .HasForeignKey(app => app.ProviderId);
 
             //Properties
             builder.Property(p => p.FirstName)
@@ -47,13 +58,12 @@ namespace Models.Configrations
                 .IsRequired(true);
 
             builder.Property(p => p.Description)
-                .HasMaxLength(500)
+                .HasMaxLength(1000)
                 .HasColumnName("Description")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
             builder.Property(p => p.ExperienceYears)
-                .HasMaxLength(500)
                 .HasColumnName("Experience Years")
                 .HasColumnType("INT")
                 .IsRequired(false);
