@@ -21,6 +21,10 @@ namespace Models.Configurations
                 .WithOne(centerService => centerService.Center)
                 .HasForeignKey(centerService => centerService.CenterID);
 
+            builder.HasMany(center => center.ProviderAssignments)
+                .WithOne(provderAssignment => provderAssignment.Center)
+                .HasForeignKey(provderAssignment => provderAssignment.CenterID);
+
             //Properties
             builder.Property(center => center.CenterName)
                 .IsRequired(true);
@@ -42,8 +46,6 @@ namespace Models.Configurations
 
             builder.Property(center => center.Longitude)
                 .IsRequired(false);
-
-
         }
     }
 }
