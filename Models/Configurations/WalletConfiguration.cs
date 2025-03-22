@@ -17,7 +17,7 @@ namespace Models.Configurations
                 .WithOne(c => c.Wallet)
                 .HasForeignKey<Wallet>(w => w.ClientID);
 
-            ///Properties
+            //Properties
             builder.Property(wallet => wallet.Balance)
                 .IsRequired(true);
 
