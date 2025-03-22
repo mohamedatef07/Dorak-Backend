@@ -18,6 +18,8 @@ namespace Models
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Wallet> Wallets { get; set; }
+        public virtual DbSet<ProviderServices> ProviderServices { get; set }
+        public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set }
 
         //Connect With database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -37,6 +39,9 @@ namespace Models
             builder.ApplyConfiguration(new PaymentConfiguration { });
             builder.ApplyConfiguration(new NotificationConfiguration { });
             builder.ApplyConfiguration(new WalletConfiguration { });
+            builder.ApplyConfiguration(new ProviderAssignmentConfiguration { });
+            builder.ApplyConfiguration(new ProviderServicesConfiguration { });
+
         }
 
     }
