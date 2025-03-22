@@ -2,8 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Models.Models;
 
-
-
 namespace Models.Configurations
 {
     public class ServiceConfiguration : IEntityTypeConfiguration<Service>
@@ -16,6 +14,13 @@ namespace Models.Configurations
           
 
             
+
+            builder.HasMany(service => service.ProviderServices)
+                .WithOne(providerService => providerService.Service)
+                .HasForeignKey(providerService => providerService.ProviderID);
+            builder.HasMany(service => service.Appointments)
+                .WithOne(appointment => appointment.Service)
+                .HasForeignKey(appointment => appointment.ServiceId);
 
             //Properties
             builder.Property(service => service.ServiceName).IsRequired(true);

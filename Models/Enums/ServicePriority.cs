@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Models.Enums
+﻿namespace Models.Enums
 {
     public enum ServicePriority
     {
