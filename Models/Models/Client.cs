@@ -11,7 +11,6 @@ namespace Models.Models
     {
         public string UserID { get; set; }
         public virtual User User { get; set; }
-        
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public GenderType Gender { get; set; }

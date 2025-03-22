@@ -1,7 +1,4 @@
-﻿using System;
-
-
-namespace Models.Models
+﻿namespace Models.Models
 {
     public class CenterService
     {

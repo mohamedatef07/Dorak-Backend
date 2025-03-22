@@ -12,7 +12,7 @@ namespace Models.Configurations
             //Primary Key
             builder.HasKey(center => center.CenterID);
 
-            //Relations Many To one
+            //Relations One to Many
             builder.HasMany(center => center.AdminCentersManagement)
                 .WithOne(AdminCenterManagement => AdminCenterManagement.Center)
                 .HasForeignKey(AdminCenterManagement => AdminCenterManagement.CenterID);
@@ -21,14 +21,17 @@ namespace Models.Configurations
                 .WithOne(centerService => centerService.Center)
                 .HasForeignKey(centerService => centerService.CenterID);
 
+            builder.HasMany(center => center.ProviderAssignments)
+                .WithOne(provderAssignment => provderAssignment.Center)
+                .HasForeignKey(provderAssignment => provderAssignment.CenterID);
+
             //Properties
             builder.Property(center => center.CenterName)
+                .HasMaxLength(50)
+                .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
             builder.Property(center => center.ContactNumber)
-                .IsRequired(true);
-
-            builder.Property(center => center.Address)
                 .IsRequired(true);
 
             builder.Property(center => center.WebsiteURL)
@@ -42,8 +45,6 @@ namespace Models.Configurations
 
             builder.Property(center => center.Longitude)
                 .IsRequired(false);
-
-
         }
     }
 }

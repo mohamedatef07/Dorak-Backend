@@ -1,8 +1,9 @@
 ﻿namespace Models.Enums
 {
-    public enum ServicePriority
+    public enum GenderType
     {
         none,
-
+        Male,
+        Female
     }
 }
