@@ -12,7 +12,7 @@ namespace Models.Configurations
             //Primary Key
             builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementID);
 
-            // Relations
+            // Relations Many to One
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)
                 .WithMany(user => user.AdminCentersManagement)
                 .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminID);

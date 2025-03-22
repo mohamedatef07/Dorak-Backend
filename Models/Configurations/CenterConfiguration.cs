@@ -12,7 +12,7 @@ namespace Models.Configurations
             //Primary Key
             builder.HasKey(center => center.CenterID);
 
-            //Relations Many To one
+            //Relations One to Many
             builder.HasMany(center => center.AdminCentersManagement)
                 .WithOne(AdminCenterManagement => AdminCenterManagement.Center)
                 .HasForeignKey(AdminCenterManagement => AdminCenterManagement.CenterID);
@@ -27,12 +27,11 @@ namespace Models.Configurations
 
             //Properties
             builder.Property(center => center.CenterName)
+                .HasMaxLength(50)
+                .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
             builder.Property(center => center.ContactNumber)
-                .IsRequired(true);
-
-            builder.Property(center => center.Address)
                 .IsRequired(true);
 
             builder.Property(center => center.WebsiteURL)

@@ -11,26 +11,6 @@ namespace Models.Configrations
 		{
 
 			builder.HasKey(ProviderAssignment => ProviderAssignment.AssignmentID);
-
-        
-
-
-            builder.HasMany(provider => provider.ProviderAssignments)
-              WithOne(providerAssignment => providerAssignment.Provider)  
-             .HasForeignKey(providerAssignment => providerAssignment.ProviderID)
-
-
-            builder..HasMany(Center => center.ProviderAssignments)
-              .WithOne(providerAssignment => providerAssignment.Center)  
-             .HasForeignKey(providerAssignment => providerAssignment.CenterID)  
-
-
-
-
-
-
-
-
         }
 	}
 }

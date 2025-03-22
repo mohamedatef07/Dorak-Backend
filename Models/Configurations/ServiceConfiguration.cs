@@ -11,7 +11,7 @@ namespace Models.Configurations
             //Primary Key
             builder.HasKey(service => service.ServiceID);
 
-            //Relations Many To one
+            //Relations One to One
             builder.HasMany(service => service.CenterServices)
                 .WithOne(centerService => centerService.Service)
                 .HasForeignKey(centerService => centerService.ServiceID);
@@ -19,6 +19,7 @@ namespace Models.Configurations
             builder.HasMany(service => service.ProviderServices)
                 .WithOne(providerService => providerService.Service)
                 .HasForeignKey(providerService => providerService.ProviderID);
+
             builder.HasMany(service => service.Appointments)
                 .WithOne(appointment => appointment.Service)
                 .HasForeignKey(appointment => appointment.ServiceId);
