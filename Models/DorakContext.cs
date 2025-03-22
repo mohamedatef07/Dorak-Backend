@@ -25,7 +25,8 @@ namespace Models
         public virtual DbSet<Provider> Providers { get; set; }
         public virtual DbSet<ProviderCertifications> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
-
+        public virtual DbSet<Operator> Operators { get; set; }
+        
         //Connect With database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -50,7 +51,7 @@ namespace Models
             builder.ApplyConfiguration(new ProviderConfiguration { });
             builder.ApplyConfiguration(new ClientConfiguration { });
             builder.ApplyConfiguration(new TemporaryClientConfiguration { });
-
+            builder.ApplyConfiguration(new OperatorConfiguration { });
             base.OnModelCreating(builder);
         }
 

@@ -12,13 +12,17 @@ namespace Models.Configurations
             builder.HasKey(payment => payment.PaymentID);
 
             //Relations Many To one
-            builder.HasOne(p => p.Client)
-                .WithMany(c => c.Payments)
-                .HasForeignKey(p => p.ClientID);
+            builder.HasOne(payment => payment.Client)
+                .WithMany(user => user.Payments)
+                .HasForeignKey(payment => payment.ClientID);
 
-            builder.HasOne(p => p.Appointment)
-                .WithMany(a => a.Payments)
-                .HasForeignKey(p => p.AppointmentID);
+            builder.HasMany(payment=> payment.Notifications)
+                .WithOne(notification=>notification.Payment)
+                .HasForeignKey(notification=>notification.PaymentID);
+
+            builder.HasOne(payment => payment.Appointment)
+                .WithOne(appointment => appointment.Payment)
+                .HasForeignKey<Payment>(p => p.AppointmentID);
 
             //Properties
             builder.Property(payment => payment.Amount)

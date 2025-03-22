@@ -7,6 +7,7 @@ namespace Models.Models
         public int ProviderID { get; set; }
         public Provider Provider { get; set; }
         public int ServiceID { get; set; }
+        public int ServiceID { get; set; }
         public Service Service { get; set; }
     }
 }

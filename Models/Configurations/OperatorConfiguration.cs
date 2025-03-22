@@ -1,36 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore;
 using Models.Models;
 
-namespace Models.Configrations
+namespace Models.Configurations
 {
-    public class ClientConfiguration : IEntityTypeConfiguration<Client>
+    public class OperatorConfiguration : IEntityTypeConfiguration<Operator>
     {
-        public void Configure(EntityTypeBuilder<Client> builder)
+        public void Configure(EntityTypeBuilder<Operator> builder)
         {
             //Primary Key
-            builder.HasKey(client => client.ClientID);
+            builder.HasKey(oper => oper.OperatorID);
 
             //Relations 
-            builder.HasOne(c => c.User)
-                .WithOne(u => u.Client)
-                .HasForeignKey<Client>(c => c.ClientID)
+            builder.HasOne(o => o.User)
+                .WithOne(u => u.Operator)
+                .HasForeignKey<Operator>(o => o.OperatorID)
                 .OnDelete(DeleteBehavior.NoAction);
-        
+
+            builder.HasMany(o => o.Shifts)
+                .WithOne(s => s.Operator)
+                .HasForeignKey(s => s.OperatorId);
+
+            builder.HasMany(o => o.LiveQueues)
+                .WithOne(lq => lq.Operator)
+                .HasForeignKey(lq => lq.OperatorID);
+
+            builder.HasMany(o => o.Appointments)
+                .WithOne(a => a.Operator)
+                .HasForeignKey(a => a.OperatorId);
+
             //Properties
             builder.Property(c => c.FirstName)
                 .HasMaxLength(50)
                 .HasColumnName("First Name")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
-            
-            
+
+
             builder.Property(c => c.LastName)
                 .HasMaxLength(50)
                 .HasColumnName("Last Name")
@@ -42,14 +53,8 @@ namespace Models.Configrations
                 .HasColumnName("Gender")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
-            
-            
-            builder.Property(c => c.BirthDate)   
-                .HasColumnType("DATE") 
-                .IsRequired();
-        }
-        
 
-        
+        }
     }
-}
+
+    }

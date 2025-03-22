@@ -13,6 +13,6 @@ namespace Models.Models
         public string AdminID { get; set; }
         public virtual User Admin { get; set; }
         public int CenterID { get; set; }
-        public virtual Center Center { get; set; }
+        public virtual Center? Center { get; set; }
     }
 }

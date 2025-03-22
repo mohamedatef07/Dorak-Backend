@@ -19,7 +19,7 @@ namespace Models.Configurations
             //Relations Many To one
             builder.HasMany(tempclient => tempclient.Appointments)
                 .WithOne(Appointment => Appointment.TemporaryClient)
-                .HasForeignKey(Appointment => Appointment.TemporaryClientID);
+                .HasForeignKey(Appointment => Appointment.TemporaryClientId);
 
             //Properties
             builder.Property(tempclient => tempclient.ContactInfo)
