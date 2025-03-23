@@ -15,7 +15,7 @@ namespace Models.Configurations
             // Relations Many to One
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)
                 .WithMany(user => user.AdminCentersManagement)
-                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminID);
+                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminId);
         }
     }
 }
