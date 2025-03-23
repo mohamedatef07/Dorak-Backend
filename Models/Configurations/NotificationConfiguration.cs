@@ -10,12 +10,12 @@ namespace Models.Configurations
         {
 
             //Primary Key
-            builder.HasKey(notification => notification.NotificationID);
+            builder.HasKey(notification => notification.NotificationId);
 
             //Relations Many To one
             builder.HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.UserID);
+                .HasForeignKey(n => n.UserId);
 
             //Properties
             builder.Property(notification => notification.Title)

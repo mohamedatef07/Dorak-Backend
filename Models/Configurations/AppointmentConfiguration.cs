@@ -15,7 +15,7 @@ namespace Models.Configurations
             //One-to-Many Relations 
             builder.HasMany(Appointment => Appointment.Notifications)
                    .WithOne(Notifcation => Notifcation.Appointment)
-                   .HasForeignKey(Notifcation => Notifcation.AppointmentID);
+                   .HasForeignKey(Notifcation => Notifcation.AppointmentId);
 
             //One-to-One Relations 
             builder.HasOne(Appointment => Appointment.Service)

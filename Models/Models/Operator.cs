@@ -9,15 +9,14 @@ namespace Models.Models
 {
     public class Operator
     {
-        public string OperatorID { get; set; }
+        public string OperatorId { get; set; }
         public virtual User User { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Gender Gender { get; set; }
+        public GenderType Gender { get; set; }
         public string? Image { get; set; }
         public virtual ICollection<LiveQueue> LiveQueues { get; set; }
         public virtual ICollection<Shift> Shifts { get; set; }
         public virtual ICollection<Appointment> Appointments { get; set; }
-        //Operator comment
     }
 }

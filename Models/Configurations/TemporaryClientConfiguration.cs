@@ -14,7 +14,7 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<TemporaryClient> builder)
         {
             //Primary Key
-            builder.HasKey(tempclient => tempclient.TempClientID);
+            builder.HasKey(tempclient => tempclient.TempClientId);
 
             //Relations Many To one
             builder.HasMany(tempclient => tempclient.Appointments)

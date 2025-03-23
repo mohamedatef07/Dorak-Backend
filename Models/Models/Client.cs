@@ -9,11 +9,11 @@ namespace Models.Models
 {
     public class Client
     {
-        public string ClientID { get; set; }
+        public string ClientId { get; set; }
         public virtual User User { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Gender Gender { get; set; }
+        public GenderType Gender { get; set; }
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }

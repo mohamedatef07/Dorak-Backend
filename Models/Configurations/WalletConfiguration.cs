@@ -10,18 +10,16 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<Wallet> builder)
         {
             //Primary Key
-            builder.HasKey(wallet => wallet.WalletID);
+            builder.HasKey(wallet => wallet.WalletId);
 
             //Relations One To one
             builder.HasOne(w => w.Client)
                 .WithOne(c => c.Wallet)
-                .HasForeignKey<Wallet>(w => w.ClientID);
+                .HasForeignKey<Wallet>(w => w.ClientId);
 
             //Properties
             builder.Property(wallet => wallet.Balance)
                 .IsRequired(true);
-
-
         }
     }
 }

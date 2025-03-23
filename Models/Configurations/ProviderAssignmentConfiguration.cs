@@ -10,7 +10,7 @@ namespace Models.Configrations
 		public void Configure(EntityTypeBuilder<ProviderAssignment> builder)
 		{
 
-			builder.HasKey(ProviderAssignment => ProviderAssignment.AssignmentID);
+			builder.HasKey(ProviderAssignment => ProviderAssignment.AssignmentId);
         }
 	}
 }

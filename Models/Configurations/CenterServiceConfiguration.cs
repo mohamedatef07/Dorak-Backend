@@ -10,7 +10,7 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<CenterService> builder)
         {
             //Primary Key
-            builder.HasKey(centerService => centerService.CenterServiceID);
+            builder.HasKey(centerService => centerService.CenterServiceId);
         }
     }
 }

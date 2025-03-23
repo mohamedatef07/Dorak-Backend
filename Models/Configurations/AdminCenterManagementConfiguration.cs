@@ -10,7 +10,7 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<AdminCenterManagement> builder)
         {
             //Primary Key
-            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementID);
+            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementId);
 
             // Relations Many to One
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)

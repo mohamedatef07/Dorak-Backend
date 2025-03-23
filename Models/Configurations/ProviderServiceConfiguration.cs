@@ -9,7 +9,7 @@ namespace Models.Configrations
     {
         public void Configure(EntityTypeBuilder<ProviderService> builder)
         {
-            builder.HasKey(ProviderServices => ProviderServices.ID);
+            builder.HasKey(ProviderServices => ProviderServices.ProviderServiceId);
 		}
 	}
 }

@@ -2,10 +2,10 @@
 {
     public class CenterService
     {
-        public int CenterServiceID { get; set; }
-        public int CenterID { get; set; }
+        public int CenterServiceId { get; set; }
+        public int CenterId { get; set; }
         public virtual Center Center { get; set; }
-        public int ServiceID { get; set; }
+        public int ServiceId { get; set; }
         public virtual Service Service { get; set; }
     }
 }
