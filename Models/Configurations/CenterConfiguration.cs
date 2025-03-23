@@ -15,7 +15,7 @@ namespace Models.Configurations
             //Relations One to Many
             builder.HasMany(center => center.AdminCentersManagement)
                 .WithOne(AdminCenterManagement => AdminCenterManagement.Center)
-                .HasForeignKey(AdminCenterManagement => AdminCenterManagement.CenterID);
+                .HasForeignKey(AdminCenterManagement => AdminCenterManagement.CenterId);
 
             builder.HasMany(center => center.CenterServices)
                 .WithOne(centerService => centerService.Center)
