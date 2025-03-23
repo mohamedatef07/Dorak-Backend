@@ -15,12 +15,12 @@ namespace Models.Configrations
         public void Configure(EntityTypeBuilder<Client> builder)
         {
             //Primary Key
-            builder.HasKey(client => client.ClientID);
+            builder.HasKey(client => client.ClientId);
 
             //Relations 
             builder.HasOne(c => c.User)
                 .WithOne(u => u.Client)
-                .HasForeignKey<Client>(c => c.ClientID)
+                .HasForeignKey<Client>(c => c.ClientId)
                 .OnDelete(DeleteBehavior.NoAction);
         
             //Properties

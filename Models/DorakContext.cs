@@ -23,7 +23,7 @@ namespace Models
         public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Provider> Providers { get; set; }
-        public virtual DbSet<ProviderCertifications> ProviderCertifications { get; set; }
+        public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
         

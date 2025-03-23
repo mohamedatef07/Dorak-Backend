@@ -4,13 +4,13 @@ namespace Models.Models
 { 
     public class ProviderAssignment
     {
-        public int AssignmentID { get; set; }
+        public int AssignmentId { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; } 
         public ProviderType AssignmentType { get; set; }
-        public int ProviderID { get; set; }
+        public string ProviderId { get; set; }
         public Provider Provider { get; set; }
-        public int CenterID { get; set; }
+        public int CenterId { get; set; }
         public Center Center { get; set; }
     }
 

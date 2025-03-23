@@ -14,12 +14,12 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<Operator> builder)
         {
             //Primary Key
-            builder.HasKey(oper => oper.OperatorID);
+            builder.HasKey(oper => oper.OperatorId);
 
             //Relations 
             builder.HasOne(o => o.User)
                 .WithOne(u => u.Operator)
-                .HasForeignKey<Operator>(o => o.OperatorID)
+                .HasForeignKey<Operator>(o => o.OperatorId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(o => o.Shifts)
@@ -28,7 +28,7 @@ namespace Models.Configurations
 
             builder.HasMany(o => o.LiveQueues)
                 .WithOne(lq => lq.Operator)
-                .HasForeignKey(lq => lq.OperatorID);
+                .HasForeignKey(lq => lq.OperatorId);
 
             builder.HasMany(o => o.Appointments)
                 .WithOne(a => a.Operator)

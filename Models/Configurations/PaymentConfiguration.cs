@@ -9,27 +9,27 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<Payment> builder)
         {
             //Primary Key
-            builder.HasKey(payment => payment.PaymentID);
+            builder.HasKey(payment => payment.PaymentId);
 
             //Relations Many To one
             builder.HasOne(payment => payment.Client)
                 .WithMany(user => user.Payments)
-                .HasForeignKey(payment => payment.ClientID);
+                .HasForeignKey(payment => payment.ClientId);
 
             builder.HasMany(payment=> payment.Notifications)
                 .WithOne(notification=>notification.Payment)
-                .HasForeignKey(notification=>notification.PaymentID);
+                .HasForeignKey(notification=>notification.PaymentId);
 
             builder.HasOne(payment => payment.Appointment)
                 .WithOne(appointment => appointment.Payment)
-                .HasForeignKey<Payment>(p => p.AppointmentID);
+                .HasForeignKey<Payment>(p => p.AppointmentId);
 
             //Properties
             builder.Property(payment => payment.Amount)
                 .IsRequired(true);
             builder.Property(payment => payment.PaymentMethod)
                 .IsRequired(true);
-            builder.Property(payment => payment.TransactionID)
+            builder.Property(payment => payment.TransactionId)
                 .IsRequired(true);
             builder.Property(payment => payment.PaymentStatus)
                 .IsRequired(true);

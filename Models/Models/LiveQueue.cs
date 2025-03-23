@@ -16,10 +16,7 @@ namespace Models.Models
         public int EstimatedDuration { get; set; }
         public string Status {  get; set; }
         public int Capacity { get; set; }
-
-
-        /////////////////////////
-        public int OperatorID { get; set; }
+        public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
         public virtual Appointment Appointment { get; set; }
     }

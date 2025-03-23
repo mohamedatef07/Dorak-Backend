@@ -14,25 +14,25 @@ namespace Models.Configrations
         public void Configure(EntityTypeBuilder<Provider> builder)
         {
             //PrimaryKey
-            builder.HasKey(provider=>provider.ProviderID);
+            builder.HasKey(provider=>provider.ProviderId);
 
             //Relations
             builder.HasOne(p => p.User)
                 .WithOne(u => u.Provider)
-                .HasForeignKey<Provider>(p => p.ProviderID);
+                .HasForeignKey<Provider>(p => p.ProviderId);
 
             builder.HasMany(p=>p.Certifications)
                 .WithOne(c=>c.Provider)
-                .HasForeignKey(c=>c.ProviderID)
+                .HasForeignKey(c=>c.ProviderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(p => p.ProviderAssignments)
                 .WithOne(pa => pa.Provider)
-                .HasForeignKey(pa => pa.ProviderID);
+                .HasForeignKey(pa => pa.ProviderId);
 
             builder.HasMany(p => p.ProviderServices)
                 .WithOne(ps => ps.Provider)
-                .HasForeignKey(ps => ps.ProviderID);
+                .HasForeignKey(ps => ps.ProviderId);
 
             builder.HasMany(p => p.Appointments)
                 .WithOne(app => app.Provider)
@@ -41,19 +41,17 @@ namespace Models.Configrations
             //Properties
             builder.Property(p => p.FirstName)
                 .HasMaxLength(50)
-                .HasColumnName("First Name")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
-            builder.Property(p => p.FirstName)
+            builder.Property(p => p.LastName)
                 .HasMaxLength(50)
-                .HasColumnName("Last Name")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
             builder.Property(p => p.Specialization)
                 .HasMaxLength(50)
-                .HasColumnName("Last Name")
+                .HasColumnName("Specialization")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
@@ -64,13 +62,11 @@ namespace Models.Configrations
                 .IsRequired(true);
 
             builder.Property(p => p.ExperienceYears)
-                .HasColumnName("Experience Years")
                 .HasColumnType("INT")
                 .IsRequired(false);
 
             builder.Property(p => p.LicenseNumber)
                 .HasMaxLength(20)
-                .HasColumnName("License Number")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
             

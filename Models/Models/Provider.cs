@@ -4,7 +4,7 @@ namespace Models.Models
 {
     public class Provider
     {
-        public string ProviderID { get; set; }
+        public string ProviderId { get; set; }
         public virtual User User { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -12,7 +12,7 @@ namespace Models.Models
         public string Description { get; set; }
         public int? ExperienceYears { get; set; }
         public string LicenseNumber {  get; set; }
-        public Gender Gender { get; set; }
+        public GenderType Gender { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
         public string Governorate { get; set; }
@@ -22,8 +22,7 @@ namespace Models.Models
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
         public decimal Rate { get; set; }
-
-        public virtual ICollection<ProviderCertifications> Certifications { get; set; }
+        public virtual ICollection<ProviderCertification> Certifications { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
         public virtual ICollection<ProviderService> ProviderServices { get; set; }
         public virtual ICollection<Appointment> Appointments { get; set; } 

@@ -9,18 +9,12 @@ using Models.Models;
 
 namespace Models.Configurations
 {
-    public class ProviderCertificationsConfiguration : IEntityTypeConfiguration<ProviderCertifications>
+    public class ProviderCertificationsConfiguration : IEntityTypeConfiguration<ProviderCertification>
     {
-        public void Configure(EntityTypeBuilder<ProviderCertifications> builder)
+        public void Configure(EntityTypeBuilder<ProviderCertification> builder)
         {
             //Primary Key
-            builder.HasKey(providercertifications => providercertifications.ProviderCertificationsID);
-
-            //Relations
-
-            //Properties
-
-
+            builder.HasKey(providercertifications => providercertifications.ProviderCertificationsId);
         }
 
     }

@@ -10,7 +10,7 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<Center> builder)
         {
             //Primary Key
-            builder.HasKey(center => center.CenterID);
+            builder.HasKey(center => center.CenterId);
 
             //Relations One to Many
             builder.HasMany(center => center.AdminCentersManagement)
@@ -19,11 +19,11 @@ namespace Models.Configurations
 
             builder.HasMany(center => center.CenterServices)
                 .WithOne(centerService => centerService.Center)
-                .HasForeignKey(centerService => centerService.CenterID);
+                .HasForeignKey(centerService => centerService.CenterId);
 
             builder.HasMany(center => center.ProviderAssignments)
                 .WithOne(provderAssignment => provderAssignment.Center)
-                .HasForeignKey(provderAssignment => provderAssignment.CenterID);
+                .HasForeignKey(provderAssignment => provderAssignment.CenterId);
 
             //Properties
             builder.Property(center => center.CenterName)
@@ -32,18 +32,14 @@ namespace Models.Configurations
                 .IsRequired(true);
 
             builder.Property(center => center.ContactNumber)
+                .HasMaxLength(25)
+                .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
             builder.Property(center => center.WebsiteURL)
                 .IsRequired(false);
 
             builder.Property(center => center.MapURL)
-                .IsRequired(false);
-
-            builder.Property(center => center.Latitude)
-                .IsRequired(false);
-
-            builder.Property(center => center.Longitude)
                 .IsRequired(false);
         }
     }

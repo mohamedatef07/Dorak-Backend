@@ -9,20 +9,16 @@ namespace Models.Configurations
         public void Configure(EntityTypeBuilder<Service> builder)
         {
             //Primary Key
-            builder.HasKey(service => service.ServiceID);
+            builder.HasKey(service => service.ServiceId);
 
             //Relations One to One
             builder.HasMany(service => service.CenterServices)
                 .WithOne(centerService => centerService.Service)
-                .HasForeignKey(centerService => centerService.ServiceID);
+                .HasForeignKey(centerService => centerService.ServiceId);
 
             builder.HasMany(service => service.ProviderServices)
                 .WithOne(providerService => providerService.Service)
-                .HasForeignKey(providerService => providerService.ProviderID);
-
-            builder.HasMany(service => service.Appointments)
-                .WithOne(appointment => appointment.Service)
-                .HasForeignKey(appointment => appointment.ServiceId);
+                .HasForeignKey(providerService => providerService.ServiceId);
 
             //Properties
             builder.Property(service => service.ServiceName).IsRequired(true);
