@@ -28,6 +28,8 @@ namespace Dorak.Models
 
             builder.Property(service => service.BasePrice).IsRequired(true);
 
+            builder.Property(service => service.IsDeleted).HasDefaultValue(false);
+
         }
     }
 }

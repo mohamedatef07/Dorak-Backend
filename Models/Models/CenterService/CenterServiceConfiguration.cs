@@ -10,6 +10,9 @@ namespace Dorak.Models
         {
             //Primary Key
             builder.HasKey(centerService => centerService.CenterServiceId);
+
+            //Properties
+            builder.Property(centerService => centerService.IsDeleted).HasDefaultValue(false);
         }
     }
 }

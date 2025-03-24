@@ -40,6 +40,9 @@ namespace Dorak.Models
 
             builder.Property(center => center.MapURL)
                 .IsRequired(false);
+
+            builder.Property(center => center.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 }
