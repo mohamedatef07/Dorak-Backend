@@ -1,6 +1,8 @@
-﻿namespace Repositories
+﻿using Dorak.Models;
+
+namespace Repositories
 {
-    public class ProviderRepository
+    public class ProviderRepository : BaseRepository<Provider>
     {
     }
 }

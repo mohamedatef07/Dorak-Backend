@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace Models
+namespace Data
 {
     public class DorakContext : IdentityDbContext<User>
     {
@@ -53,6 +53,5 @@ namespace Models
             builder.ApplyConfiguration(new OperatorConfiguration { });
             base.OnModelCreating(builder);
         }
-
     }
 }
