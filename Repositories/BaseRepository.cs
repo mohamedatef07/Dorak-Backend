@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Repositories
 {
-    public abstract class BaseRepository<T> where T : class
+    public class BaseRepository<T> where T : class
     {
         protected readonly DorakContext DbContext;
         protected DbSet<T> Table;
