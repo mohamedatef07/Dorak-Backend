@@ -9,10 +9,5 @@ namespace Repositories
         {
             
         }
-        public bool AssignProviderToCenter(int providerId, int centerId)
-        {
-            return true;
-        }
-
     }
 }
