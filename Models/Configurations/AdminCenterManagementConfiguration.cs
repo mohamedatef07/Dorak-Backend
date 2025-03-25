@@ -1,24 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Models.Models;
 
 
-namespace Dorak.Models
+namespace Models.Configurations
 {
     public class AdminCenterManagementConfiguration : IEntityTypeConfiguration<AdminCenterManagement>
     {
         public void Configure(EntityTypeBuilder<AdminCenterManagement> builder)
         {
             //Primary Key
-            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementId);
+            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementID);
 
-            // Relations Many to One
+            // Relations
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)
                 .WithMany(user => user.AdminCentersManagement)
-                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminId);
-
-            //Properties
-            builder.Property(adminCenterManagement => adminCenterManagement.IsDeleted)
-                .HasDefaultValue(false);
+                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminID);
         }
     }
 }

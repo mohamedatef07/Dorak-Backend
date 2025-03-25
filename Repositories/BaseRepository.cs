@@ -18,6 +18,7 @@ namespace Repositories
             dbContext = _dbContext;
             Table = dbContext.Set<T>();
         }
+      
         public void Add(T entity)
         {
             Table.Add(entity);
@@ -34,6 +35,7 @@ namespace Repositories
         {
             await dbContext.SaveChangesAsync();
         }
+
         public async Task<T> GetByIdAsync(Expression<Func<T, bool>> predicate)
         {
             return await Table.FirstOrDefaultAsync(predicate);

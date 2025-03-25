@@ -20,6 +20,7 @@ namespace Dorak.Models
                 .HasForeignKey(c=>c.ProviderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+<<<<<<< HEAD:Models/Models/Provider/ProviderConfiguration.cs
             builder.HasMany(p => p.ProviderAssignments)
                 .WithOne(pa => pa.Provider)
                 .HasForeignKey(pa => pa.ProviderId);
@@ -33,6 +34,13 @@ namespace Dorak.Models
                 .HasForeignKey(app => app.ProviderId);
 
             //Properties
+=======
+
+
+            
+
+            //Properties 
+>>>>>>> 511f5ff87e7b2e02e673bbed0b71bd85335f9958:Models/Configurations/ProviderConfiguration.cs
             builder.Property(p => p.FirstName)
                 .HasMaxLength(50)
                 .HasColumnType("NVARCHAR")
@@ -69,7 +77,7 @@ namespace Dorak.Models
                 .HasColumnName("Gender")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
-
+             
             builder.Property(p => p.BirthDate)
                 .HasColumnType("DATE")
                 .IsRequired(true);
