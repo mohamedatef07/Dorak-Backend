@@ -15,6 +15,10 @@ namespace Dorak.Models
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)
                 .WithMany(user => user.AdminCentersManagement)
                 .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminId);
+
+            //Properties
+            builder.Property(adminCenterManagement => adminCenterManagement.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 }

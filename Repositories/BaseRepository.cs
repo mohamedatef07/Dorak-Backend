@@ -18,28 +18,24 @@ namespace Repositories
             DbContext = dbContext;
             Table = DbContext.Set<T>();
         }
-
         // add 
         public async Task AddAsync(T entity)
         {
             await Table.AddAsync(entity);
             await DbContext.SaveChangesAsync();
         }
-
         // update
         public async Task EditAsync(T entity)
         {
             Table.Update(entity);
             await DbContext.SaveChangesAsync();
         }
-
         // delete
         public async Task DeleteAsync(T entity)
         {
             Table.Remove(entity);
             await DbContext.SaveChangesAsync();
         }
-
         // read
         public async Task<T> GetByIdAsync(Expression<Func<T, bool>> predicate)
         {
