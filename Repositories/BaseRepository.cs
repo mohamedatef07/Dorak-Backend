@@ -60,7 +60,6 @@ namespace Repositories
             }
 
             // order by
-
             var entityType = typeof(T);
             var property = entityType.GetProperty(Order_ColName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
