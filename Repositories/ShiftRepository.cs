@@ -16,9 +16,5 @@ namespace Dorak.Models.Models.Wallet
             //context = _context;
         }
 
-        public void add (Shift shift)
-        {
-            
-        }
 }
 }

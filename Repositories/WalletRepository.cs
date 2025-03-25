@@ -11,7 +11,7 @@ namespace Repositories
 {
     public class WalletRepository : BaseRepository<Wallet>
     {
-        public DorakContext context;
+        
         public WalletRepository(DorakContext _context) : base(_context)
         { 
             context = _context;
@@ -19,12 +19,12 @@ namespace Repositories
 
         public async Task<Wallet> GetWalletByUserId(string walletId)
         {
-            return await base.table.FirstOrDefaultAsync(w=>w.UserId == walletId);
+            return await base.Table.get(w=>w.UserId == walletId);
         }
 
         public async Task<bool> IncreaseBalance(string walletId, decimal amount)
         {
-            var wallet = await context.Wallets.FindAsync(walletId);
+            var wallet = await base..FindAsync(walletId);
 
             if (wallet == null) return false;
 
