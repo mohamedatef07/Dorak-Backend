@@ -39,7 +39,6 @@ namespace Repositories
         {
             await dbContext.SaveChangesAsync();
         }
-
         public async Task<T> GetByIdAsync(Expression<Func<T, bool>> predicate)
         {
             return await Table.FirstOrDefaultAsync(predicate);
@@ -48,7 +47,6 @@ namespace Repositories
         {
             return await Table.ToListAsync();
         }
-
         public IQueryable<T> GetAll()
         {
             return Table.AsQueryable();
@@ -62,7 +60,6 @@ namespace Repositories
             }
 
             // order by
-
             var entityType = typeof(T);
             var property = entityType.GetProperty(Order_ColName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 

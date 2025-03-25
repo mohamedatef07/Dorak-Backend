@@ -14,50 +14,7 @@ namespace Repositories
         public ServicesRepository(DorakContext dbContext) : base(dbContext)
         {
         }
-        public List<Service> GetServicesByCenterId(int centerId)
-        {
-            var serviceIds = DbContext.CenterServices
-                             .Where(cs => cs.CenterId == centerId)
-                             .Select(cs => cs.ServiceId)
-            .ToList();
 
-            return DbContext.Services
-                           .Where(s => serviceIds.Contains(s.ServiceId))
-                           .ToList();
-        }
-
-<<<<<<< HEAD
-=======
-        //public List<Service> GetServicesByProviderId(int providerId)
-        //{
-        //    var serviceIds = DbContext.ProviderServices
-        //                     .Where(ps => ps.ProviderId == providerId)
-        //                     .Select(ps => ps.ServiceId)
-        //                     .ToList();
-
-        //    return DbContext.Services
-        //                   .Where(s => serviceIds.Contains(s.ServiceId))
-        //                   .ToList();
-        //}
->>>>>>> 511f5ff87e7b2e02e673bbed0b71bd85335f9958
-        public List<Service> SearchServices(string keyword)
-        {
-            return DbContext.Services
-                .Where(s => s.ServiceName.Contains(keyword) || s.Description.Contains(keyword))
-                .ToList();
-        }
-
-        public List<Service> FilterServicesByPrice(decimal minPrice, decimal maxPrice)
-        {
-            return DbContext.Services
-                .Where(s => s.BasePrice >= minPrice && s.BasePrice <= maxPrice)
-                .ToList();
-        }
-
-        public bool IsServiceAvailableInCenter(int serviceId, int centerId)
-        {
-            return DbContext.CenterServices.Any(cs => cs.ServiceId == serviceId && cs.CenterId == centerId);
-        }
 
 
     }

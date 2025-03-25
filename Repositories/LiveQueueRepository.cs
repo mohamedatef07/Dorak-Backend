@@ -101,7 +101,7 @@ namespace Repositories
             if (queueEntry != null)
             {
                 queueEntry.Status = newStatus;
-                await DbContext.SaveChangesAsync();
+                await this.SaveChangesAsync();
             }
         }
 
