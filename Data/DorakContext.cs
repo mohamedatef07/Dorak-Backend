@@ -1,5 +1,9 @@
+<<<<<<< HEAD:Data/DorakContext.cs
 ﻿using Dorak.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+=======
+﻿ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+>>>>>>> 511f5ff87e7b2e02e673bbed0b71bd85335f9958:Models/DorakContext.cs
 using Microsoft.EntityFrameworkCore;
 
 

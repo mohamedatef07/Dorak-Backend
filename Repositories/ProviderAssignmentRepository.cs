@@ -9,9 +9,17 @@ namespace Repositories
         {
 
         }
+       
+
         public bool AssignProviderToShift(int providerId, int shiftId)
         {
+            if (providerId > 0)
+            {
+                return true;
+            }
 
+            return false; 
         }
+
     }
 }
