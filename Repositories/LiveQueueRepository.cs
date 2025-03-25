@@ -84,5 +84,27 @@ namespace Repositories
                 .FirstOrDefaultAsync();
         }
 
+        // get queue by opeartor
+        public async Task<List<LiveQueue>> GetByOperatorIdAsync(string operatorId)
+        {
+            return await Table
+                .Where(q => q.OperatorId == operatorId)
+                .OrderBy(q => q.CurrentQueuePosition)
+                .ToListAsync();
+        }
+
+        // update status
+
+        public async Task UpdateStatusAsync(int liveQueueId, string newStatus)
+        {
+            var queueEntry = await Table.FindAsync(liveQueueId);
+            if (queueEntry != null)
+            {
+                queueEntry.Status = newStatus;
+                await DbContext.SaveChangesAsync();
+            }
+        }
+
     }
+
 }
