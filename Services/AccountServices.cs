@@ -33,7 +33,7 @@ namespace Services
                 if (user.Role == "Client")
                 {
                     
-                    clientRepository.AddAsync(new Client() { ClientId = currentUser.Id });
+                    clientRepository.Add(new Client() { ClientId = currentUser.Id });
                 }
                 
 

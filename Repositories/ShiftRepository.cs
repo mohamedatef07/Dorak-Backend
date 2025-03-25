@@ -4,17 +4,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Data;
+using Microsoft.EntityFrameworkCore;
 using Repositories;
 
 namespace Dorak.Models.Models.Wallet
 {
     public class ShiftRepository : BaseRepository<Shift>
     {
-        //public DorakContext context { get; set; }
-        public ShiftRepository(DorakContext _context) : base(_context)
-        { 
-            //context = _context;
+        public ShiftRepository(DorakContext _context) : base(_context){ }
+
+        public async Task<IEnumerable<Shift>> GetShiftsByProviderId(string providerId)
+        {
+            return await Table.Where(s => s.ProviderAssignment.ProviderId == providerId).ToListAsync();
         }
 
-}
+        public async Task<IEnumerable<Shift>> GetShiftsByCenterId(int centerId)
+        {
+            return await Table.Where(s=>s.ProviderAssignment.CenterId == centerId).ToListAsync();
+        }
+
+        
+    }
 }
