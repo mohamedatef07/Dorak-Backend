@@ -26,6 +26,20 @@ namespace Repositories
                            .ToList();
         }
 
+<<<<<<< HEAD
+=======
+        //public List<Service> GetServicesByProviderId(int providerId)
+        //{
+        //    var serviceIds = DbContext.ProviderServices
+        //                     .Where(ps => ps.ProviderId == providerId)
+        //                     .Select(ps => ps.ServiceId)
+        //                     .ToList();
+
+        //    return DbContext.Services
+        //                   .Where(s => serviceIds.Contains(s.ServiceId))
+        //                   .ToList();
+        //}
+>>>>>>> 511f5ff87e7b2e02e673bbed0b71bd85335f9958
         public List<Service> SearchServices(string keyword)
         {
             return DbContext.Services
