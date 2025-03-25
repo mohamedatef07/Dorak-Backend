@@ -10,6 +10,7 @@ namespace Repositories
     public class RoleRepository : BaseRepository<IdentityRole>
     {
         // asp.net core identity role manager
+
         private readonly RoleManager<IdentityRole> roleManager;
 
         public RoleRepository(DorakContext dbContext, RoleManager<IdentityRole> _roleManager)
