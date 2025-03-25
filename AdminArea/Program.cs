@@ -1,3 +1,5 @@
+using Repositories;
+
 namespace AdminArea
 {
     public class Program
@@ -8,6 +10,9 @@ namespace AdminArea
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped(typeof(CenterRepository));
+            builder.Services.AddScoped(typeof(ProviderRepository));
+            builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
 
             var app = builder.Build();
 
