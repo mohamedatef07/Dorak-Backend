@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Data;
 
 namespace Repositories
 {
-    public abstract class BaseRepository<T> where T : class
+    public class BaseRepository<T> where T : class
     {
         protected readonly DorakContext DbContext;
         protected DbSet<T> Table;
