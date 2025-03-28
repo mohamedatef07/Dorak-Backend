@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data
 {
     public class DorakContext : IdentityDbContext<User>
-    {
+    {       
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
