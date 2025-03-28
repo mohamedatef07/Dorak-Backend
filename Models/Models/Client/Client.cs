@@ -15,5 +15,7 @@ namespace Dorak.Models
         public string? Country { get; set; }
         public DateOnly BirthDate { get; set; }
         public string? Image {  get; set; }
+        public bool IsDeleted { get; set; }
+
     }
 }

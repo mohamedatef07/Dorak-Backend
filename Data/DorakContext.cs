@@ -7,6 +7,8 @@ namespace Data
 {
     public class DorakContext : IdentityDbContext<User>
     {
+        public DorakContext(DbContextOptions options) : base(options) { }
+        
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
@@ -27,10 +29,10 @@ namespace Data
         public virtual DbSet<Operator> Operators { get; set; }
         
         //Connect With database
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
+        //}
         //Apply Configurations
         protected override void OnModelCreating(ModelBuilder builder)
         {
