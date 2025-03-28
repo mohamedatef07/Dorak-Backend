@@ -1,0 +1,8 @@
+﻿@model IdentityRole;
+
+
+<form asp-controller="Role" asp-action="Edit" method="post">
+    <input class="form-control" asp-for="Id" hidden />
+    <input class="form-control" asp-for="Name" />
+    <input class="btn btn-info" type="submit" value="Edit Role" />
+</form>

@@ -49,7 +49,9 @@
                     <tr>
                         <th scope="row">@item.Id</th>
                         <td>@item.Name</td>
-                        <td></td>
+                        <td>
+                            <a asp-action="Edit" asp-controller="Role" asp-route-Id="@item.Id">Edit </a>
+                        </td>
                     </tr>}
             
         </tbody>

@@ -59,5 +59,20 @@ namespace AdminArea.Controllers
             }
 
         }
+
+        [HttpGet]
+        public IActionResult Edit(string roleId, string name)
+        {
+            var selected = roleRepository.GetAll().Select(i => i.Id == roleId).FirstOrDefault();
+            return View(selected);
+        }
+        [HttpPost]
+        public IActionResult Edit(IdentityRole role)
+        {
+            
+            roleRepository.Edit(role);
+            return RedirectToAction("Add");
+        }
+
     }
 }

@@ -13,9 +13,7 @@ namespace AdminArea
             var builder = WebApplication.CreateBuilder(args);
 
 
-            builder.Services.AddDbContext<DorakContext>(i =>
-                                i.UseLazyLoadingProxies()
-                                .UseSqlServer(builder.Configuration.GetConnectionString("MyDB")));
+            
             // Add services to the container.
 
             builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
@@ -24,7 +22,7 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(CenterRepository));
             builder.Services.AddScoped(typeof(ProviderRepository));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
-            builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
+            builder.Services.AddScoped(typeof(RoleRepository));
             builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             var app = builder.Build();
