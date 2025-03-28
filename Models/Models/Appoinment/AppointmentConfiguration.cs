@@ -14,12 +14,14 @@ namespace Dorak.Models
             //One-to-Many Relations 
             builder.HasMany(Appointment => Appointment.Notifications)
                    .WithOne(Notifcation => Notifcation.Appointment)
-                   .HasForeignKey(Notifcation => Notifcation.AppointmentId);
+                   .HasForeignKey(Notifcation => Notifcation.AppointmentId)
+                   .OnDelete(DeleteBehavior.NoAction);
 
             //One-to-One Relations 
             builder.HasOne(Appointment => Appointment.Service)
                    .WithOne(Service => Service.Appointment)
-                   .HasForeignKey<Appointment>(Appointment => Appointment.ServiceId);
+                   .HasForeignKey<Appointment>(Appointment => Appointment.ServiceId)
+                   .OnDelete(DeleteBehavior.NoAction);
 
         }
     }
