@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,13 +12,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(DorakContext))]
-    partial class DorakContextModelSnapshot : ModelSnapshot
+    [Migration("20250328135636_initds")]
+    partial class initds
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.3")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -101,12 +107,6 @@ namespace Data.Migrations
                     b.Property<decimal>("Fees")
                         .HasColumnType("decimal(18,2)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<int>("LiveQueueId")
                         .HasColumnType("int");
 
@@ -174,12 +174,9 @@ namespace Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("NVARCHAR");
 
-<<<<<<< HEAD
                     b.Property<int>("CenterStatus")
                         .HasColumnType("int");
 
-=======
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -287,12 +284,6 @@ namespace Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -330,12 +321,6 @@ namespace Data.Migrations
                     b.Property<DateTime>("EstimatedTime")
                         .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("OperatorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -372,12 +357,6 @@ namespace Data.Migrations
                     b.Property<DateTime>("ExpiredAt")
                         .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<bool>("IsRead")
                         .HasColumnType("bit");
 
@@ -431,12 +410,6 @@ namespace Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -466,12 +439,6 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("PaymentMethod")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -548,12 +515,6 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -602,12 +563,6 @@ namespace Data.Migrations
                     b.Property<DateTime?>("EndDate")
                         .HasColumnType("datetime2");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("ProviderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -636,12 +591,6 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("ProviderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -664,12 +613,6 @@ namespace Data.Migrations
                     b.Property<decimal>("CustomPrice")
                         .HasColumnType("decimal(18,2)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("ProviderId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -729,12 +672,6 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftId"));
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("OperatorId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -765,12 +702,6 @@ namespace Data.Migrations
                     b.Property<string>("ContactInfo")
                         .HasColumnType("nvarchar(max)");
 
-<<<<<<< HEAD
-=======
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                     b.Property<string>("TempCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1006,21 +937,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "Admin")
                         .WithMany("AdminCentersManagement")
                         .HasForeignKey("AdminId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Center", "Center")
                         .WithMany("AdminCentersManagement")
                         .HasForeignKey("CenterId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Admin");
@@ -1039,61 +962,36 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.LiveQueue", "LiveQueue")
                         .WithOne("Appointment")
                         .HasForeignKey("Dorak.Models.Appointment", "LiveQueueId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Operator", "Operator")
                         .WithMany("Appointments")
                         .HasForeignKey("OperatorId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("Appointments")
                         .HasForeignKey("ProviderId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Service", "Service")
                         .WithOne("Appointment")
                         .HasForeignKey("Dorak.Models.Appointment", "ServiceId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Shift", "Shift")
                         .WithMany("Appointments")
                         .HasForeignKey("ShiftId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.TemporaryClient", "TemporaryClient")
                         .WithMany("Appointments")
-<<<<<<< HEAD
-                        .HasForeignKey("TemporaryClientId")
-                        .OnDelete(DeleteBehavior.NoAction);
-=======
                         .HasForeignKey("TemporaryClientId");
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
 
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Appointments")
@@ -1123,21 +1021,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Center", "Center")
                         .WithMany("CenterServices")
                         .HasForeignKey("CenterId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Service", "Service")
                         .WithMany("CenterServices")
                         .HasForeignKey("ServiceId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Center");
@@ -1161,11 +1051,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Operator", "Operator")
                         .WithMany("LiveQueues")
                         .HasForeignKey("OperatorId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Operator");
@@ -1176,31 +1062,19 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
                         .WithMany("Notifications")
                         .HasForeignKey("AppointmentId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Payment", "Payment")
                         .WithMany("Notifications")
                         .HasForeignKey("PaymentId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1226,21 +1100,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
                         .WithOne("Payment")
                         .HasForeignKey("Dorak.Models.Payment", "AppointmentId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", "Client")
                         .WithMany("Payments")
                         .HasForeignKey("ClientId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1253,11 +1119,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "User")
                         .WithOne("Provider")
                         .HasForeignKey("Dorak.Models.Provider", "ProviderId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("User");
@@ -1268,21 +1130,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Center", "Center")
                         .WithMany("ProviderAssignments")
                         .HasForeignKey("CenterId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("ProviderAssignments")
                         .HasForeignKey("ProviderId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Center");
@@ -1295,11 +1149,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("Certifications")
                         .HasForeignKey("ProviderId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Provider");
@@ -1310,21 +1160,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("ProviderServices")
                         .HasForeignKey("ProviderId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Service", "Service")
                         .WithMany("ProviderServices")
                         .HasForeignKey("ServiceId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Provider");
@@ -1337,11 +1179,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Operator", "Operator")
                         .WithMany("Shifts")
                         .HasForeignKey("OperatorId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.ProviderAssignment", "ProviderAssignment")
@@ -1360,11 +1198,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "Client")
                         .WithOne("Wallet")
                         .HasForeignKey("Dorak.Models.Wallet", "ClientId")
-<<<<<<< HEAD
-                        .OnDelete(DeleteBehavior.NoAction)
-=======
                         .OnDelete(DeleteBehavior.Cascade)
->>>>>>> e5daef982137e79926bc5fd0aa8256d88ffaf472
                         .IsRequired();
 
                     b.Navigation("Client");
