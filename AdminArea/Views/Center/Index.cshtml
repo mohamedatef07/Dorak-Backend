@@ -1,0 +1,23 @@
+﻿@model List<Center>;
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Center ID</th>
+            <th scope="col">Center Name</th>
+            @* <th scope="col">Status</th> *@
+            <th scope="col">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var center in Model)
+        {
+            <tr>
+                <th>@center.CenterId</th>
+                <td>@center.CenterName</td>
+                @* <td>@center.Status</td> *@
+                <td><button asp-controller="center" asp-action="delete" asp-route-CenterId="@center.CenterId">Delete</button></td>
+            </tr>
+        }
+    </tbody>
+</table>

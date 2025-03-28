@@ -21,8 +21,6 @@ namespace Services
             accountRepository = _AccountRepository;
             clientRepository = _ClientRepository;
         }
-
-
         public async Task<IdentityResult> CreateAccount(UserRegisterViewModel user)
         {
             var userRes = await accountRepository.Register(user);
@@ -31,12 +29,9 @@ namespace Services
             {
                 var currentUser = await accountRepository.FindByUserName(user.UserName);
                 if (user.Role == "Client")
-                {
-                    
+                {                
                     clientRepository.Add(new Client() { ClientId = currentUser.Id });
                 }
-                
-
             }
             return IdentityResult.Failed();
         }
