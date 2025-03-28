@@ -8,7 +8,6 @@ namespace Dorak.Models
         public string ProviderId { get; set; }
         public virtual Provider Provider { get; set; }
         public int ServiceId { get; set; }
-        public bool IsDeleted { get; set; }
         public virtual Service Service { get; set; }
     }
 }

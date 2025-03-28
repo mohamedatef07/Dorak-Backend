@@ -1,4 +1,7 @@
-﻿namespace Dorak.Models
+﻿using Dorak.Models.Enums;
+using Models.Enums;
+
+namespace Dorak.Models
 {
     public class Center
     {
@@ -15,6 +18,7 @@
         public decimal? Longitude { get; set; }
         public string MapURL { get; set; }
         public bool IsDeleted { get; set; }
+        public CenterStatus CenterStatus { get; set; }
         public virtual ICollection<AdminCenterManagement> AdminCentersManagement { get; set; }
         public virtual ICollection<CenterService> CenterServices { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
