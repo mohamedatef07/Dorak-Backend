@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data
 {
     public class DorakContext : IdentityDbContext<User>
-    {
+    {       
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
@@ -29,10 +29,6 @@ namespace Data
         //Connect With database
         public DorakContext(DbContextOptions<DorakContext> options) : base(options) { }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
-        //}
         //Apply Configurations
         protected override void OnModelCreating(ModelBuilder builder)
         {
