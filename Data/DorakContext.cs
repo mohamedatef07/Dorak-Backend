@@ -25,12 +25,10 @@ namespace Data
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
-        
+
         //Connect With database
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
-        }
+        public DorakContext(DbContextOptions<DorakContext> options) : base(options) { }
+
         //Apply Configurations
         protected override void OnModelCreating(ModelBuilder builder)
         {

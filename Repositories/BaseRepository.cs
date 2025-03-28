@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 using Data;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.EntityFrameworkCore;
 using System.Drawing.Printing;
 using System.Reflection;
+using Dorak.Models;
 
 namespace Repositories
 {
@@ -43,10 +44,10 @@ namespace Repositories
         {
             return await Table.FirstOrDefaultAsync(predicate);
         }
-        public async Task<IEnumerable<T>> GetAllAsync()
-        {
-            return await Table.ToListAsync();
-        }
+        //public async Task<IEnumerable<T>> GetAll()
+        //{
+        //    return await Table.ToListAsync();
+        //}
         public IQueryable<T> GetAll()
         {
             return Table.AsQueryable();
@@ -72,7 +73,7 @@ namespace Repositories
             var propertyAccess = Expression.Property(parameter, property);
             var orderByExpression = Expression.Lambda(propertyAccess, parameter);
 
-            
+
             string methodName = isAscending ? "OrderBy" : "OrderByDescending";
             var resultExpression = Expression.Call(
                 typeof(Queryable),

@@ -13,7 +13,7 @@ namespace Dorak.Models
         public DateTime ExpiredAt { get; set; }
         public string DeliveryMethod { get; set; } 
         public string UserId { get; set; } 
-        public User User { get; set; }
+        public virtual User User { get; set; }
         public int PaymentId { get; set; }
         public virtual Payment Payment { get; set; }
         public int AppointmentId { get; set; }
