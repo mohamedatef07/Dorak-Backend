@@ -59,5 +59,18 @@ namespace Repositories
 
             return await roleManager.DeleteAsync(role);
         }
+
+
+        public async Task<IdentityResult> UpdateRoleAsync(string roleId, string newRoleName)
+        {
+            var role = await roleManager.FindByIdAsync(roleId);
+            if (role == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "Role not found." });
+            }
+
+            role.Name = newRoleName;
+            return await roleManager.UpdateAsync(role);
+        }
     }
 }

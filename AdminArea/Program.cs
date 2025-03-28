@@ -20,6 +20,7 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(CenterRepository));
             builder.Services.AddScoped(typeof(ProviderRepository));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
+            builder.Services.AddScoped(typeof(RoleRepository));
 
 
 

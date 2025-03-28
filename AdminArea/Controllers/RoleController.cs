@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Repositories;
+using System.Threading.Tasks;
 
 namespace AdminArea.Controllers
 {
@@ -61,18 +62,40 @@ namespace AdminArea.Controllers
         }
 
         [HttpGet]
-        public IActionResult Edit(string roleId, string name)
+        public async Task<IActionResult> Edit(string roleName)
         {
-            var selected = roleRepository.GetAll().Select(i => i.Id == roleId).FirstOrDefault();
+            var selected = await roleRepository.GetRoleByNameAsync(roleName);
             return View(selected);
         }
         [HttpPost]
-        public IActionResult Edit(IdentityRole role)
+        public async Task<IActionResult> Edit(IdentityRole role)
         {
-            
-            roleRepository.Edit(role);
+
+            var result = await roleRepository.UpdateRoleAsync(role.Id,role.Name);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Add");
+            }
+            return View("Edit");
+        }
+        public async Task<IActionResult> Delete(string roleName)
+        {
+            var result = await roleRepository.DeleteRoleAsync(roleName);
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction("Add");
+            }
+
+            // Handle errors if deletion fails
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
+
             return RedirectToAction("Add");
         }
+
 
     }
 }
