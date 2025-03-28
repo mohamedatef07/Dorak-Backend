@@ -24,6 +24,9 @@ namespace Dorak.Models
 
             builder.Property(tempclient => tempclient.TempCode)
                 .IsRequired(true);
+
+            builder.Property(tempclient => tempclient.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 }

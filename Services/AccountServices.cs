@@ -1,13 +1,9 @@
 ﻿using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Services
 {
@@ -15,11 +11,17 @@ namespace Services
     {
         AccountRepository accountRepository;
         ClientRepository clientRepository;
+        ProviderRepository providerRepository;
+        private readonly IConfiguration configuration;
         public AccountServices(AccountRepository _AccountRepository,
-                               ClientRepository _ClientRepository)
+                               ClientRepository _ClientRepository,
+                               ProviderRepository _ProviderRepository,
+                               IConfiguration _configuration)
         {
             accountRepository = _AccountRepository;
             clientRepository = _ClientRepository;
+            providerRepository = _ProviderRepository;
+            configuration = _configuration;
         }
 
 
@@ -30,13 +32,22 @@ namespace Services
             if (userRes.Succeeded)
             {
                 var currentUser = await accountRepository.FindByUserName(user.UserName);
-                if (user.Role == "Client")
+                if (user.Role == "Admin")
                 {
-                    
                     clientRepository.Add(new Client() { ClientId = currentUser.Id });
                 }
-                
-
+                else if(user.Role == "Operator")
+                {
+                    OperatorRepo
+                }
+                else if (user.Role == "Provider")
+                {
+                    providerRepository.Add(new Provider() { ProviderId = currentUser.Id });
+                }
+                else if (user.Role == "Client")
+                {
+                    clientRepository.Add(new Client() { ClientId = currentUser.Id });
+                }
             }
             return IdentityResult.Failed();
         }

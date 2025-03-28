@@ -7,6 +7,8 @@ namespace Dorak.Models
         public int TempClientId {  get; set; }
         public string? ContactInfo { get; set; }
         public string TempCode { get; set; }
+        public bool IsDeleted { get; set; }
+
         public virtual ICollection<Appointment> Appointments { get; set; }
     }
 }
