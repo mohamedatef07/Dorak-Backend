@@ -22,6 +22,7 @@ namespace Dorak.Models
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
         public decimal Rate { get; set; }
+        public bool IsDeleted { get; set; }
         public virtual ICollection<ProviderCertification> Certifications { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
         public virtual ICollection<ProviderService> ProviderServices { get; set; }

@@ -13,6 +13,7 @@
         public DateTime EstimatedTime { get; set; }
         public DateTime ExactTime { get; set; }
         public DateTime EndTime { get; set; }
+        public bool IsDeleted { get; set; }
         public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
         public int LiveQueueId { get; set; }
