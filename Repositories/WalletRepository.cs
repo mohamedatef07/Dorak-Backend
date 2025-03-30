@@ -13,31 +13,20 @@ namespace Repositories
     {
         public WalletRepository(DorakContext _context) : base(_context){ }
 
-        public async Task<Wallet> GetWalletByUserId(string UserId)
+        public Wallet GetWalletByUserId(string UserId)
         {
-            return await this.GetByIdAsync(w=>w.ClientId == UserId);    
+            return  this.GetById(w=>w.ClientId == UserId);    
         }
-        public async Task UpdateWalletBalance(string userId, decimal amount)
+        public void UpdateWalletBalance(string userId, decimal amount)
         {
-            var wallet = await this.GetWalletByUserId(userId);
+            var wallet = this.GetWalletByUserId(userId);
             if (wallet != null) 
             {
                 wallet.Balance += amount;
                 this.Edit(wallet);
-                await SaveChangesAsync();
+                CommitData.SaveChanges();
             }
         }
-
-
-
-
-
-
-
-
-
-
-
 
         //public async Task<bool> IncreaseBalance(string walletId, decimal amount)
         //{

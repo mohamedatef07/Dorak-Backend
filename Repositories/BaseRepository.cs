@@ -1,16 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Data;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore;
-using System.Drawing.Printing;
 using System.Reflection;
-using Dorak.Models;
 
 namespace Repositories
 {
@@ -36,18 +27,10 @@ namespace Repositories
         {
             Table.Remove(entity);
         }
-        public async Task SaveChangesAsync()
+        public T GetById(Expression<Func<T, bool>> predicate)
         {
-            await dbContext.SaveChangesAsync();
+            return  Table.FirstOrDefault(predicate);
         }
-        public async Task<T> GetByIdAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await Table.FirstOrDefaultAsync(predicate);
-        }
-        //public async Task<IEnumerable<T>> GetAll()
-        //{
-        //    return await Table.ToListAsync();
-        //}
         public IQueryable<T> GetAll()
         {
             return Table.AsQueryable();
@@ -82,9 +65,7 @@ namespace Repositories
                 Query.Expression,
                 Expression.Quote(orderByExpression)
             );
-
             return Query.Provider.CreateQuery<T>(resultExpression);
         }
-
     }
 }

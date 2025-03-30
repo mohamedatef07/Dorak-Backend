@@ -27,6 +27,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Models\Dorak.Models.csproj" />
     <ProjectReference Include="..\Repositories\Repositories.csproj" />
+    <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
 </Project>
