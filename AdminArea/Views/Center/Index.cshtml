@@ -1,22 +1,42 @@
 ﻿@model List<Center>;
-
+@section styles {
+    <link rel="stylesheet" href="~/css/centerIndex.css" />
+}
 <table class="table">
     <thead>
         <tr>
             <th scope="col">Center ID</th>
             <th scope="col">Center Name</th>
-            @* <th scope="col">Status</th> *@
-            <th scope="col">Action</th>
+            <th scope="col">Contact Number</th>
+            <th scope="col">City</th>
+            <th scope="col">Status</th>
+            <th scope="col">Active</th>
+            <th scope="col">Inactive</th>
+            <th scope="col">Delete</th>
+            <th scope="col">Details</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var center in Model)
         {
             <tr>
-                <th>@center.CenterId</th>
+                <td>@center.CenterId</td>
                 <td>@center.CenterName</td>
-                @* <td>@center.Status</td> *@
-                <td><button asp-controller="center" asp-action="delete" asp-route-CenterId="@center.CenterId">Delete</button></td>
+                <td>@center.ContactNumber</td>
+                <td>@center.City</td>
+                <td>@center.CenterStatus</td>
+                <td>
+                    <a class="btn btn-success" asp-controller="center" asp-action="active" asp-route-CenterId="@center.CenterId">Active</a>
+                </td>
+                <td>
+                    <a class="btn btn-secondary" asp-controller="center" asp-action="inactive" asp-route-CenterId="@center.CenterId">Inactive</a>
+                </td>
+                <td>
+                    <a class="btn btn-danger" asp-controller="center" asp-action="delete" asp-route-CenterId="@center.CenterId">Delete</a>
+                </td>
+                <td>
+                    <a class="btn btn-outline-dark" asp-controller="center" asp-action="details" asp-route-CenterId="@center.CenterId">Details</a>
+                </td>
             </tr>
         }
     </tbody>

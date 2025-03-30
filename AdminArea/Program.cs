@@ -3,6 +3,7 @@ using Dorak.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
+using Services;
 
 namespace AdminArea
 {
@@ -17,12 +18,14 @@ namespace AdminArea
            .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped(typeof(CenterRepository));
+            builder.Services.AddScoped(typeof(CenterServices));
             builder.Services.AddScoped(typeof(ProviderRepository));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
+            builder.Services.AddScoped(typeof(CenterRepository));
+            builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
+            builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddScoped(typeof(RoleRepository));
-
-
 
             var app = builder.Build();
 
