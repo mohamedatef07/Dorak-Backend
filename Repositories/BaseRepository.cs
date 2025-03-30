@@ -67,5 +67,40 @@ namespace Repositories
             );
             return Query.Provider.CreateQuery<T>(resultExpression);
         }
+        //Pagination
+        public IQueryable<T> GetList(Expression<Func<T, bool>> filter = null)
+        {
+            if (filter == null)
+                return Table.AsQueryable();
+            return Table.Where(filter);
+        }
+        public IQueryable<T> Get(Expression<Func<T, bool>> filter = null, int pageSize = 4, int pageNumber = 1)
+        {
+            IQueryable<T> query = Table.AsQueryable();
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (pageSize < 0)
+                pageSize = 4;
+
+            if (pageNumber < 0)
+                pageNumber = 1;
+
+
+            int count = query.Count();
+
+            if (count < pageSize)
+            {
+                pageSize = count;
+                pageNumber = 1;
+            }
+
+            int ToSkip = (pageNumber - 1) * pageSize;
+
+            query = query.Skip(ToSkip).Take(pageSize);
+
+            return query;
+        }
     }
 }

@@ -25,6 +25,8 @@ namespace AdminArea
             builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
             builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
+            builder.Services.AddScoped(typeof(RoleRepository));
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
