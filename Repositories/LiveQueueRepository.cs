@@ -95,13 +95,13 @@ namespace Repositories
 
         // update status
 
-        public async Task UpdateStatusAsync(int liveQueueId, string newStatus)
+        public void UpdateStatus(int liveQueueId, string newStatus)
         {
-            var queueEntry = await Table.FindAsync(liveQueueId);
+            var queueEntry = Table.Find(liveQueueId);
             if (queueEntry != null)
             {
                 queueEntry.Status = newStatus;
-                await this.SaveChangesAsync();
+                CommitData.SaveChanges();
             }
         }
 
