@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
     bool canBack = Model.PageNumber <= 1;
     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
