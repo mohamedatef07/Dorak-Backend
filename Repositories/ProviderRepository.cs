@@ -10,10 +10,7 @@ namespace Repositories
     {
         public ProviderRepository(DorakContext context) : base(context)
         { }
-
-
-
-        public PaginationViewModel<Provider> Search(string searchText = "", int pageNumber = 1,
+        public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
         int pageSize = 2)
         {
             var builder = PredicateBuilder.New<Provider>();
@@ -29,14 +26,12 @@ namespace Repositories
             }
 
             var count = base.GetList(builder).Count();
-            var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).ToList();
-
-
-            return new PaginationViewModel<Provider>
+            var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).Select(p => p.toModelView()).ToList();
+            return new PaginationViewModel<ProviderViewModel>
             {
                 Data = resultAfterPagination,
                 PageNumber = pageNumber,
-                PageSize   = pageSize,
+                PageSize = pageSize,
                 Total = count
             };
         }

@@ -1,4 +1,5 @@
 ﻿using Data;
+using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Repositories;
@@ -27,6 +28,7 @@ namespace Services
 
         public Provider GetProviderById(string providerId)
         {
+            return providerRepository.GetById(p => p.ProviderId == providerId);
             return providerRepository.GetById(p => p.ProviderId == providerId);
         }
         public void AssignProviderToCenter(ProviderAssignmentViewModel model)
@@ -89,5 +91,6 @@ namespace Services
 
             return "schedule has been created successfully!";
         }
+        
     }
 }

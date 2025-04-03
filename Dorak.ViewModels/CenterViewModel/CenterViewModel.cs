@@ -6,27 +6,19 @@ namespace Dorak.ViewModels.CenterViewModel
 {
     public class CenterViewModel
     {
-        [Required(ErrorMessage = "This Field is Required")]
-        [Display(Name = "Center Name")]
+        public int CenterId { get; set; }
         public string CenterName { get; set; }
-        [Required(ErrorMessage = "This Field is Required")]
-        [Display(Name = "Contact Number")]
         public string ContactNumber { get; set; }
-        [Required(ErrorMessage = "This Field is Required")]
-        public string Country { get; set; }
-        [Required(ErrorMessage = "This Field is Required")]
-        public string Governorate { get; set; }
-        [Required(ErrorMessage = "This Field is Required")]
-        public string City { get; set; }
-        [Required(ErrorMessage = "This Field is Required")]
         public string Street { get; set; }
+        public string City { get; set; }
+        public string Governorate { get; set; }
+        public string Country { get; set; }
         public string Email { get; set; }
-        [Display(Name = "Website URL")]
         public string WebsiteURL { get; set; }
         public decimal? Latitude { get; set; }
         public decimal? Longitude { get; set; }
-        [Display(Name = "Map URL")]
         public string MapURL { get; set; }
+        public bool IsDeleted { get; set; }
         public CenterStatus CenterStatus { get; set; }
     }
 }
