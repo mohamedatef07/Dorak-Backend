@@ -1,25 +1,27 @@
 ﻿using Dorak.Models;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
+using Services;
 
 namespace AdminArea.Controllers
 {
     public class ProviderController : Controller
     {
-        private ProviderRepository providerRepository;
-        public ProviderController(ProviderRepository _providerRepository)
+        
+        private readonly ProviderServices providerService;
+
+        public ProviderController(ProviderServices providerService)
         {
 
-            providerRepository = _providerRepository;   
+            this.providerService = providerService;
         }
-
-
+        
 
 
         public IActionResult Index(string searchText = "", int pageNumber = 1,
             int pageSize = 2)
         {
-            var list = providerRepository.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
+            var list = providerService.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
             ViewBag.CurrentPage = pageNumber;
             return View(list);
         }
@@ -27,13 +29,13 @@ namespace AdminArea.Controllers
         [HttpGet]
         public IActionResult Edit(string Id)
         {
-            var selected = providerRepository.GetList(i => i.ProviderId == Id).FirstOrDefault();
+            var selected = providerService.GetProviderById(Id);
             return View(selected);
         }
         [HttpPost]
         public IActionResult Edit(Provider provider)
         {
-            providerRepository.Edit(provider);
+            providerService.EditProvider(provider);
             return RedirectToAction("Index");
         }
 
@@ -41,9 +43,10 @@ namespace AdminArea.Controllers
         public IActionResult Delete(string Id) 
         {
 
-            var selected = providerRepository.GetList(i => i.ProviderId == Id).FirstOrDefault();
-            providerRepository.Delete(selected);
-            providerRepository.SaveChangesAsync();
+            var selected = providerService.GetProviderById(Id);
+            
+            providerService.DeleteProvider(selected);
+            
             return RedirectToAction("Index");
         }
     }

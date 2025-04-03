@@ -1,4 +1,5 @@
 ﻿using Dorak.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace AdminArea.Controllers
 {
+    //[Authorize(Roles ="Admin")]
     public class RoleController : Controller
     {
         private RoleRepository roleRepository;

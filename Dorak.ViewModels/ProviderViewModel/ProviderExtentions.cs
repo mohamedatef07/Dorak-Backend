@@ -1,0 +1,59 @@
+﻿using Dorak.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dorak.ViewModels
+{
+    public static class ProviderExtentions
+    {
+        public static Provider ToModel(this ProviderViewModel viewModel)
+        {
+            return new Provider
+            {
+                ProviderId = viewModel.ProviderId,
+                FirstName = viewModel.FirstName,
+                LastName = viewModel.LastName,
+                Specialization = viewModel.Specialization,
+                Description = viewModel.Description,
+                ExperienceYears = viewModel.ExperienceYears,
+                LicenseNumber   = viewModel.LicenseNumber,
+                Gender = viewModel.Gender,
+                Street = viewModel.Street,
+                City = viewModel.City,
+                Governorate = viewModel.Governorate,
+                Country = viewModel.Country,
+                BirthDate = viewModel.BirthDate,
+                PicName = viewModel.PicName,
+                Availability =viewModel.Availability,
+                EstimatedDuration = viewModel.EstimatedDuration
+            };
+        }
+
+
+        public static ProviderViewModel toModelView(this Provider provider)
+        {
+            return new ProviderViewModel
+            {
+                ProviderId = provider.ProviderId,
+                FirstName = provider.FirstName,
+                LastName = provider.LastName,
+                Specialization = provider.Specialization,
+                Description = provider.Description,
+                ExperienceYears = provider.ExperienceYears,
+                LicenseNumber = provider.LicenseNumber,
+                Gender = provider.Gender,
+                Street = provider.Street,
+                City = provider.City,
+                Governorate = provider.Governorate,
+                Country = provider.Country,
+                BirthDate = provider.BirthDate,
+                PicName = provider.PicName,
+                Availability = provider.Availability,
+                EstimatedDuration = provider.EstimatedDuration
+            };
+        }
+    }
+}
