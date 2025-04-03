@@ -11,7 +11,11 @@ namespace Repositories
 {
     public class WalletRepository : BaseRepository<Wallet>
     {
-        public WalletRepository(DorakContext _context) : base(_context){ }
+        public CommitData commitData;
+        public WalletRepository(DorakContext _context, CommitData _commitData) : base(_context)
+        {
+            commitData = _commitData;
+        }
 
         public Wallet GetWalletByUserId(string UserId)
         {
@@ -24,7 +28,7 @@ namespace Repositories
             {
                 wallet.Balance += amount;
                 this.Edit(wallet);
-                CommitData.SaveChanges();
+                commitData.SaveChanges();
             }
         }
 

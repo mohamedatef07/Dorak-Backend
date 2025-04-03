@@ -18,27 +18,7 @@
     color: var(--text-color-Light);
     background-color: #f9f9fb;
 }
-
-.waiting-badge {
-    border-radius: var(--border-radius);
-    color: var(--waiting-text) !important;
-    background-color: var(--waiting-bg) !important;
-}
-
-.completed-badge {
-    border-radius: var(--border-radius);
-    color: var(--active-text) !important;
-    background-color: var(--active-bg) !important;
-}
-
-.inProgress-badge {
-    border-radius: var(--border-radius);
-    color: var(--error-text) !important;
-    background-color: var(--error-bg) !important;
-}
-
-.notChecked-badge {
-    border-radius: var(--border-radius);
-    color: var(--alert-text) !important;
-    background-color: var(--alert-bg) !important;
+div form .search-btn {
+    background-color: var(--main-bg-color-Light);
+    width: fit-content;
 }

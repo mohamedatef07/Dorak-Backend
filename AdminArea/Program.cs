@@ -26,6 +26,9 @@ namespace AdminArea
             builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddScoped(typeof(RoleRepository));
+            builder.Services.AddScoped(typeof(CommitData));
+
+
 
             var app = builder.Build();
 

@@ -24,7 +24,29 @@ namespace Dorak.ViewModels.CenterViewModel
                 WebsiteURL = viewModel.WebsiteURL,
                 Latitude = viewModel.Latitude,
                 Longitude = viewModel.Longitude,
-                MapURL = viewModel.MapURL
+                MapURL = viewModel.MapURL,
+                CenterStatus = viewModel.CenterStatus
+
+            };
+        }
+        public static CenterViewModel ToViewModel(this Center model)
+        {
+            return new CenterViewModel
+            {
+                CenterId = model.CenterId,
+                CenterName = model.CenterName,
+                ContactNumber = model.ContactNumber,
+                Country = model.Country,
+                Governorate = model.Governorate,
+                City = model.City,
+                Street = model.Street,
+                Email = model.Email,
+                WebsiteURL = model.WebsiteURL,
+                Latitude = model.Latitude,
+                Longitude = model.Longitude,
+                MapURL = model.MapURL,
+                CenterStatus = model.CenterStatus
+                
             };
         }
     }

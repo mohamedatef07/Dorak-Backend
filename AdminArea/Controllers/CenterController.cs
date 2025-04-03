@@ -21,7 +21,7 @@ namespace AdminArea.Controllers
             string city = "", int pageNumber = 1,
             int pageSize = 3)
         {
-            var searchList = centerServices.FilterBy(c => c.CenterName == centerName, "CenterName",true);
+            var searchList = centerServices.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
             //var centerList = centerServices.GetAll();
             return View(searchList);
         }

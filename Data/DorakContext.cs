@@ -51,9 +51,5 @@ namespace Data
             builder.ApplyConfiguration(new OperatorConfiguration { });
             base.OnModelCreating(builder);
         }
-        protected void Commit()
-        {
-            base.SaveChanges();
-        }
     }
 }

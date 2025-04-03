@@ -1,5 +1,7 @@
 ﻿using Data;
 using Dorak.Models;
+using Dorak.ViewModels;
+using Dorak.ViewModels.CenterViewModel;
 using Repositories;
 using System.Linq.Expressions;
 
@@ -8,9 +10,11 @@ namespace Services
     public class CenterServices
     {
         public CenterRepository centerRepository;
-        public CenterServices(CenterRepository _centerRepository)
+        public CommitData commitData;
+        public CenterServices(CenterRepository _centerRepository, CommitData _commitData)
         {
             centerRepository = _centerRepository;
+            commitData = _commitData;
         }
         public List<Center> GetAll()
         {
@@ -23,20 +27,30 @@ namespace Services
         public void Edit(Center entity)
         {
             centerRepository.Edit(entity);
-            CommitData.SaveChanges();
+            commitData.SaveChanges();
         }
-        public void Delete(int id)
+        public bool Delete(int id)
         {
-            var center = centerRepository.GetById(c => c.CenterId == id);
-            if (center != null)
+            try
             {
-                centerRepository.Delete(center);
-                CommitData.SaveChanges();
+                var center = centerRepository.GetById(c => c.CenterId == id);
+                if (center != null)
+                {
+                    centerRepository.Delete(center);
+                    commitData.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
         }
-        public IQueryable<Center> FilterBy(Expression<Func<Center, bool>> filtereq, string Order_ColName, bool isAscending)
+        public PaginationViewModel<CenterViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                            int pageSize = 2)
         {
-            return centerRepository.FilterBy(filtereq, Order_ColName, isAscending);
+            return centerRepository.Search(searchText, pageNumber, pageSize);
         }
     }
 }

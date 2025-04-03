@@ -6,10 +6,17 @@ using System.Threading.Tasks;
 
 namespace Data
 {
-    public class CommitData
+    public  class CommitData
     {
-        private static DorakContext context;
-        public static void SaveChanges()
+        private DorakContext context;
+        public CommitData(DorakContext _context)
+        {
+            if (context == null)
+            {
+                context = _context;
+            }
+        }
+        public void SaveChanges()
         {
             context.SaveChanges();
         }
