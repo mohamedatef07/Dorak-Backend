@@ -13,7 +13,7 @@ namespace Services
         ProviderRepository providerRepository;
         ProviderAssignmentRepository providerAssignmentRepository;
 
-        
+
         public ProviderServices(ProviderRepository _providerRepository, ProviderAssignmentRepository _providerAssignmentRepository)
         {
             providerRepository = _providerRepository;
@@ -27,8 +27,20 @@ namespace Services
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
         }
+        public List<Provider> GetAllProviders()
+        {
+            return providerRepository.GetAll().ToList();
+        }
+        public void EditProvider(Provider provider)
+        {
+            providerRepository.Edit(provider);
+        }
+        public void DeleteProvider(Provider provider)
+        {
+            providerRepository.Delete(provider);
+        }
 
-        public async Task AssignProviderToCenterAsync(string providerId, int centerId, DateTime startDate, DateTime endDate, ProviderType assignmentType)
+        public void AssignProviderToCenter(string providerId, int centerId, DateTime startDate, DateTime endDate, ProviderType assignmentType)
         {
             var assignment = new ProviderAssignment
             {
@@ -41,7 +53,14 @@ namespace Services
 
             providerAssignmentRepository.Add(assignment);
 
-             CommitData.SaveChanges();
         }
+
+
+        public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                            int pageSize = 2)
+        {
+            return providerRepository.Search(searchText, pageNumber, pageSize);
+        }
+        
     }
 }

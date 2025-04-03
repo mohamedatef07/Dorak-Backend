@@ -20,6 +20,7 @@ namespace AdminArea
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped(typeof(CenterServices));
             builder.Services.AddScoped(typeof(ProviderRepository));
+            builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
             builder.Services.AddScoped(typeof(CenterRepository));
             builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()

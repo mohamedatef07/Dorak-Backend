@@ -13,7 +13,7 @@ namespace Repositories
 
 
 
-        public PaginationViewModel<Provider> Search(string searchText = "", int pageNumber = 1,
+        public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
         int pageSize = 2)
         {
             var builder = PredicateBuilder.New<Provider>();
@@ -29,10 +29,10 @@ namespace Repositories
             }
 
             var count = base.GetList(builder).Count();
-            var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).ToList();
+            var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).Select(p=>p.toModelView()).ToList();
 
 
-            return new PaginationViewModel<Provider>
+            return new PaginationViewModel<ProviderViewModel>
             {
                 Data = resultAfterPagination,
                 PageNumber = pageNumber,
