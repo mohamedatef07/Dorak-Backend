@@ -4,7 +4,7 @@
     bool canBack = Model.PageNumber <= 1;
     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
 }
-@model PaginationViewModel<Provider>
+@model PaginationViewModel<ProviderViewModel>
 
 <h1>All Providers</h1>
 
@@ -25,14 +25,15 @@
         @foreach (var item in Model.Data)
         {
             <tr>
-                <td>@item.ProviderId</td>
+                
                 <td>@item.FirstName @item.LastName</td>
                 <td>@item.City , @item.Country</td>
                 <td>@item.Availability</td>
                 <td><img src="/Images/@item.PicName" class="card-img" style="width:30px" alt="Alternate Text" /></td>
 
                 <td>
-                    <a asp-action="edit" asp-controller="Provider" asp-route-Id="@item">Edit </a>
+                    <a asp-action="Edit" asp-controller="Provider" asp-route-Id="@item">Edit </a>|
+                    <a asp-action="Delete" asp-controller="Provider" asp-route-Id="@item">Delete </a>
                 </td>
             </tr>
         }
