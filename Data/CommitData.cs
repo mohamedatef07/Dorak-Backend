@@ -9,6 +9,15 @@ namespace Data
     public class CommitData
     {
         private static DorakContext context;
+
+        public static void Initialize(DorakContext _context)
+        {
+            if (context == null)
+            {
+                context = _context;
+            }
+        }
+
         public static void SaveChanges()
         {
             context.SaveChanges();
