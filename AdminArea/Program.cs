@@ -22,7 +22,6 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(ProviderRepository));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
             builder.Services.AddScoped(typeof(CenterRepository));
-            builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
             builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddScoped(typeof(RoleRepository));
@@ -30,10 +29,10 @@ namespace AdminArea
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
-            //if (!app.Environment.IsDevelopment())
-            //{
-            //    app.UseExceptionHandler("/Home/Error");
-            //}
+            if (!app.Environment.IsDevelopment())
+            {
+                app.UseExceptionHandler("/Home/Error");
+            }
             app.UseStaticFiles();
             app.UseRouting();
             app.UseAuthorization();

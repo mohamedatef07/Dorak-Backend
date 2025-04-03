@@ -1,4 +1,5 @@
-﻿using Dorak.Models;
+﻿using Data;
+using Dorak.Models;
 using Dorak.ViewModels;
 using Models.Enums;
 using Repositories;
@@ -22,9 +23,9 @@ namespace Services
         // ----- assign provider to center -----
 
         // get provider by id to assign to center later
-        public async Task<Provider> GetProviderByIdAsync(string providerId)
+        public Provider GetProviderById(string providerId)
         {
-            return await providerRepository.GetByIdAsync(p => p.ProviderId == providerId);
+            return providerRepository.GetById(p => p.ProviderId == providerId);
         }
 
         public async Task AssignProviderToCenterAsync(string providerId, int centerId, DateTime startDate, DateTime endDate, ProviderType assignmentType)
@@ -40,7 +41,7 @@ namespace Services
 
             providerAssignmentRepository.Add(assignment);
 
-            await providerAssignmentRepository.SaveChangesAsync();
+             CommitData.SaveChanges();
         }
     }
 }

@@ -1,7 +1,16 @@
-﻿@model List<Center>;
+﻿@model.
+@{
+    bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
+    bool canBack = Model.PageNumber <= 1;
+    int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+}
 @section styles {
     <link rel="stylesheet" href="~/css/centerIndex.css" />
 }
+<div class="col-md-4">
+    <label>Search Text</label>
+    <input type="text" class="form form-control" name="searchText">
+</div>
 <table class="table">
     <thead>
         <tr>
@@ -41,3 +50,21 @@
         }
     </tbody>
 </table>
+<div class="d-flex justify-content-center align-items-center">
+    <button class="btn btn-primary" onclick="page('back')" disabled="@canBack">Back</button>
+    <button class="btn btn-primary" onclick="page('next')" disabled="@canNext">Next</button>
+</div>
+
+<script>
+    let form= document.getElementsByTagName("form")[0]
+
+    function page(btn){
+        if(btn == "next"){
+            form.pagenumber.value++;
+        }
+        else{
+            form.pagenumber.value--;
+        }
+        form.submit()
+    }
+</script>
