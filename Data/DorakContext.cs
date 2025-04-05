@@ -20,6 +20,7 @@ namespace Data
         public virtual DbSet<Wallet> Wallets { get; set; }
         public virtual DbSet<ProviderService> ProviderServices { get; set; }
         public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set; }
+        public virtual DbSet<ProviderSchedule> ProviderSchedules { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Provider> Providers { get; set; }
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
@@ -43,6 +44,7 @@ namespace Data
             builder.ApplyConfiguration(new NotificationConfiguration { });
             builder.ApplyConfiguration(new WalletConfiguration { });
             builder.ApplyConfiguration(new ProviderAssignmentConfiguration { });
+            builder.ApplyConfiguration(new ProviderScheduleConfiguration { });
             builder.ApplyConfiguration(new ProviderServicesConfiguration { });
             builder.ApplyConfiguration(new ProviderCertificationsConfiguration { });
             builder.ApplyConfiguration(new ProviderConfiguration { });
