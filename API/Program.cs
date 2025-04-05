@@ -38,9 +38,9 @@ namespace API
             var app = builder.Build();
 
             
-            var scope = app.Services.CreateScope();
-            var context = scope.ServiceProvider.GetRequiredService<DorakContext>();
-            CommitData.Initialize(context);  
+            //var scope = app.Services.CreateScope();
+            //var context = scope.ServiceProvider.GetRequiredService<DorakContext>();
+            //CommitData.Initialize(context);  
 
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
