@@ -74,32 +74,32 @@ namespace Services
                         return IdentityResult.Success;
                     }
                 }
-                else if (user.Role == "Provider")
-                {
+               // else if (user.Role == "Provider")
+                //{
                    
-                    var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
-                    {
-                        FirstName = user.FirstName,
-                        LastName = user.LastName,
-                        Specialization = user.Specialization,
-                        Description = user.Description,
-                        ExperienceYears = user.ExperienceYears,
-                        //ProviderType = user.ProviderType,
-                        LicenseNumber = user.LicenseNumber,
-                        //Gender = user.Gender,
-                        BirthDate = user.ClientBirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
-                        Street = user.Street,
-                        City = user.City,
-                        Governorate = user.Governorate,
-                        Country = user.Country,
-                        Image = user.Image,
-                        EstimatedDuration = user.EstimatedDuration ?? 0
-                    });
-                    if (providerres.Succeeded)
-                    {
-                        return IdentityResult.Success;
-                    }
-                }
+                //    var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
+                //    {
+                //        FirstName = user.FirstName,
+                //        LastName = user.LastName,
+                //        Specialization = user.Specialization,
+                //        Description = user.Description,
+                //        ExperienceYears = user.ExperienceYears,
+                //        //ProviderType = user.ProviderType,
+                //        LicenseNumber = user.LicenseNumber,
+                //        //Gender = user.Gender,
+                //        BirthDate = user.ClientBirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                //        Street = user.Street,
+                //        City = user.City,
+                //        Governorate = user.Governorate,
+                //        Country = user.Country,
+                //        Image = user.Image,
+                //        EstimatedDuration = user.EstimatedDuration ?? 0
+                //    });
+                //    if (providerres.Succeeded)
+                //    {
+                //        return IdentityResult.Success;
+                //    }
+                //}
                 else if (user.Role == "Client")
                 {
                     var clientRes = await clientServices.CreateClient(currentUser.Id, new ClientRegisterViewModel

@@ -24,13 +24,13 @@ namespace Dorak.ViewModels.AccountViewModels
         public int? ExperienceYears { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
-        public ProviderType? ProviderType { get; set; }
+        public ProviderType ProviderType { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
         public string LicenseNumber { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
-        public GenderType? Gender { get; set; }
+        public GenderType Gender { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
         public DateOnly BirthDate { get; set; }
