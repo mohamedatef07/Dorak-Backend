@@ -13,18 +13,15 @@ namespace Dorak.Models
             //Relations Many To one
             builder.HasOne(payment => payment.Client)
                 .WithMany(user => user.Payments)
-                .HasForeignKey(payment => payment.ClientId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(payment => payment.ClientId);
 
             builder.HasMany(payment=> payment.Notifications)
                 .WithOne(notification=>notification.Payment)
-                .HasForeignKey(notification=>notification.PaymentId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(notification=>notification.PaymentId);
 
             builder.HasOne(payment => payment.Appointment)
                 .WithOne(appointment => appointment.Payment)
-                .HasForeignKey<Payment>(p => p.AppointmentId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey<Payment>(p => p.AppointmentId);
 
             //Properties
             builder.Property(payment => payment.Amount)

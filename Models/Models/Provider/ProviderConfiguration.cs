@@ -13,28 +13,24 @@ namespace Dorak.Models
             //Relations
             builder.HasOne(p => p.User)
                 .WithOne(u => u.Provider)
-                .HasForeignKey<Provider>(p => p.ProviderId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey<Provider>(p => p.ProviderId);
 
             builder.HasMany(p=>p.Certifications)
                 .WithOne(c=>c.Provider)
                 .HasForeignKey(c=>c.ProviderId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(p => p.ProviderAssignments)
                 .WithOne(pa => pa.Provider)
-                .HasForeignKey(pa => pa.ProviderId)
-             .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(pa => pa.ProviderId);
 
             builder.HasMany(p => p.ProviderServices)
                 .WithOne(ps => ps.Provider)
-                .HasForeignKey(ps => ps.ProviderId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(ps => ps.ProviderId);
 
             builder.HasMany(p => p.Appointments)
                 .WithOne(app => app.Provider)
-                .HasForeignKey(app => app.ProviderId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(app => app.ProviderId);
 
             //Properties
             builder.Property(p => p.FirstName)
@@ -77,6 +73,9 @@ namespace Dorak.Models
             builder.Property(p => p.BirthDate)
                 .HasColumnType("DATE")
                 .IsRequired(true);
+
+            builder.Property(p => p.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 }
