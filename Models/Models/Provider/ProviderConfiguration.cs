@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Models.Enums;
 
 namespace Dorak.Models
 {
@@ -63,11 +65,9 @@ namespace Dorak.Models
                 .HasMaxLength(20)
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
-            
+
             builder.Property(p => p.Gender)
-                .HasMaxLength(10)
-                .HasColumnName("Gender")
-                .HasColumnType("NVARCHAR")
+                //.HasConversion(new EnumToStringConverter<GenderType>())
                 .IsRequired(true);
 
             builder.Property(p => p.BirthDate)

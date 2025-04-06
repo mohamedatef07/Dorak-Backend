@@ -32,7 +32,14 @@ namespace Services
                 City = model.City,
                 Governorate = model.Governorate,
                 Country = model.Country,
-                PicName = model.Image
+                ExperienceYears =model.ExperienceYears,
+                LicenseNumber = model.LicenseNumber,
+                Description = model.Description,
+                EstimatedDuration = model.EstimatedDuration,
+                Availability = model.Availability,
+                //RATE
+                Specialization = model.Specialization,
+                PicName = model.Image,
             };
 
             providerRepository.Add(provider);

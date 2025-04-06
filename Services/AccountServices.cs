@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Repositories;
 using Dorak.ViewModels.AccountViewModels;
+using Models.Enums;
 
 namespace Services
 {
@@ -51,6 +52,12 @@ namespace Services
         public async Task<IdentityResult> CreateAccount(RegisterationViewModel user)
         {
             var userRes = await accountRepository.Register(user);
+
+            //Converting the Enums into Lists:
+            List<GenderType> Genders = Enum.GetValues(typeof(GenderType)).Cast<GenderType>().ToList();
+            List<UserStatus> statuses = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().ToList();
+            List<ProviderType> ProviderTypes = Enum.GetValues(typeof(ProviderType)).Cast<ProviderType>().ToList();
+
             if (userRes.Succeeded)
             {
                 // Our Roles:
@@ -84,16 +91,18 @@ namespace Services
                         Specialization = user.Specialization,
                         Description = user.Description,
                         ExperienceYears = user.ExperienceYears,
-                        //ProviderType = user.ProviderType,
+                        ProviderType = user.ProviderType,
                         LicenseNumber = user.LicenseNumber,
-                        //Gender = user.Gender,
-                        BirthDate = user.ClientBirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
+                        BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,
                         Country = user.Country,
                         Image = user.Image,
-                        EstimatedDuration = user.EstimatedDuration ?? 0
+                        EstimatedDuration = user.EstimatedDuration ?? 0,
+                        Availability = user.Availability
+
                     });
                     if (providerres.Succeeded)
                     {
@@ -106,7 +115,7 @@ namespace Services
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        BirthDate = user.ClientBirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                        BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,

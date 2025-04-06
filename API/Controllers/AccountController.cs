@@ -47,6 +47,7 @@ namespace API.Controllers
             return BadRequest(new { Message = "Account creation failed", Status = 400 });
         }
 
+        #region Creating Users
         [HttpPost("CreateClient")]
         public async Task<IActionResult> CreateClient(string id, ClientRegisterViewModel client)
         {
@@ -123,6 +124,7 @@ namespace API.Controllers
             return BadRequest(new { Message = "Client creation failed", Status = 400 });
         }
 
+        #endregion
 
         [HttpPost("Login")]
         public async Task<IActionResult> Login(UserLoginViewModel user)
@@ -137,7 +139,7 @@ namespace API.Controllers
             var token = await _accountServices.LoginWithGenerateJWTToken(user);
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized(new { Message = "Invalid Email, Username, or Password", Status = 401 });
+                return Unauthorized(new { Message = "Invalid Email, Username, or Password", Status = 400 });
             }
 
             var roles = await _accountServices.GetUserRolesAsync(user.UserName);

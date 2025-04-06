@@ -28,7 +28,7 @@ namespace Data
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
-        
+
         //Connect With database
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

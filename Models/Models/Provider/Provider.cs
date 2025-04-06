@@ -12,7 +12,7 @@ namespace Dorak.Models
         public string Description { get; set; }
         public int? ExperienceYears { get; set; }
         public string LicenseNumber {  get; set; }
-        public GenderType? Gender { get; set; } = GenderType.none;
+        public GenderType? Gender { get; set; } 
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }
@@ -23,8 +23,8 @@ namespace Dorak.Models
         public string? PicName { get; set; }
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
-        public decimal Rate { get; set; }
-        public bool IsDeleted { get; set; }
+        public decimal Rate { get; set; } = 3;
+        public bool IsDeleted { get; set; } = false;
 
         public virtual ICollection<ProviderCertification> Certifications { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }

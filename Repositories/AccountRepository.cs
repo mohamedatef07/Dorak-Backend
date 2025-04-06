@@ -42,6 +42,8 @@ namespace Repositories
         {
             //if correct Email
             var User = await UserManager.FindByEmailAsync(vmodel.UserName);
+            if (User == null)
+                User = await UserManager.FindByNameAsync(vmodel.UserName);
             if (User != null)
                 return await signInManager.PasswordSignInAsync(User, vmodel.Password, true, true);
             else
