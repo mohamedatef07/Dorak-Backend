@@ -1,4 +1,5 @@
 ﻿using Dorak.Models;
+using Dorak.ViewModels.AccountViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Dorak.ViewModels
 {
     public static class AccountExtentions
     {
-        public static User ToModel(this UserRegisterViewModel viewmodel)
+        public static User ToModel(this RegisterationViewModel viewmodel)
         {
             return new User
             {

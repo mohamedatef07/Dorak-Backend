@@ -24,7 +24,7 @@ namespace Repositories
             {
                 wallet.Balance += amount;
                 this.Edit(wallet);
-                await SaveChangesAsync();
+                //await SaveChangesAsync();
             }
         }
 

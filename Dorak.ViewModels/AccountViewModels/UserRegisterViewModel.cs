@@ -1,44 +1,36 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dorak.ViewModels
 {
     public class UserRegisterViewModel
     {
-        [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value Must at least 6 letter ")]
-        [Display(Name = "User Name")]
+        [Required(ErrorMessage = "This field is required")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
         public string UserName { get; set; }
 
-        [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value Must at least 6 letter ")]
-        [DataType(DataType.EmailAddress)]
+        [Required(ErrorMessage = "This field is required")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
+        [EmailAddress(ErrorMessage = "Invalid email address")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value Must at least 6 letter ")]
-        [DataType(DataType.PhoneNumber)]
-        [Display(Name = "Phone Number")]
+        [Required(ErrorMessage = "This field is required")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
+        [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
 
-        [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Value Must at least 8 letter ")]
+        [Required(ErrorMessage = "This field is required")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Value must be at least 8 characters")]
         [DataType(DataType.Password)]
-        [Compare("ConformPassord")]
+        [Compare("ConfirmPassword", ErrorMessage = "The password and confirmation password do not match.")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value Must at least 6 letter ")]
+        [Required(ErrorMessage = "This field is required")]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm Password")]
-        public string ConformPassord { get; set; }
+        public string ConfirmPassword { get; set; }
 
-        [Required(ErrorMessage = "Role is Required")]
+        [Required(ErrorMessage = "Role is required")]
         public string Role { get; set; }
-
     }
 }

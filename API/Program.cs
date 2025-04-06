@@ -1,10 +1,14 @@
 using System.Text;
 using Data;
 using Dorak.Models;
+using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Repositories;
+using Services;
 
 namespace API
 {
@@ -21,8 +25,20 @@ namespace API
                 (i=>i.UseLazyLoadingProxies().UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
-
-
+            builder.Services.AddScoped(typeof(AccountRepository));
+            builder.Services.AddScoped(typeof(ProviderRepository));
+            builder.Services.AddScoped(typeof(ClientRepository));
+            builder.Services.AddScoped(typeof(OperatorRepository));
+            builder.Services.AddScoped(typeof(AdminCenterRepository));
+            builder.Services.AddScoped(typeof(AdminCenterManagement));
+            builder.Services.AddScoped(typeof(RoleRepository));
+            builder.Services.AddScoped(typeof(AccountServices));
+            builder.Services.AddScoped(typeof(ClientServices));
+            builder.Services.AddScoped(typeof(OperatorServices));
+            builder.Services.AddScoped(typeof(ProviderServices));
+            builder.Services.AddScoped(typeof(AdminCenterServices));
+            
+            
             //Authentication
             builder.Services.AddAuthentication(option =>
             {

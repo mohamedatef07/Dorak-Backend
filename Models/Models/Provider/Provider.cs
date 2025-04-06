@@ -12,12 +12,14 @@ namespace Dorak.Models
         public string Description { get; set; }
         public int? ExperienceYears { get; set; }
         public string LicenseNumber {  get; set; }
-        public GenderType Gender { get; set; }
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string Governorate { get; set; }
-        public string Country { get; set; }
+        public GenderType? Gender { get; set; } = GenderType.none;
+        public string? Street { get; set; }
+        public string? City { get; set; }
+        public string? Governorate { get; set; }
+        public string? Country { get; set; }
         public DateOnly BirthDate { get; set; }
+        public UserStatus? Status { get; set; } = UserStatus.none;
+        public ProviderType providerType { get; set; }
         public string? PicName { get; set; }
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }

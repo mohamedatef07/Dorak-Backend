@@ -35,9 +35,9 @@ namespace Repositories
         {
             Table.Remove(entity);
         }
-        public async Task SaveChangesAsync()
+        public void SaveChanges()
         {
-            await dbContext.SaveChangesAsync();
+            dbContext.SaveChangesAsync();
         }
         public async Task<T> GetByIdAsync(Expression<Func<T, bool>> predicate)
         {
