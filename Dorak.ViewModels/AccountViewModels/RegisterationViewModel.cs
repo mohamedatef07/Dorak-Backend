@@ -6,7 +6,8 @@ namespace Dorak.ViewModels.AccountViewModels
 {
     public class RegisterationViewModel
     {
-        // From UserRegisterViewModel
+        // From UserRegisterViewModel 
+        //UPDATED
         [Required(ErrorMessage = "This field is required")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
         public string UserName { get; set; }
