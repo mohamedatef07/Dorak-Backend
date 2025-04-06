@@ -41,11 +41,11 @@ namespace Dorak.ViewModels.AccountViewModels
         // Duplicated in ClientRegisterViewModel, ProviderRegisterViewModel, and AdminCenterViewModel
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public GenderType? Gender { get; set; }
+        public string Gender { get; set; }
+        public DateOnly? BirthDate { get; set; }
 
 
         // From ClientRegisterViewModel
-        public DateOnly? ClientBirthDate { get; set; }
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }

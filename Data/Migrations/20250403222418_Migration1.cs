@@ -220,7 +220,7 @@ namespace Data.Migrations
                     ClientId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(name: "First Name", type: "NVARCHAR(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(name: "Last Name", type: "NVARCHAR(50)", maxLength: 50, nullable: false),
-                    Gender = table.Column<string>(type: "NVARCHAR(10)", maxLength: 10, nullable: false),
+                    Gender = table.Column<string>(type: "int", nullable: false),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Governorate = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -247,7 +247,7 @@ namespace Data.Migrations
                     OperatorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(name: "First Name", type: "NVARCHAR(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(name: "Last Name", type: "NVARCHAR(50)", maxLength: 50, nullable: false),
-                    Gender = table.Column<string>(type: "NVARCHAR(10)", maxLength: 10, nullable: false),
+                    Gender = table.Column<string>(type: "int", nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -271,7 +271,7 @@ namespace Data.Migrations
                     Description = table.Column<string>(type: "NVARCHAR(1000)", maxLength: 1000, nullable: false),
                     ExperienceYears = table.Column<int>(type: "INT", nullable: true),
                     LicenseNumber = table.Column<string>(type: "NVARCHAR(20)", maxLength: 20, nullable: false),
-                    Gender = table.Column<string>(type: "NVARCHAR(10)", maxLength: 10, nullable: false),
+                    Gender = table.Column<string>(type: "int", nullable: false),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Governorate = table.Column<string>(type: "nvarchar(max)", nullable: true),

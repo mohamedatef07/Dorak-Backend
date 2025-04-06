@@ -44,6 +44,23 @@ namespace Services
         {
             var assignment = new ProviderAssignment
             {
+                ProviderId = userId,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Gender = model.Gender,
+                BirthDate = model.BirthDate,
+                Street = model.Street,
+                City = model.City,
+                Governorate = model.Governorate,
+                Country = model.Country,
+                ExperienceYears =model.ExperienceYears,
+                LicenseNumber = model.LicenseNumber,
+                Description = model.Description,
+                EstimatedDuration = model.EstimatedDuration,
+                Availability = model.Availability,
+                //RATE
+                Specialization = model.Specialization,
+                PicName = model.Image,
                 ProviderId = providerId,
                 CenterId = centerId,
                 StartDate = startDate,

@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Repositories;
 using Dorak.ViewModels.AccountViewModels;
+using Models.Enums;
 
 namespace Services
 {
@@ -51,6 +52,12 @@ namespace Services
         public async Task<IdentityResult> CreateAccount(RegisterationViewModel user)
         {
             var userRes = await accountRepository.Register(user);
+
+            //Converting the Enums into Lists:
+            List<GenderType> Genders = Enum.GetValues(typeof(GenderType)).Cast<GenderType>().ToList();
+            List<UserStatus> statuses = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().ToList();
+            List<ProviderType> ProviderTypes = Enum.GetValues(typeof(ProviderType)).Cast<ProviderType>().ToList();
+
             if (userRes.Succeeded)
             {
                 // Our Roles:
@@ -77,36 +84,38 @@ namespace Services
                // else if (user.Role == "Provider")
                 //{
                    
-                //    var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
-                //    {
-                //        FirstName = user.FirstName,
-                //        LastName = user.LastName,
-                //        Specialization = user.Specialization,
-                //        Description = user.Description,
-                //        ExperienceYears = user.ExperienceYears,
-                //        //ProviderType = user.ProviderType,
-                //        LicenseNumber = user.LicenseNumber,
-                //        //Gender = user.Gender,
-                //        BirthDate = user.ClientBirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
-                //        Street = user.Street,
-                //        City = user.City,
-                //        Governorate = user.Governorate,
-                //        Country = user.Country,
-                //        Image = user.Image,
-                //        EstimatedDuration = user.EstimatedDuration ?? 0
-                //    });
-                //    if (providerres.Succeeded)
-                //    {
-                //        return IdentityResult.Success;
-                //    }
-                //}
+                    var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Specialization = user.Specialization,
+                        Description = user.Description,
+                        ExperienceYears = user.ExperienceYears,
+                        ProviderType = user.ProviderType,
+                        LicenseNumber = user.LicenseNumber,
+                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
+                        BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                        Street = user.Street,
+                        City = user.City,
+                        Governorate = user.Governorate,
+                        Country = user.Country,
+                        Image = user.Image,
+                        EstimatedDuration = user.EstimatedDuration ?? 0,
+                        Availability = user.Availability
+
+                    });
+                    if (providerres.Succeeded)
+                    {
+                        return IdentityResult.Success;
+                    }
+                }
                 else if (user.Role == "Client")
                 {
                     var clientRes = await clientServices.CreateClient(currentUser.Id, new ClientRegisterViewModel
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        BirthDate = user.ClientBirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                        BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,
