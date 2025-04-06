@@ -1,4 +1,4 @@
-﻿namespace Dorak.ViewModels
+﻿namespace Dorak.ViewModels.AdminCenterManagementViewModel
 {
     public class AdminCenterManagementViewModel
     {

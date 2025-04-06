@@ -22,5 +22,6 @@ namespace Dorak.Models
         public virtual ICollection<AdminCenterManagement> AdminCentersManagement { get; set; }
         public virtual ICollection<CenterService> CenterServices { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
+        public virtual ICollection<ProviderService> ProviderServices { get; set; }
     }
 }

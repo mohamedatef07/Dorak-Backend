@@ -1,17 +1,18 @@
 ﻿@model PaginationViewModel<CenterViewModel>
 @{
     bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
-    bool canBack = Model.PageNumber <= 1;
     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+    bool canBack = Model.PageNumber <= 1;
 }
 @section styles {
     <link rel="stylesheet" href="~/css/centerIndex.css" />
 }
 
-<div class="col-md-4 mb-4">
+<div class="search col-7 mb-4">
     <form asp-controller="Center" asp-action="Index" method="get" class="g-3 d-flex gap-4">
-        <input type="text" class="form form-control" name="searchText" placeholder="Search Text">
-        <input type="submit" class="btn text-white search-btn " value="Search" />
+        <input type="text" class="form form-control serach-input" name="searchText" placeholder="Search Text">
+        <input type="submit" class="btn text-white main-btn" value="Search" />
+        <input type="hidden" name="pagenumber" value="@Model.PageNumber" />
     </form>
 </div>
 <table class="table">
@@ -23,7 +24,7 @@
             <th scope="col">City</th>
             <th scope="col">Status</th>
             <th scope="col">Active</th>
-            <th scope="col">Inactive</th>
+            <th scope="col">Inctive</th>
             <th scope="col">Delete</th>
             <th scope="col">Details</th>
         </tr>
@@ -55,18 +56,17 @@
 </table>
 
 <div class="d-flex justify-content-center align-items-center gap-2 pt-2 pb-2">
-    <button class="btn btn-primary" onclick="page('back')" disabled="@canBack">Back</button>
+    <button class="btn text-white main-btn" onclick="page('back')" disabled="@canBack">Back</button>
     @for (int i = 1; i <= PageCount; i++)
     {
-        <button class="btn btn-primary" onclick="pagenum('@i')">@i</button>
+        <button class="btn text-white main-btn" onclick="pagenum('@i')">@i</button>
     }
-    <button class="btn btn-primary" onclick="page('next')" disabled="@canNext">Next</button>
+    <button class="btn text-white main-btn" onclick="page('next')" disabled="@canNext">Next</button>
 </div>
 
 @section scripts {
     <script>
         let form= document.getElementsByTagName("form")[0]
-
         function page(btn){
             if(btn == "next"){
                 form.pagenumber.value++;

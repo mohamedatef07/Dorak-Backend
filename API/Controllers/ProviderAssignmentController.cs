@@ -19,22 +19,22 @@ namespace API.Controllers
 
         
         [HttpGet("provider/{providerId}")]
-        public async Task<IActionResult> GetProviderById(string providerId)
+        public IActionResult GetProviderById(string providerId)
         {
-            var provider = await providerServices.GetProviderByIdAsync(providerId);
+            var provider =  providerServices.GetProviderById(providerId);
 
             return Ok(provider);
         }
 
         [HttpPost("assign")]
-        public async Task<IActionResult> AssignProvider(
+        public IActionResult AssignProvider(
             string providerId,
             int centerId,
             DateTime startDate,
             DateTime endDate,
             ProviderType assignmentType)
         {
-            await providerServices.AssignProviderToCenterAsync(
+            providerServices.AssignProviderToCenter(
                 providerId,
                 centerId,
                 startDate,

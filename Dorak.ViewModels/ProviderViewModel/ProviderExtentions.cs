@@ -17,7 +17,7 @@ namespace Dorak.ViewModels
                 FirstName = viewModel.FirstName,
                 LastName = viewModel.LastName,
                 Specialization = viewModel.Specialization,
-                Description = viewModel.Description,
+                Bio = viewModel.Bio,
                 ExperienceYears = viewModel.ExperienceYears,
                 LicenseNumber   = viewModel.LicenseNumber,
                 Gender = viewModel.Gender,
@@ -26,7 +26,7 @@ namespace Dorak.ViewModels
                 Governorate = viewModel.Governorate,
                 Country = viewModel.Country,
                 BirthDate = viewModel.BirthDate,
-                PicName = viewModel.PicName,
+                Image = viewModel.Image,
                 Availability =viewModel.Availability,
                 EstimatedDuration = viewModel.EstimatedDuration
             };
@@ -41,7 +41,7 @@ namespace Dorak.ViewModels
                 FirstName = provider.FirstName,
                 LastName = provider.LastName,
                 Specialization = provider.Specialization,
-                Description = provider.Description,
+                Bio = provider.Bio,
                 ExperienceYears = provider.ExperienceYears,
                 LicenseNumber = provider.LicenseNumber,
                 Gender = provider.Gender,
@@ -50,7 +50,7 @@ namespace Dorak.ViewModels
                 Governorate = provider.Governorate,
                 Country = provider.Country,
                 BirthDate = provider.BirthDate,
-                PicName = provider.PicName,
+                Image = provider.Image,
                 Availability = provider.Availability,
                 EstimatedDuration = provider.EstimatedDuration
             };

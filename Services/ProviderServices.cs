@@ -55,7 +55,6 @@ namespace Services
 
         }
 
-
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
