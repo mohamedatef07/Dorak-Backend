@@ -1,50 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
-using Microsoft.AspNetCore.Identity;
+using Models.Enums;
 using Repositories;
+using System;
+using System.Threading.Tasks;
 
 namespace Services
 {
     public class ProviderServices
     {
-        private ProviderRepository providerRepository;
+        ProviderRepository providerRepository;
+        ProviderAssignmentRepository providerAssignmentRepository;
 
-        public ProviderServices(ProviderRepository _providerRepository)
+
+        public ProviderServices(ProviderRepository _providerRepository, ProviderAssignmentRepository _providerAssignmentRepository)
         {
             providerRepository = _providerRepository;
+            providerAssignmentRepository = _providerAssignmentRepository;
         }
 
-        //public IdentityResult CreateProvider(string userId, ProviderRegisterViewModel model)
-        //{
-        //    var provider = new Provider
-        //    {
-        //        ProviderId = userId,
-        //        FirstName = model.FirstName,
-        //        LastName = model.LastName,
-        //        Gender = model.Gender,
-        //        BirthDate = model.BirthDate,
-        //        Street = model.Street,
-        //        City = model.City,
-        //        Governorate = model.Governorate,
-        //        Country = model.Country,
-        //        Image = model.Image
-        //    };
+        // ----- assign provider to center -----
 
-        //    providerRepository.Add(provider);
-        //    return 
+        // get provider by id to assign to center later
+        public Provider GetProviderById(string providerId)
+        {
+            return providerRepository.GetById(p => p.ProviderId == providerId);
+        }
+        public List<Provider> GetAllProviders()
+        {
+            return providerRepository.GetAll().ToList();
+        }
+        public void EditProvider(Provider provider)
+        {
+            providerRepository.Edit(provider);
+        }
+        public void DeleteProvider(Provider provider)
+        {
+            providerRepository.Delete(provider);
+        }
 
-        //}
+        public void AssignProviderToCenter(string providerId, int centerId, DateTime startDate, DateTime endDate, ProviderType assignmentType)
+        {
+            var assignment = new ProviderAssignment
+            {
+                ProviderId = providerId,
+                CenterId = centerId,
+                StartDate = startDate,
+                EndDate = endDate,
+                AssignmentType = assignmentType
+            };
 
-        //public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
-        //                                                    int pageSize = 2)
-        //{
-        //    return providerRepository.Search(searchText, pageNumber, pageSize);
-        //}
+            providerAssignmentRepository.Add(assignment);
+
+        }
+
+        public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                            int pageSize = 2)
+        {
+            return providerRepository.Search(searchText, pageNumber, pageSize);
+        }
+
     }
 }
