@@ -9,6 +9,10 @@ namespace Dorak.Models
         {
             //Primary Key
             builder.HasKey(providercertifications => providercertifications.ProviderCertificationsId);
+
+            //Property
+            builder.Property(providercertifications => providercertifications.IsDeleted)
+                .HasDefaultValue(false);
         }
 
     }

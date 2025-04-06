@@ -9,7 +9,7 @@ namespace Dorak.Models
         public string LastName { get; set; }
         public GenderType Gender { get; set; }
         public string? Image { get; set; }
-        public bool IsDeleted   { get; set; }
+        public bool IsDeleted { get; set; }
         public string AdminId { get; set; }
         public virtual User Admin { get; set; }
         public int CenterId { get; set; }

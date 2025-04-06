@@ -14,8 +14,7 @@ namespace Dorak.Models
             // Relations Many to One
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)
                 .WithMany(user => user.AdminCentersManagement)
-                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminId);
 
             //Properties
             builder.Property(adminCenterManagement => adminCenterManagement.IsDeleted)
