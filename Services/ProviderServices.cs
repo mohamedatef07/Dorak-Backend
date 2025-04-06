@@ -1,8 +1,10 @@
 ﻿using Data;
-using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Models.Enums;
 using Repositories;
+using System;
+using System.Threading.Tasks;
 
 namespace Services
 {
@@ -10,87 +12,54 @@ namespace Services
     {
         ProviderRepository providerRepository;
         ProviderAssignmentRepository providerAssignmentRepository;
-        ProviderScheduleRepository providerScheduleRepository;
-        
 
-        public ProviderServices(ProviderRepository _providerRepository,
-            ProviderAssignmentRepository _providerAssignmentRepository,
-            ProviderScheduleRepository _providerScheduleRepository
-            )
+
+        public ProviderServices(ProviderRepository _providerRepository, ProviderAssignmentRepository _providerAssignmentRepository)
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
-            providerScheduleRepository = _providerScheduleRepository;
-            
         }
 
-        // ----- Assign provider to center -----
+        // ----- assign provider to center -----
 
+        // get provider by id to assign to center later
         public Provider GetProviderById(string providerId)
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
-            return providerRepository.GetById(p => p.ProviderId == providerId);
         }
-        public void AssignProviderToCenter(ProviderAssignmentViewModel model)
+        public List<Provider> GetAllProviders()
+        {
+            return providerRepository.GetAll().ToList();
+        }
+        public void EditProvider(Provider provider)
+        {
+            providerRepository.Edit(provider);
+        }
+        public void DeleteProvider(Provider provider)
+        {
+            providerRepository.Delete(provider);
+        }
+
+        public void AssignProviderToCenter(string providerId, int centerId, DateTime startDate, DateTime endDate, ProviderType assignmentType)
         {
             var assignment = new ProviderAssignment
             {
-                ProviderId = model.ProviderId,
-                CenterId = model.CenterId,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                AssignmentType = model.AssignmentType
+                ProviderId = providerId,
+                CenterId = centerId,
+                StartDate = startDate,
+                EndDate = endDate,
+                AssignmentType = assignmentType
             };
 
             providerAssignmentRepository.Add(assignment);
-            CommitData.SaveChanges();
+
         }
 
-        // ----- Manage provider schedule -----
-        public string ManageProviderSchedule(ProviderScheduleViewModel model)
+        public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                            int pageSize = 2)
         {
-            if (model.StartDate > model.EndDate)
-            {
-                return "start date cannot be after end date.";
-            }
-
-            if (model.StartTime >= model.EndTime)
-            {
-                return "start time must be before end time.";
-            }
-
-            // ***
-
-            var existingSchedule = providerScheduleRepository
-                .GetAll()
-                .FirstOrDefault(s =>
-                    s.ProviderId == model.ProviderId &&
-                    s.CenterId == model.CenterId &&
-                    ((model.StartDate <= s.EndDate && model.EndDate >= s.StartDate) &&
-                    (model.StartTime < s.EndTime && model.EndTime > s.StartTime))
-                );
-
-            if (existingSchedule != null)
-            {
-                return "provider already has a schedule at this time.";
-            }
-
-            var providerSchedule = new ProviderSchedule
-            {
-                ProviderId = model.ProviderId,
-                CenterId = model.CenterId,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
-                MaxPatientsPerDay = model.MaxPatientsPerDay
-            };
-
-            providerScheduleRepository.Add(providerSchedule);
-            CommitData.SaveChanges();
-
-            return "schedule has been created successfully!";
+            return providerRepository.Search(searchText, pageNumber, pageSize);
         }
-        
+
     }
 }

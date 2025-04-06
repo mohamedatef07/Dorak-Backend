@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Dorak.Models;
 using Repositories;
-using Dorak.Models.Enums;
 using Data;
 using Services;
 
@@ -19,10 +18,9 @@ namespace AdminArea.Controllers
         }
         public IActionResult Index(string searchText = "", string centerName = "",
             string city = "", int pageNumber = 1,
-            int pageSize = 3)
+            int pageSize = 5)
         {
             var searchList = centerServices.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
-            //var centerList = centerServices.GetAll();
             return View(searchList);
         }
         //[HttpGet]
@@ -48,19 +46,17 @@ namespace AdminArea.Controllers
         [HttpGet]
         public IActionResult Delete(int centerId)
         {
-            centerServices.Delete(centerId);
-            return RedirectToAction("Index");
-
-            //return NotFound();
+            if (centerServices.Delete(centerId))
+            {
+                return RedirectToAction("Index");
+            }
+            return NotFound();
         }
         [HttpGet]
         public IActionResult Active(int centerId)
         {
-            var center = centerServices.GetById(centerId);
-            if (center != null)
+            if (centerServices.Active(centerId))
             {
-                center.CenterStatus = CenterStatus.Active;
-                centerServices.Edit(center);
                 return RedirectToAction("Index");
             }
             return NotFound();
@@ -68,11 +64,8 @@ namespace AdminArea.Controllers
         [HttpGet]
         public IActionResult InActive(int centerId)
         {
-            var center = centerServices.GetById(centerId);
-            if (center != null)
+            if (centerServices.Inactive(centerId))
             {
-                center.CenterStatus = CenterStatus.Inactive;
-                centerServices.Edit(center);
                 return RedirectToAction("Index");
             }
             return NotFound();

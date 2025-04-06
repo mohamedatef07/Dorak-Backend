@@ -8,6 +8,7 @@ namespace Dorak.Models
         public string Certification {  get; set; }
         public string ProviderId { get; set; }
         public bool IsDeleted { get; set; }
+
         public virtual Provider Provider { get; set; }
     }
 }

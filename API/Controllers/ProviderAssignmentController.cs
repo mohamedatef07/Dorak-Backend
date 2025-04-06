@@ -1,40 +1,48 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services;
 using Models.Enums;
-using Dorak.ViewModels;
 using System;
+using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/{Controller}")]
     [ApiController]
     public class ProviderAssignmentController : ControllerBase
     {
-        private readonly ProviderServices providerServices;
+        ProviderServices providerServices;
 
         public ProviderAssignmentController(ProviderServices _providerServices)
         {
             providerServices = _providerServices;
         }
 
-        [HttpGet]
-        [Route("getproviderbyid")]
+        
+        [HttpGet("provider/{providerId}")]
         public IActionResult GetProviderById(string providerId)
         {
-            var provider = providerServices.GetProviderById(providerId);
-            return Ok(provider);
+            //var provider =  providerServices.GetProviderById(providerId);
+
+            return Ok();//provider
         }
 
-        [HttpPost]
-        [Route("assign")]
-        public IActionResult AssignProvider(ProviderAssignmentViewModel model)
+        [HttpPost("assign")]
+        public IActionResult AssignProvider(
+            string providerId,
+            int centerId,
+            DateTime startDate,
+            DateTime endDate,
+            ProviderType assignmentType)
         {
+            //providerServices.AssignProviderToCenter(
+            //    providerId,
+            //    centerId,
+            //    startDate,
+            //    endDate,
+            //    assignmentType
+            //);
 
-            providerServices.AssignProviderToCenter(
-                model
-            );
-
-            return Ok("provider assigned successfully.");
+            return Ok("Provider assigned successfully.");
         }
     }
 }

@@ -3,6 +3,8 @@
     public enum ServicePriority
     {
         none,
-
+        Urgent,
+        Examination,
+        Consultation
     }
 }
