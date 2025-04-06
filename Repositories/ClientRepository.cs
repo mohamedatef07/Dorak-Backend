@@ -11,5 +11,10 @@ namespace Repositories
     public class ClientRepository : BaseRepository<Client>
     {
         public ClientRepository(DorakContext context) : base(context) { }
+    
+        //public void AddClient(Client client)
+        //{
+        //    Table.Add(client);
+        //}
     }
 }

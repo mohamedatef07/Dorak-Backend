@@ -11,8 +11,6 @@ namespace Dorak.Models
         public string PaymentStatus { get; set; }
         public string RefundStatus { get; set; }
         public DateTime TransactionDate { get; set; }
-        public bool IsDeleted { get; set; }
-
         public int AppointmentId { get; set; }
         public virtual Appointment Appointment { get; set; }
         public string ClientId { get; set; }

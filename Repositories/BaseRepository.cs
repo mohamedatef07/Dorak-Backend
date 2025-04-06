@@ -1,6 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Data;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Drawing.Printing;
 using System.Reflection;
 
 namespace Repositories
@@ -27,9 +35,17 @@ namespace Repositories
         {
             Table.Remove(entity);
         }
-        public T GetById(Expression<Func<T, bool>> predicate)
+        public void SaveChanges()
         {
-            return  Table.FirstOrDefault(predicate);
+            dbContext.SaveChangesAsync();
+        }
+        public async Task<T> GetByIdAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await Table.FirstOrDefaultAsync(predicate);
+        }
+        public async Task<IEnumerable<T>> GetAllAsync()
+        {
+            return await Table.ToListAsync();
         }
         public IQueryable<T> GetAll()
         {
@@ -57,7 +73,7 @@ namespace Repositories
             var propertyAccess = Expression.Property(parameter, property);
             var orderByExpression = Expression.Lambda(propertyAccess, parameter);
 
-
+            
             string methodName = isAscending ? "OrderBy" : "OrderByDescending";
             var resultExpression = Expression.Call(
                 typeof(Queryable),
@@ -66,42 +82,9 @@ namespace Repositories
                 Query.Expression,
                 Expression.Quote(orderByExpression)
             );
+
             return Query.Provider.CreateQuery<T>(resultExpression);
         }
-        //Pagination
-        public IQueryable<T> GetList(Expression<Func<T, bool>> filter = null)
-        {
-            if (filter == null)
-                return Table.AsQueryable();
-            return Table.Where(filter);
-        }
-        public IQueryable<T> Get(Expression<Func<T, bool>> filter = null, int pageSize = 4, int pageNumber = 1)
-        {
-            IQueryable<T> query = Table.AsQueryable();
 
-            if (filter != null)
-                query = query.Where(filter);
-
-            if (pageSize < 0)
-                pageSize = 4;
-
-            if (pageNumber < 0)
-                pageNumber = 1;
-
-
-            int count = query.Count();
-
-            if (count < pageSize)
-            {
-                pageSize = count;
-                pageNumber = 1;
-            }
-
-            int ToSkip = (pageNumber - 1) * pageSize;
-
-            query = query.Skip(ToSkip).Take(pageSize);
-
-            return query;
-        }
     }
 }
