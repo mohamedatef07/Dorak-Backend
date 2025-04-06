@@ -6,10 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data
 {
     public class DorakContext : IdentityDbContext<User>
-    {
-        public DorakContext(DbContextOptions<DorakContext> options) : base(options)
-        {
-        }
+    {       
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
@@ -23,17 +20,15 @@ namespace Data
         public virtual DbSet<Wallet> Wallets { get; set; }
         public virtual DbSet<ProviderService> ProviderServices { get; set; }
         public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set; }
+        public virtual DbSet<ProviderSchedule> ProviderSchedules { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Provider> Providers { get; set; }
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
-        
+
         //Connect With database
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("Data source = .; Initial catalog = Dorak; Integrated security= true; trustservercertificate = true; Encrypt= false;");
-        }
+        public DorakContext(DbContextOptions<DorakContext> options) : base(options) { }
 
         //Apply Configurations
         protected override void OnModelCreating(ModelBuilder builder)
@@ -49,6 +44,7 @@ namespace Data
             builder.ApplyConfiguration(new NotificationConfiguration { });
             builder.ApplyConfiguration(new WalletConfiguration { });
             builder.ApplyConfiguration(new ProviderAssignmentConfiguration { });
+            builder.ApplyConfiguration(new ProviderScheduleConfiguration { });
             builder.ApplyConfiguration(new ProviderServicesConfiguration { });
             builder.ApplyConfiguration(new ProviderCertificationsConfiguration { });
             builder.ApplyConfiguration(new ProviderConfiguration { });
@@ -57,6 +53,5 @@ namespace Data
             builder.ApplyConfiguration(new OperatorConfiguration { });
             base.OnModelCreating(builder);
         }
-
     }
 }

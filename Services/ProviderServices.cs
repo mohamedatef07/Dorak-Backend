@@ -1,43 +1,96 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Data;
+using Data;
 using Dorak.Models;
-using Dorak.ViewModels.AccountViewModels;
-using Microsoft.AspNetCore.Identity;
+using Dorak.ViewModels;
 using Repositories;
 
 namespace Services
 {
     public class ProviderServices
     {
-        private ProviderRepository providerRepository;
+        ProviderRepository providerRepository;
+        ProviderAssignmentRepository providerAssignmentRepository;
+        ProviderScheduleRepository providerScheduleRepository;
+        
 
-        public ProviderServices(ProviderRepository _providerRepository)
+        public ProviderServices(ProviderRepository _providerRepository,
+            ProviderAssignmentRepository _providerAssignmentRepository,
+            ProviderScheduleRepository _providerScheduleRepository
+            )
         {
             providerRepository = _providerRepository;
+            providerAssignmentRepository = _providerAssignmentRepository;
+            providerScheduleRepository = _providerScheduleRepository;
+            
         }
 
-        public async Task<IdentityResult> CreateProvider(string userId, ProviderRegisterViewModel model)
+        // ----- Assign provider to center -----
+
+        public Provider GetProviderById(string providerId)
         {
-            var provider = new Provider
+            return providerRepository.GetById(p => p.ProviderId == providerId);
+            return providerRepository.GetById(p => p.ProviderId == providerId);
+        }
+        public void AssignProviderToCenter(ProviderAssignmentViewModel model)
+        {
+            var assignment = new ProviderAssignment
             {
-                ProviderId = userId,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Gender = model.Gender,
-                BirthDate = model.BirthDate,
-                Street = model.Street,
-                City = model.City,
-                Governorate = model.Governorate,
-                Country = model.Country,
-                PicName = model.Image
+                ProviderId = model.ProviderId,
+                CenterId = model.CenterId,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                AssignmentType = model.AssignmentType
             };
 
-            providerRepository.Add(provider);
-            providerRepository.SaveChanges();
-            return IdentityResult.Success;
+            providerAssignmentRepository.Add(assignment);
+            CommitData.SaveChanges();
         }
+
+        // ----- Manage provider schedule -----
+        public string ManageProviderSchedule(ProviderScheduleViewModel model)
+        {
+            if (model.StartDate > model.EndDate)
+            {
+                return "start date cannot be after end date.";
+            }
+
+            if (model.StartTime >= model.EndTime)
+            {
+                return "start time must be before end time.";
+            }
+
+            // ***
+
+            var existingSchedule = providerScheduleRepository
+                .GetAll()
+                .FirstOrDefault(s =>
+                    s.ProviderId == model.ProviderId &&
+                    s.CenterId == model.CenterId &&
+                    ((model.StartDate <= s.EndDate && model.EndDate >= s.StartDate) &&
+                    (model.StartTime < s.EndTime && model.EndTime > s.StartTime))
+                );
+
+            if (existingSchedule != null)
+            {
+                return "provider already has a schedule at this time.";
+            }
+
+            var providerSchedule = new ProviderSchedule
+            {
+                ProviderId = model.ProviderId,
+                CenterId = model.CenterId,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                MaxPatientsPerDay = model.MaxPatientsPerDay
+            };
+
+            providerScheduleRepository.Add(providerSchedule);
+            CommitData.SaveChanges();
+
+            return "schedule has been created successfully!";
+        }
+        
     }
 }

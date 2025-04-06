@@ -14,7 +14,8 @@ namespace Dorak.Models
             //One-to-Many Relations 
             builder.HasMany(Shift => Shift.Appointments)
                    .WithOne(Appointment => Appointment.Shift)
-                   .HasForeignKey(Appointment => Appointment.ShiftId);
+                   .HasForeignKey(Appointment => Appointment.ShiftId)
+                    .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

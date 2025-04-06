@@ -40,9 +40,6 @@ namespace Dorak.Models
             builder.Property(c => c.BirthDate)
                 .HasColumnType("DATE")
                 .IsRequired();
-
-            builder.Property(c => c.IsDeleted)
-                .HasDefaultValue(false);
         }
     }
 }

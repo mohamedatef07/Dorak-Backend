@@ -13,7 +13,8 @@ namespace Dorak.Models
             //Relations Many To one
             builder.HasMany(tempclient => tempclient.Appointments)
                 .WithOne(Appointment => Appointment.TemporaryClient)
-                .HasForeignKey(Appointment => Appointment.TemporaryClientId);
+                .HasForeignKey(Appointment => Appointment.TemporaryClientId)
+                 .OnDelete(DeleteBehavior.NoAction);
 
             //Properties
             builder.Property(tempclient => tempclient.ContactInfo)
@@ -24,9 +25,6 @@ namespace Dorak.Models
 
             builder.Property(tempclient => tempclient.TempCode)
                 .IsRequired(true);
-
-            builder.Property(tempclient => tempclient.IsDeleted)
-                .HasDefaultValue(false);
         }
     }
 }

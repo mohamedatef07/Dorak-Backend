@@ -14,7 +14,8 @@ namespace Dorak.Models
             //Relations Many To one
             builder.HasOne(n => n.User)
                 .WithMany(u => u.Notifications)
-                .HasForeignKey(n => n.UserId);
+                .HasForeignKey(n => n.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //Properties
             builder.Property(notification => notification.Title)

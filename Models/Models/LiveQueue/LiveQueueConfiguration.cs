@@ -15,7 +15,8 @@ namespace Dorak.Models
 
             builder.HasOne(LiveQueue => LiveQueue.Appointment)
                    .WithOne(Appointment => Appointment.LiveQueue)
-                   .HasForeignKey<Appointment>(Appointment => Appointment.LiveQueueId);
+                   .HasForeignKey<Appointment>(Appointment => Appointment.LiveQueueId)
+                   .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

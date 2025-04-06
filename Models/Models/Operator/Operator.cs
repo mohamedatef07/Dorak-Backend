@@ -9,8 +9,8 @@ namespace Dorak.Models
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public GenderType Gender { get; set; }
-
         public string? Image { get; set; }
+        public bool IsDeleted { get; set; }
         public virtual ICollection<LiveQueue> LiveQueues { get; set; }
         public virtual ICollection<Shift> Shifts { get; set; }
         public virtual ICollection<Appointment> Appointments { get; set; }
