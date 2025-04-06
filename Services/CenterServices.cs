@@ -1,8 +1,6 @@
 ﻿using Data;
 using Dorak.Models;
-using Dorak.Models.Enums;
 using Dorak.ViewModels;
-using Dorak.ViewModels.CenterViewModel;
 using Repositories;
 using System.Linq.Expressions;
 
@@ -44,7 +42,7 @@ namespace Services
             var center = centerRepository.GetById(c => c.CenterId == id);
             if (center != null)
             {
-                center.CenterStatus = CenterStatus.Active;
+                //center.CenterStatus = CenterStatus.Active;
                 centerRepository.Edit(center);
                 commitData.SaveChanges();
                 return true;
@@ -59,7 +57,7 @@ namespace Services
             var center = centerRepository.GetById(c => c.CenterId == id);
             if (center != null)
             {
-                center.CenterStatus = CenterStatus.Inactive;
+                //center.CenterStatus = CenterStatus.Inactive;
                 centerRepository.Edit(center);
                 commitData.SaveChanges();
                 return true;

@@ -1,85 +1,86 @@
-﻿@model PaginationViewModel<CenterViewModel>
-@{
-    bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
-    int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
-    bool canBack = Model.PageNumber <= 1;
-}
-@section styles {
-    <link rel="stylesheet" href="~/css/centerIndex.css" />
-}
+﻿@* @using Dorak.ViewModels *@
+@* @model PaginationViewModel<CenterViewModel> *@
+@* @{ *@
+@*     bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total); *@
+@*     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize); *@
+@*     bool canBack = Model.PageNumber <= 1; *@
+@* } *@
+@* @section styles { *@
+@*     <link rel="stylesheet" href="~/css/centerIndex.css" /> *@
+@* } *@
 
-<div class="search col-7 mb-4">
-    <form asp-controller="Center" asp-action="Index" method="get" class="g-3 d-flex gap-4">
-        <input type="text" class="form form-control serach-input" name="searchText" placeholder="Search Text">
-        <input type="submit" class="btn text-white main-btn" value="Search" />
-        <input type="hidden" name="pagenumber" value="@Model.PageNumber" />
-    </form>
-</div>
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Center ID</th>
-            <th scope="col">Center Name</th>
-            <th scope="col">Contact Number</th>
-            <th scope="col">City</th>
-            <th scope="col">Status</th>
-            <th scope="col">Active</th>
-            <th scope="col">Inctive</th>
-            <th scope="col">Delete</th>
-            <th scope="col">Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var center in Model.Data)
-        {
-            <tr>
-                <td>@center.CenterId</td>
-                <td>@center.CenterName</td>
-                <td>@center.ContactNumber</td>
-                <td>@center.City</td>
-                <td>@center.CenterStatus</td>
-                <td>
-                    <a class="btn btn-success" asp-controller="center" asp-action="active" asp-route-CenterId="@center.CenterId">Active</a>
-                </td>
-                <td>
-                    <a class="btn btn-secondary" asp-controller="center" asp-action="inactive" asp-route-CenterId="@center.CenterId">Inactive</a>
-                </td>
-                <td>
-                    <a class="btn btn-danger" asp-controller="center" asp-action="delete" asp-route-CenterId="@center.CenterId">Delete</a>
-                </td>
-                <td>
-                    <a class="btn btn-outline-dark" asp-controller="center" asp-action="details" asp-route-CenterId="@center.CenterId">Details</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@* <div class="search col-7 mb-4"> *@
+@*     <form asp-controller="Center" asp-action="Index" method="get" class="g-3 d-flex gap-4"> *@
+@*         <input type="text" class="form form-control serach-input" name="searchText" placeholder="Search Text"> *@
+@*         <input type="submit" class="btn text-white main-btn" value="Search" /> *@
+@*         <input type="hidden" name="pagenumber" value="@Model.PageNumber" /> *@
+@*     </form> *@
+@* </div> *@
+@* <table class="table"> *@
+@*     <thead> *@
+@*         <tr> *@
+@*             <th scope="col">Center ID</th> *@
+@*             <th scope="col">Center Name</th> *@
+@*             <th scope="col">Contact Number</th> *@
+@*             <th scope="col">City</th> *@
+@*             <th scope="col">Status</th> *@
+@*             <th scope="col">Active</th> *@
+@*             <th scope="col">Inctive</th> *@
+@*             <th scope="col">Delete</th> *@
+@*             <th scope="col">Details</th> *@
+@*         </tr> *@
+@*     </thead> *@
+@*     <tbody> *@
+@*         @foreach (var center in Model.Data) *@
+@*         { *@
+@*             <tr> *@
+@*                 <td>@center.CenterId</td> *@
+@*                 <td>@center.CenterName</td> *@
+@*                 <td>@center.ContactNumber</td> *@
+@*                 <td>@center.City</td> *@
+@*                 <td>@center.CenterStatus</td> *@
+@*                 <td> *@
+@*                     <a class="btn btn-success" asp-controller="center" asp-action="active" asp-route-CenterId="@center.CenterId">Active</a> *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     <a class="btn btn-secondary" asp-controller="center" asp-action="inactive" asp-route-CenterId="@center.CenterId">Inactive</a> *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     <a class="btn btn-danger" asp-controller="center" asp-action="delete" asp-route-CenterId="@center.CenterId">Delete</a> *@
+@*                 </td> *@
+@*                 <td> *@
+@*                     <a class="btn btn-outline-dark" asp-controller="center" asp-action="details" asp-route-CenterId="@center.CenterId">Details</a> *@
+@*                 </td> *@
+@*             </tr> *@
+@*         } *@
+@*     </tbody> *@
+@* </table> *@
 
-<div class="d-flex justify-content-center align-items-center gap-2 pt-2 pb-2">
-    <button class="btn text-white main-btn" onclick="page('back')" disabled="@canBack">Back</button>
-    @for (int i = 1; i <= PageCount; i++)
-    {
-        <button class="btn text-white main-btn" onclick="pagenum('@i')">@i</button>
-    }
-    <button class="btn text-white main-btn" onclick="page('next')" disabled="@canNext">Next</button>
-</div>
+@* <div class="d-flex justify-content-center align-items-center gap-2 pt-2 pb-2"> *@
+@*     <button class="btn text-white main-btn" onclick="page('back')" disabled="@canBack">Back</button> *@
+@*     @for (int i = 1; i <= PageCount; i++) *@
+@*     { *@
+@*         <button class="btn text-white main-btn" onclick="pagenum('@i')">@i</button> *@
+@*     } *@
+@*     <button class="btn text-white main-btn" onclick="page('next')" disabled="@canNext">Next</button> *@
+@* </div> *@
 
-@section scripts {
-    <script>
-        let form= document.getElementsByTagName("form")[0]
-        function page(btn){
-            if(btn == "next"){
-                form.pagenumber.value++;
-            }
-            else{
-                form.pagenumber.value--;
-            }
+@* @section scripts { *@
+@*     <script> *@
+@*         let form= document.getElementsByTagName("form")[0] *@
+@*         function page(btn){ *@
+@*             if(btn == "next"){ *@
+@*                 form.pagenumber.value++; *@
+@*             } *@
+@*             else{ *@
+@*                 form.pagenumber.value--; *@
+@*             } *@
 
-            form.submit()
-        }
-        function pagenum(a){
-            form.pagenumber.value=a;
-            form.submit()
-        }
-    </script>
-}
+@*             form.submit() *@
+@*         } *@
+@*         function pagenum(a){ *@
+@*             form.pagenumber.value=a; *@
+@*             form.submit() *@
+@*         } *@
+@*     </script> *@
+@* } *@

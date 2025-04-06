@@ -1,54 +1,38 @@
-﻿using Data;
-using Dorak.Models;
-using Dorak.ViewModels;
-using Models.Enums;
-using Repositories;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Dorak.Models;
+using Dorak.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Identity;
+using Repositories;
 
 namespace Services
 {
     public class ProviderServices
     {
-        ProviderRepository providerRepository;
-        ProviderAssignmentRepository providerAssignmentRepository;
+        private ProviderRepository providerRepository;
 
-
-        public ProviderServices(ProviderRepository _providerRepository, ProviderAssignmentRepository _providerAssignmentRepository)
+        public ProviderServices(ProviderRepository _providerRepository)
         {
             providerRepository = _providerRepository;
-            providerAssignmentRepository = _providerAssignmentRepository;
         }
 
-        // ----- assign provider to center -----
-
-        // get provider by id to assign to center later
-        public Provider GetProviderById(string providerId)
+        public async Task<IdentityResult> CreateProvider(string userId, ProviderRegisterViewModel model)
         {
-            return providerRepository.GetById(p => p.ProviderId == providerId);
-        }
-        public List<Provider> GetAllProviders()
-        {
-            return providerRepository.GetAll().ToList();
-        }
-        public void EditProvider(Provider provider)
-        {
-            providerRepository.Edit(provider);
-        }
-        public void DeleteProvider(Provider provider)
-        {
-            providerRepository.Delete(provider);
-        }
-
-        public void AssignProviderToCenter(string providerId, int centerId, DateTime startDate, DateTime endDate, ProviderType assignmentType)
-        {
-            var assignment = new ProviderAssignment
+            var provider = new Provider
             {
-                ProviderId = providerId,
-                CenterId = centerId,
-                StartDate = startDate,
-                EndDate = endDate,
-                AssignmentType = assignmentType
+                ProviderId = userId,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Gender = model.Gender,
+                BirthDate = model.BirthDate,
+                Street = model.Street,
+                City = model.City,
+                Governorate = model.Governorate,
+                Country = model.Country,
+                PicName = model.Image
             };
 
             providerAssignmentRepository.Add(assignment);
@@ -60,6 +44,5 @@ namespace Services
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
-        
     }
 }

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
 
 namespace Repositories
 {
@@ -23,7 +24,7 @@ namespace Repositories
 
 
 
-        public async Task<IdentityResult> Register(UserRegisterViewModel userRegister)
+        public async Task<IdentityResult> Register(RegisterationViewModel userRegister)
         {
 
             var res = await UserManager.CreateAsync(userRegister.ToModel(), userRegister.Password);
@@ -51,6 +52,17 @@ namespace Repositories
         {
             return await UserManager.FindByNameAsync(userName);
         }
+
+        public async Task<User> FindByEmail(string email)
+        {
+            return await UserManager.FindByEmailAsync(email);
+        }
+
+        public async Task<IList<string>> GetUserRoles(User user)
+        {
+            return await UserManager.GetRolesAsync(user);
+        }
+
 
         public async Task Signout()
         {

@@ -21,9 +21,9 @@ namespace API.Controllers
         [HttpGet("provider/{providerId}")]
         public IActionResult GetProviderById(string providerId)
         {
-            var provider =  providerServices.GetProviderById(providerId);
+            //var provider =  providerServices.GetProviderById(providerId);
 
-            return Ok(provider);
+            return Ok();//provider
         }
 
         [HttpPost("assign")]
@@ -34,13 +34,13 @@ namespace API.Controllers
             DateTime endDate,
             ProviderType assignmentType)
         {
-            providerServices.AssignProviderToCenter(
-                providerId,
-                centerId,
-                startDate,
-                endDate,
-                assignmentType
-            );
+            //providerServices.AssignProviderToCenter(
+            //    providerId,
+            //    centerId,
+            //    startDate,
+            //    endDate,
+            //    assignmentType
+            //);
 
             return Ok("Provider assigned successfully.");
         }

@@ -1,28 +1,28 @@
-﻿@using Dorak.Models.Enums
-@using Dorak.ViewModels.CenterViewModel
-@model Center
-<div>
-    <div class="col-7 mb-4">
-        <div class="card shadow-lg border-0">
-            <div class="card-body">
-                <h1 class="card-title">@Model.CenterName</h1>
-                <p class="card-text">
-                    <strong>ID:</strong> @Model.CenterId <br />
-                    <strong>Contact:</strong> @Model.ContactNumber <br />
-                    <strong>Email:</strong> @Model.Email <br />
-                    <strong>Location:</strong> @Model.Country, @Model.City, @Model.Street <br />
-                    <strong>Status:</strong>
-                    <span class="badge @(Model.CenterStatus == CenterStatus.Active ? "bg-success" : "bg-danger")">
-                        @Model.CenterStatus
-                    </span>
-                </p>
-                <div class="d-flex justify-content-between">
-                    <a class="btn btn-danger" asp-controller="center" asp-action="delete" asp-route-CenterId="@Model.CenterId">Delete</a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+﻿@* @using Dorak.Models.Enums *@
+@* @using Dorak.ViewModels.CenterViewModel *@
+@* @model Center *@
+@* <div> *@
+@*     <div class="col-7 mb-4"> *@
+@*         <div class="card shadow-lg border-0"> *@
+@*             <div class="card-body"> *@
+@*                 <h1 class="card-title">@Model.CenterName</h1> *@
+@*                 <p class="card-text"> *@
+@*                     <strong>ID:</strong> @Model.CenterId <br /> *@
+@*                     <strong>Contact:</strong> @Model.ContactNumber <br /> *@
+@*                     <strong>Email:</strong> @Model.Email <br /> *@
+@*                     <strong>Location:</strong> @Model.Country, @Model.City, @Model.Street <br /> *@
+@*                     <strong>Status:</strong> *@
+@*                     <span class="badge @(Model.CenterStatus == CenterStatus.Active ? "bg-success" : "bg-danger")"> *@
+@*                         @Model.CenterStatus *@
+@*                     </span> *@
+@*                 </p> *@
+@*                 <div class="d-flex justify-content-between"> *@
+@*                     <a class="btn btn-danger" asp-controller="center" asp-action="delete" asp-route-CenterId="@Model.CenterId">Delete</a> *@
+@*                 </div> *@
+@*             </div> *@
+@*         </div> *@
+@*     </div> *@
+@* </div> *@
 
 
-<a class="btn text-white" style="color:#2a6f96" asp-controller="center" asp-action="Index">Back</a>
+@* <a class="btn text-white" style="color:#2a6f96" asp-controller="center" asp-action="Index">Back</a> *@
