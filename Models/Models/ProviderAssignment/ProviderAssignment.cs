@@ -14,6 +14,8 @@ namespace Dorak.Models
         public virtual Provider Provider { get; set; }
         public int CenterId { get; set; }
         public virtual Center Center { get; set; }
+        public virtual ICollection<Shift> Shifts { get; set; }
+
     }
 
 }

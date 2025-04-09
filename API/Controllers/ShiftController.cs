@@ -7,20 +7,20 @@ namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProviderScheduleController : ControllerBase
+    public class ShiftController : ControllerBase
     {
         private readonly ProviderServices providerServices;
 
-        public ProviderScheduleController(ProviderServices _providerServices)
+        public ShiftController(ProviderServices _providerServices)
         {
             providerServices = _providerServices;
         }
 
-        [HttpPost("schedule")]
-        public IActionResult ManageProviderSchedule([FromBody] ProviderScheduleViewModel model)
+        [HttpPost("create")]
+        public IActionResult ManageProviderSchedule([FromBody] ShiftViewModel model)
         {
 
-            var result = providerServices.ManageProviderSchedule(model);
+            var result = providerServices.CreateShift(model);
 
             return Ok(new { message = result });
         }

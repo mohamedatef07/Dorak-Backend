@@ -17,24 +17,22 @@ namespace API.Controllers
             providerServices = _providerServices;
         }
 
-        [HttpGet]
-        [Route("getproviderbyid")]
-        public IActionResult GetProviderById(string providerId)
-        {
-            var provider = providerServices.GetProviderById(providerId);
-            return Ok(provider);
-        }
+        //[HttpGet]
+        //[Route("getproviderbyid")]
+        //public IActionResult GetProviderById(string providerId)
+        //{
+        //    var provider = providerServices.GetProviderById(providerId);
+        //    return Ok(provider);
+        //}
 
         [HttpPost]
         [Route("assign")]
-        public IActionResult AssignProvider(ProviderAssignmentViewModel model)
+        public IActionResult AssignProvider([FromBody] ProviderAssignmentViewModel model)
         {
 
-            providerServices.AssignProviderToCenter(
-                model
-            );
+            var result = providerServices.AssignProviderToCenter(model);
 
-            return Ok("provider assigned successfully.");
+            return Ok(new { message = result});
         }
     }
 }

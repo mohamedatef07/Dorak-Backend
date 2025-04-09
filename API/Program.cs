@@ -1,5 +1,6 @@
 using Data;
 using Dorak.Models;
+using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
@@ -20,7 +21,8 @@ namespace API
             builder.Services.AddScoped(typeof(ProviderRepository));
             builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
-            builder.Services.AddScoped(typeof(ProviderScheduleRepository));
+            builder.Services.AddScoped(typeof(ProviderCenterServiceRepository));
+            builder.Services.AddScoped(typeof(ShiftRepository));
             builder.Services.AddScoped(typeof(CommitData));
 
             builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
@@ -38,10 +40,7 @@ namespace API
             var app = builder.Build();
 
             
-            //var scope = app.Services.CreateScope();
-            //var context = scope.ServiceProvider.GetRequiredService<DorakContext>();
-            //CommitData.Initialize(context);  
-
+           
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
             {

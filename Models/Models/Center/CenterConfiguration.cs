@@ -17,9 +17,9 @@ namespace Dorak.Models
                 .HasForeignKey(AdminCenterManagement => AdminCenterManagement.CenterId)
                  .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(center => center.CenterServices)
-                .WithOne(centerService => centerService.Center)
-                .HasForeignKey(centerService => centerService.CenterId)
+            builder.HasMany(center => center.ProviderCenterServices)
+                .WithOne(ProviderCenterService => ProviderCenterService.Center)
+                .HasForeignKey(ProviderCenterService => ProviderCenterService.CenterId)
                  .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(center => center.ProviderAssignments)

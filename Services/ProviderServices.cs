@@ -1,8 +1,9 @@
 ﻿using Data;
-using Data;
 using Dorak.Models;
+using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Repositories;
+using System.Linq;
 
 namespace Services
 {
@@ -10,28 +11,26 @@ namespace Services
     {
         ProviderRepository providerRepository;
         ProviderAssignmentRepository providerAssignmentRepository;
-        ProviderScheduleRepository providerScheduleRepository;
-        
+        ProviderCenterServiceRepository providerCenterServiceRepository;
+        ShiftRepository shiftRepository;
+        CommitData commitData;
 
-        public ProviderServices(ProviderRepository _providerRepository,
+        public ProviderServices(
+            ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
-            ProviderScheduleRepository _providerScheduleRepository
-            )
+            ProviderCenterServiceRepository _providerCenterServiceRepository,
+            ShiftRepository _shiftRepository,
+            CommitData _commitData)
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
-            providerScheduleRepository = _providerScheduleRepository;
-            
+            providerCenterServiceRepository = _providerCenterServiceRepository;
+            shiftRepository = _shiftRepository;
+            commitData = _commitData;
         }
 
-        // ----- Assign provider to center -----
-
-        public Provider GetProviderById(string providerId)
-        {
-            return providerRepository.GetById(p => p.ProviderId == providerId);
-            return providerRepository.GetById(p => p.ProviderId == providerId);
-        }
-        public void AssignProviderToCenter(ProviderAssignmentViewModel model)
+        // Assign provider to center
+        public string AssignProviderToCenter(ProviderAssignmentViewModel model)
         {
             var assignment = new ProviderAssignment
             {
@@ -43,54 +42,59 @@ namespace Services
             };
 
             providerAssignmentRepository.Add(assignment);
-            CommitData.SaveChanges();
+            commitData.SaveChanges();
+
+            return "Provider assigned successfully!";
         }
 
-        // ----- Manage provider schedule -----
-        public string ManageProviderSchedule(ProviderScheduleViewModel model)
+        // Assign service to center (replacing ProviderService with direct ServiceId)
+        public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
         {
-            if (model.StartDate > model.EndDate)
-            {
-                return "start date cannot be after end date.";
-            }
+            var isAssigned = providerAssignmentRepository.GetAll()
+                .Any(a => a.ProviderId == model.ProviderId && a.CenterId == model.CenterId);
 
-            if (model.StartTime >= model.EndTime)
-            {
-                return "start time must be before end time.";
-            }
+            if (!isAssigned)
+                return "Provider is not assigned to the selected center.";
 
-            // ***
-
-            var existingSchedule = providerScheduleRepository
-                .GetAll()
-                .FirstOrDefault(s =>
-                    s.ProviderId == model.ProviderId &&
-                    s.CenterId == model.CenterId &&
-                    ((model.StartDate <= s.EndDate && model.EndDate >= s.StartDate) &&
-                    (model.StartTime < s.EndTime && model.EndTime > s.StartTime))
-                );
-
-            if (existingSchedule != null)
-            {
-                return "provider already has a schedule at this time.";
-            }
-
-            var providerSchedule = new ProviderSchedule
+            // Create the ProviderCenterService directly
+            var providerCenterService = new ProviderCenterService
             {
                 ProviderId = model.ProviderId,
+                ServiceId = model.ServiceId,
                 CenterId = model.CenterId,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
-                MaxPatientsPerDay = model.MaxPatientsPerDay
+                Duration = model.Duration,
+                Price = model.Price,
+                Priority = model.Priority,
+                IsDeleted = false
             };
 
-            providerScheduleRepository.Add(providerSchedule);
-            CommitData.SaveChanges();
+            providerCenterServiceRepository.Add(providerCenterService);
+            commitData.SaveChanges();
 
-            return "schedule has been created successfully!";
+            return "Service successfully assigned to center for the provider!";
         }
-        
+
+        // Create shift
+        public string CreateShift(ShiftViewModel model)
+        {
+            var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
+            if (assignment == null)
+                return "Invalid provider assignment ID.";
+
+            var shift = new Shift
+            {
+                ProviderAssignmentId = model.ProviderAssignmentId,
+                ShiftType = model.ShiftType,
+                StartTime = model.StartTime,
+                EndTime = model.EndTime,
+                MaxPatientsPerDay = model.MaxPatientsPerDay,
+                IsDeleted = false
+            };
+
+            shiftRepository.Add(shift);
+            commitData.SaveChanges();
+
+            return "Shift created successfully!";
+        }
     }
 }
