@@ -1,5 +1,6 @@
 using Data;
 using Dorak.Models;
+using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
@@ -18,11 +19,16 @@ namespace AdminArea
            .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped(typeof(CenterServices));
-            builder.Services.AddScoped(typeof(ProviderRepository));
-            builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(ProviderAssignmentRepository));
+            builder.Services.AddScoped(typeof(ProviderRepository));
+            builder.Services.AddScoped(typeof(ServicesRepository));
             builder.Services.AddScoped(typeof(CenterRepository));
+            builder.Services.AddScoped(typeof(ProviderCenterServiceRepository));
+
+            builder.Services.AddScoped(typeof(CenterServices));
+            builder.Services.AddScoped(typeof(ProviderServices));
+            builder.Services.AddScoped(typeof(S_Services));
+            builder.Services.AddScoped(typeof(ShiftRepository));
             builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddScoped(typeof(RoleRepository));

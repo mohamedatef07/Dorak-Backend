@@ -22,7 +22,6 @@ namespace Dorak.Models
                    .WithOne(Service => Service.Appointment)
                    .HasForeignKey<Appointment>(Appointment => Appointment.ServiceId)
                    .OnDelete(DeleteBehavior.NoAction);
-
         }
     }
 }

@@ -31,15 +31,15 @@ namespace Dorak.Models
                 .IsRequired(true);
 
             builder.Property(c => c.Gender)
-                .HasMaxLength(10)
-                .HasColumnName("Gender")
-                .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
 
             builder.Property(c => c.BirthDate)
                 .HasColumnType("DATE")
                 .IsRequired();
+
+            builder.Property(c => c.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 }

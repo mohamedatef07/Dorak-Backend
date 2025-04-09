@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services;
-using Models.Enums;
 using Dorak.ViewModels;
-using System;
-
 namespace API.Controllers
 {
     [Route("api/[controller]")]
@@ -17,13 +14,7 @@ namespace API.Controllers
             providerServices = _providerServices;
         }
 
-        //[HttpGet]
-        //[Route("getproviderbyid")]
-        //public IActionResult GetProviderById(string providerId)
-        //{
-        //    var provider = providerServices.GetProviderById(providerId);
-        //    return Ok(provider);
-        //}
+
 
         [HttpPost]
         [Route("assign")]
@@ -32,7 +23,7 @@ namespace API.Controllers
 
             var result = providerServices.AssignProviderToCenter(model);
 
-            return Ok(new { message = result});
+            return Ok(new { message = result });
         }
     }
 }

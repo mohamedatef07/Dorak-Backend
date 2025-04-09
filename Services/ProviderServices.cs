@@ -2,31 +2,85 @@
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Identity;
+using Models.Enums;
 using Repositories;
+using System;
+using System.Threading.Tasks;
 using System.Linq;
 
 namespace Services
 {
     public class ProviderServices
     {
-        ProviderRepository providerRepository;
-        ProviderAssignmentRepository providerAssignmentRepository;
-        ProviderCenterServiceRepository providerCenterServiceRepository;
-        ShiftRepository shiftRepository;
-        CommitData commitData;
+        public ProviderRepository providerRepository;
+        public ProviderAssignmentRepository providerAssignmentRepository;
+        public ShiftRepository shiftRepository;
+        public ProviderCenterServiceRepository providerCenterServiceRepository;
+        public CommitData commitData;
 
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
-            ProviderCenterServiceRepository _providerCenterServiceRepository,
             ShiftRepository _shiftRepository,
+            ProviderCenterServiceRepository _providerCenterServiceRepository,
             CommitData _commitData)
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
-            providerCenterServiceRepository = _providerCenterServiceRepository;
             shiftRepository = _shiftRepository;
+            providerCenterServiceRepository = _providerCenterServiceRepository;
             commitData = _commitData;
+        }
+
+        // Creating a New User-Provider 
+        public async Task<IdentityResult> CreateProvider(string userId, ProviderRegisterViewModel model)
+        {
+            var _provider = new Provider
+            {
+                ProviderId = userId,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Gender = model.Gender,
+                BirthDate = model.BirthDate,
+                Street = model.Street,
+                City = model.City,
+                Governorate = model.Governorate,
+                Country = model.Country,
+                ExperienceYears = model.ExperienceYears,
+                LicenseNumber = model.LicenseNumber,
+                Bio = model.Description,
+                EstimatedDuration = model.EstimatedDuration,
+                Availability = model.Availability,
+                //RATE
+                Specialization = model.Specialization,
+                Image = model.Image,
+            };
+
+            providerRepository.Add(_provider);
+            commitData.SaveChanges();
+            return IdentityResult.Success;
+        }
+
+
+        public Provider GetProviderById(string providerId)
+        {
+            return providerRepository.GetById(p => p.ProviderId == providerId);
+        }
+
+        public List<Provider> GetAllProviders()
+        {
+            return providerRepository.GetAll().ToList();
+        }
+        public void EditProvider(Provider provider)
+        {
+            providerRepository.Edit(provider);
+            commitData.SaveChanges();
+        }
+        public void DeleteProvider(Provider provider)
+        {
+            providerRepository.Delete(provider);
         }
 
         // Assign provider to center
@@ -44,10 +98,26 @@ namespace Services
             providerAssignmentRepository.Add(assignment);
             commitData.SaveChanges();
 
-            return "Provider assigned successfully!";
+            return "Provider assigned Succesfully!";
         }
 
-        // Assign service to center (replacing ProviderService with direct ServiceId)
+        //public GetProviderBookingInfoViewModel GetProviderBookingInfo(string providerId)
+        //{
+        //    var provider = GetProviderById(providerId);
+        //    var providerAssignment = provider.ProviderAssignments.FirstOrDefault(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+        //    var providerService = provider.ProviderServices.FirstOrDefault(ps => ps.ProviderId == providerId);
+        //    var shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
+        //    return new GetProviderBookingInfoViewModel
+        //    {
+        //        CenterName = providerAssignment.Center.CenterName,
+        //        ServiceName = providerService.Service.ServiceName,
+        //        BasePrice = providerService.Service.BasePrice,
+        //        ShiftType = shift.ShiftType
+        //    };
+        //}
+
+
+        // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
         {
             var isAssigned = providerAssignmentRepository.GetAll()
@@ -56,7 +126,7 @@ namespace Services
             if (!isAssigned)
                 return "Provider is not assigned to the selected center.";
 
-            // Create the ProviderCenterService directly
+           
             var providerCenterService = new ProviderCenterService
             {
                 ProviderId = model.ProviderId,
@@ -88,7 +158,8 @@ namespace Services
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
                 MaxPatientsPerDay = model.MaxPatientsPerDay,
-                IsDeleted = false
+                IsDeleted = false,
+               
             };
 
             shiftRepository.Add(shift);
@@ -96,5 +167,11 @@ namespace Services
 
             return "Shift created successfully!";
         }
+        public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                            int pageSize = 2)
+        {
+            return providerRepository.Search(searchText, pageNumber, pageSize);
+        }
+
     }
 }

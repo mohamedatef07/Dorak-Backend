@@ -35,6 +35,11 @@ namespace Repositories
                 Total = count
             };
         }
+
+        public Provider GetProviderById(string providerId)
+        {
+            return GetById(p => p.ProviderId == providerId);
+        }
     }
 }
 

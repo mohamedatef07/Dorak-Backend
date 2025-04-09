@@ -16,20 +16,17 @@ namespace Dorak.Models
                 .HasForeignKey<Operator>(o => o.OperatorId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            //builder.HasMany(o => o.Shifts)
-            //    .WithOne(s => s.Operator)
-            //    .HasForeignKey(s => s.OperatorId)
-            //    .OnDelete(DeleteBehavior.NoAction);
+            builder.HasMany(o => o.Shifts)
+                .WithOne(s => s.Operator)
+                .HasForeignKey(s => s.OperatorId);
 
             builder.HasMany(o => o.LiveQueues)
                 .WithOne(lq => lq.Operator)
-                .HasForeignKey(lq => lq.OperatorId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(lq => lq.OperatorId);
 
             builder.HasMany(o => o.Appointments)
                 .WithOne(a => a.Operator)
-                .HasForeignKey(a => a.OperatorId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(a => a.OperatorId);
 
             //Properties
             builder.Property(c => c.FirstName)
@@ -46,11 +43,11 @@ namespace Dorak.Models
                 .IsRequired(true);
 
             builder.Property(c => c.Gender)
-                .HasMaxLength(10)
-                .HasColumnName("Gender")
-                .HasColumnType("NVARCHAR")
+
                 .IsRequired(true);
 
+            builder.Property(p => p.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 

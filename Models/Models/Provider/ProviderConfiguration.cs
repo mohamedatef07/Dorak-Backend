@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Models.Enums;
 
 namespace Dorak.Models
 {
@@ -13,18 +15,16 @@ namespace Dorak.Models
             //Relations
             builder.HasOne(p => p.User)
                 .WithOne(u => u.Provider)
-                .HasForeignKey<Provider>(p => p.ProviderId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey<Provider>(p => p.ProviderId);
 
             builder.HasMany(p=>p.Certifications)
                 .WithOne(c=>c.Provider)
                 .HasForeignKey(c=>c.ProviderId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(p => p.ProviderAssignments)
                 .WithOne(pa => pa.Provider)
-                .HasForeignKey(pa => pa.ProviderId)
-             .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(pa => pa.ProviderId);
 
             builder.HasMany(p => p.ProviderCenterServices)
                 .WithOne(pcs => pcs.Provider)
@@ -33,8 +33,7 @@ namespace Dorak.Models
 
             builder.HasMany(p => p.Appointments)
                 .WithOne(app => app.Provider)
-                .HasForeignKey(app => app.ProviderId)
-                 .OnDelete(DeleteBehavior.NoAction);
+                .HasForeignKey(app => app.ProviderId);
 
             //Properties
             builder.Property(p => p.FirstName)
@@ -53,9 +52,9 @@ namespace Dorak.Models
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
-            builder.Property(p => p.Description)
+            builder.Property(p => p.Bio)
                 .HasMaxLength(1000)
-                .HasColumnName("Description")
+                .HasColumnName("Bio")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 
@@ -67,16 +66,17 @@ namespace Dorak.Models
                 .HasMaxLength(20)
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
-            
+
             builder.Property(p => p.Gender)
-                .HasMaxLength(10)
-                .HasColumnName("Gender")
-                .HasColumnType("NVARCHAR")
+                //.HasConversion(new EnumToStringConverter<GenderType>())
                 .IsRequired(true);
 
             builder.Property(p => p.BirthDate)
                 .HasColumnType("DATE")
                 .IsRequired(true);
+
+            builder.Property(p => p.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 }

@@ -4,6 +4,91 @@
     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
 }
 @model PaginationViewModel<ProviderViewModel>
+<style>
+    div form .search-btn {
+        background-color: var(--main-bg-color-Light);
+        width: fit-content;
+    }
+</style>
+<h1>All Providers</h1>
+
+<div class="col-md-4 mb-4">
+    <form asp-controller="Provider" asp-action="Index" method="get" class="g-3 d-flex gap-4">
+        <input type="text" class="form form-control" name="searchText" placeholder="Search Text">
+        <input type="submit" class="btn text-white search-btn " value="Search" />
+    </form>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Address</th>
+            <th scope="col">Availability</th>
+            <th scope="col">Image</th>
+            <th scope="col">Edit</th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var item in Model.Data)
+        {
+            <tr>
+
+                <td>@item.FirstName @item.LastName</td>
+                <td>@item.City , @item.Country</td>
+                <td>@item.Availability</td>
+                <td><img src="/Images/@item.Image" class="card-img" style="width:30px" alt="Alternate Text" /></td>
+
+                <td>
+                    <a asp-action="Edit" asp-controller="Provider" asp-route-Id="@item.ProviderId">Edit </a>|
+                    <a asp-action="Delete" asp-controller="Provider" asp-route-Id="@item">Delete </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+<div class="d-flex justify-content-center align-items-center gap-2 pt-2 pb-2">
+    <button class="btn btn-primary" onclick="page('back')" disabled="@canBack">Back</button>
+    @for (int i = 1; i <= PageCount; i++)
+    {
+        <button class="btn btn-primary" onclick="pagenum('@i')">@i</button>
+
+    }
+    <button class="btn btn-primary" onclick="page('next')" disabled="@canNext">Next</button>
+</div>
+
+@section scripts {
+    <script>
+        let form= document.getElementsByTagName("form")[0]
+
+        function page(btn){
+            if(btn == "next"){
+                form.pagenumber.value++;
+            }
+            else{
+                form.pagenumber.value--;
+            }
+
+            form.submit()
+        }
+        function pagenum(a){
+            form.pagenumber.value=a;
+            form.submit()
+        }
+    </script>
+}
+
+
+@* @{
+    bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
+    bool canBack = Model.PageNumber <= 1;
+    int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+}
+@model PaginationViewModel<ProviderViewModel>
 
 <h1>All Providers</h1>
 
@@ -28,7 +113,7 @@
                 <td>@item.FirstName @item.LastName</td>
                 <td>@item.City , @item.Country</td>
                 <td>@item.Availability</td>
-                <td><img src="/Images/@item.PicName" class="card-img" style="width:30px" alt="Alternate Text" /></td>
+                <td><img src="/Images/@item.Image" class="card-img" style="width:30px" alt="Alternate Text" /></td>
 
                 <td>
                     <a asp-action="Edit" asp-controller="Provider" asp-route-Id="@item">Edit </a>|
@@ -70,4 +155,4 @@
             form.submit()
         }
     </script>
-}
+} *@

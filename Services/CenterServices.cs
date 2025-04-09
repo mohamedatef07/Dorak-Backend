@@ -47,6 +47,36 @@ namespace Services
                 return false;
             }
         }
+
+        public bool Active(int id)
+        {
+            var center = centerRepository.GetById(c => c.CenterId == id);
+            if (center != null)
+            {
+                centerRepository.Edit(center);
+                commitData.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public bool Inactive(int id)
+        {
+            var center = centerRepository.GetById(c => c.CenterId == id);
+            if (center != null)
+            {
+                centerRepository.Edit(center);
+                commitData.SaveChanges();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public PaginationViewModel<CenterViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {

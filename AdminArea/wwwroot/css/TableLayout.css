@@ -18,7 +18,12 @@
     color: var(--text-color-Light);
     background-color: #f9f9fb;
 }
+
 div form .search-btn {
     background-color: var(--main-bg-color-Light);
     width: fit-content;
+}
+
+.main-bg-color {
+    background-color: #2a6f96;
 }
