@@ -1,12 +1,12 @@
-﻿namespace Models.Enums
-{
-    public enum ServicePriority
-    {
-        none,
-        Urgent,
-        Examination,
-        FollowUp,
-        MedicalRep
+//namespace Models.Enums
+//{
+//    public enum ServicePriority
+//    {
+//        none,
+//        Urgent,
+//        Examination,
+//        FollowUp,
+//        MedicalRep
 
-    }
-}
+//    }
+//}

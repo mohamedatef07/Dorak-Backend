@@ -18,11 +18,10 @@ namespace Data
         public virtual DbSet<Payment> Payments { get; set; }
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Wallet> Wallets { get; set; }
-        public virtual DbSet<ProviderService> ProviderServices { get; set; }
         public virtual DbSet<ProviderAssignment> ProviderAssignments { get; set; }
-        public virtual DbSet<ProviderSchedule> ProviderSchedules { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<Provider> Providers { get; set; }
+        public virtual DbSet<ProviderCenterService> ProviderCenterServices { get; set; }
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
@@ -44,13 +43,13 @@ namespace Data
             builder.ApplyConfiguration(new NotificationConfiguration { });
             builder.ApplyConfiguration(new WalletConfiguration { });
             builder.ApplyConfiguration(new ProviderAssignmentConfiguration { });
-            builder.ApplyConfiguration(new ProviderScheduleConfiguration { });
-            builder.ApplyConfiguration(new ProviderServicesConfiguration { });
+            builder.ApplyConfiguration(new ProviderCenterServiceConfiguration { });
             builder.ApplyConfiguration(new ProviderCertificationsConfiguration { });
             builder.ApplyConfiguration(new ProviderConfiguration { });
             builder.ApplyConfiguration(new ClientConfiguration { });
             builder.ApplyConfiguration(new TemporaryClientConfiguration { });
             builder.ApplyConfiguration(new OperatorConfiguration { });
+
             base.OnModelCreating(builder);
         }
     }

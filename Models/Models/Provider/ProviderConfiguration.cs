@@ -26,9 +26,10 @@ namespace Dorak.Models
                 .WithOne(pa => pa.Provider)
                 .HasForeignKey(pa => pa.ProviderId);
 
-            builder.HasMany(p => p.ProviderServices)
-                .WithOne(ps => ps.Provider)
-                .HasForeignKey(ps => ps.ProviderId);
+            builder.HasMany(p => p.ProviderCenterServices)
+                .WithOne(pcs => pcs.Provider)
+                .HasForeignKey(pcs => pcs.ProviderId)
+                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(p => p.Appointments)
                 .WithOne(app => app.Provider)

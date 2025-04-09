@@ -11,6 +11,7 @@ namespace Dorak.Models
         public decimal BasePrice { get; set; }
         public bool IsDeleted { get; set; }
         public virtual Appointment Appointment { get; set; }
-        public virtual ICollection<ProviderService> ProviderServices { get; set; }
+        public virtual ICollection<ProviderCenterService> ProviderCenterServices { get; set; }
+
     }
 }

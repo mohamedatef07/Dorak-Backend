@@ -22,7 +22,7 @@ namespace Dorak.ViewModels.ServiceVMs
         public decimal BasePrice { get; set; }
 
         [Required(ErrorMessage = "This Field is Required")]
-        public ServicePriority Priority { get; set; }
+        public int Priority { get; set; }
     }
 
 }

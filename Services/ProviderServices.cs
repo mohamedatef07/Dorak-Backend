@@ -8,6 +8,7 @@ using Models.Enums;
 using Repositories;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Services
 {
@@ -63,7 +64,6 @@ namespace Services
         }
 
 
-        // ----- assign provider to center -----
         public Provider GetProviderById(string providerId)
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
@@ -83,6 +83,7 @@ namespace Services
             providerRepository.Delete(provider);
         }
 
+        // Assign provider to center
         public string AssignProviderToCenter(ProviderAssignmentViewModel model)
         {
             var assignment = new ProviderAssignment
@@ -100,60 +101,55 @@ namespace Services
             return "Provider assigned Succesfully!";
         }
 
-        public GetProviderBookingInfoViewModel GetProviderBookingInfo(string providerId)
-        {
-            var provider = GetProviderById(providerId);
-            var providerAssignment = provider.ProviderAssignments.FirstOrDefault(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
-            var providerService = provider.ProviderServices.FirstOrDefault(ps => ps.ProviderId == providerId);
-            var shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
-            return new GetProviderBookingInfoViewModel
-            {
-                CenterName = providerAssignment.Center.CenterName,
-                ServiceName = providerService.Service.ServiceName,
-                BasePrice = providerService.Service.BasePrice,
-                ShiftType = shift.ShiftType
-            };
-        }
+        //public GetProviderBookingInfoViewModel GetProviderBookingInfo(string providerId)
+        //{
+        //    var provider = GetProviderById(providerId);
+        //    var providerAssignment = provider.ProviderAssignments.FirstOrDefault(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+        //    var providerService = provider.ProviderServices.FirstOrDefault(ps => ps.ProviderId == providerId);
+        //    var shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
+        //    return new GetProviderBookingInfoViewModel
+        //    {
+        //        CenterName = providerAssignment.Center.CenterName,
+        //        ServiceName = providerService.Service.ServiceName,
+        //        BasePrice = providerService.Service.BasePrice,
+        //        ShiftType = shift.ShiftType
+        //    };
+        //}
 
+
+        // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
         {
-
             var isAssigned = providerAssignmentRepository.GetAll()
                 .Any(a => a.ProviderId == model.ProviderId && a.CenterId == model.CenterId);
 
             if (!isAssigned)
                 return "Provider is not assigned to the selected center.";
 
-
-            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
-            var providerService = provider.ProviderServices.FirstOrDefault(s => s.ServiceId == model.ServiceId);
-
-            if (providerService == null)
-                return "Provider does not offer the selected service.";
-
-            var pcs = new ProviderCenterService
+           
+            var providerCenterService = new ProviderCenterService
             {
-                ProviderServiceId = providerService.ProviderServiceId,
+                ProviderId = model.ProviderId,
+                ServiceId = model.ServiceId,
                 CenterId = model.CenterId,
-                Duration = model.Duration > 0 ? model.Duration : providerService.Duration,
-                Price = model.Price > 0 ? model.Price : providerService.CustomPrice,
+                Duration = model.Duration,
+                Price = model.Price,
                 Priority = model.Priority,
                 IsDeleted = false
             };
 
-            providerCenterServiceRepository.Add(pcs);
+            providerCenterServiceRepository.Add(providerCenterService);
             commitData.SaveChanges();
 
             return "Service successfully assigned to center for the provider!";
         }
 
+        // Create shift
         public string CreateShift(ShiftViewModel model)
         {
             var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
             if (assignment == null)
-            {
                 return "Invalid provider assignment ID.";
-            }
 
             var shift = new Shift
             {
@@ -162,12 +158,12 @@ namespace Services
                 StartTime = model.StartTime,
                 EndTime = model.EndTime,
                 MaxPatientsPerDay = model.MaxPatientsPerDay,
-                IsDeleted = false
+                IsDeleted = false,
+               
             };
 
             shiftRepository.Add(shift);
             commitData.SaveChanges();
-
 
             return "Shift created successfully!";
         }

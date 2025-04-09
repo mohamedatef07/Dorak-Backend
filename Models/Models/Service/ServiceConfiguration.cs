@@ -10,10 +10,9 @@ namespace Dorak.Models
             //Primary Key
             builder.HasKey(service => service.ServiceId);
 
-            //Relations One to One
-            builder.HasMany(service => service.ProviderServices)
-                .WithOne(providerService => providerService.Service)
-                .HasForeignKey(providerService => providerService.ServiceId)
+            builder.HasMany(service => service.ProviderCenterServices)
+                .WithOne(providerCenterService => providerCenterService.Service)
+                .HasForeignKey(providerCenterService => providerCenterService.ServiceId)
                  .OnDelete(DeleteBehavior.NoAction);
 
             //Properties

@@ -7,5 +7,5 @@ public class AssignProviderCenterServiceViewModel
     public int CenterId { get; set; }
     public decimal Price { get; set; }
     public int Duration { get; set; }
-    public ServicePriority Priority { get; set; }
+    public int Priority { get; set; }
 }
