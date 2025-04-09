@@ -5,6 +5,8 @@
         none,
         Urgent,
         Examination,
-        Consultation
+        FollowUp,
+        MedicalRep
+
     }
 }

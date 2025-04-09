@@ -46,6 +46,8 @@ namespace Dorak.Models
 
                 .IsRequired(true);
 
+            builder.Property(p => p.IsDeleted)
+                .HasDefaultValue(false);
         }
     }
 

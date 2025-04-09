@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Dorak.ViewModels.AccountViewModels;
@@ -13,11 +14,12 @@ namespace Services
 {
     public class AdminCenterServices
     {
-        private AdminCenterRepository adminCenterRepository;
-
-        public AdminCenterServices(AdminCenterRepository _adminCenterRepository)
+        public AdminCenterRepository adminCenterRepository;
+        public CommitData commitData;
+        public AdminCenterServices(AdminCenterRepository _adminCenterRepository, CommitData _commitData)
         {
             adminCenterRepository = _adminCenterRepository;
+            commitData = _commitData;
         }
 
         public async Task<IdentityResult> CreateAdminCenter(string userId, AdminCenterViewModel model)
@@ -32,7 +34,7 @@ namespace Services
             };
 
             adminCenterRepository.Add(admin);
-            adminCenterRepository.SaveChanges();
+            commitData.SaveChanges();
             return IdentityResult.Success;
         }
     }

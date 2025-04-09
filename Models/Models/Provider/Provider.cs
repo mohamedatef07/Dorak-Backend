@@ -23,7 +23,7 @@ namespace Dorak.Models
         public ProviderType providerType { get; set; }
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
-        public decimal Rate { get; set; } = 3;
+        public decimal Rate { get; set; } = 0;
         public bool IsDeleted { get; set; } = false;
 
         public virtual ICollection<ProviderCertification> Certifications { get; set; }

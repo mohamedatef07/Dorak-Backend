@@ -53,7 +53,7 @@ namespace Dorak.Models
 
             builder.Property(p => p.Bio)
                 .HasMaxLength(1000)
-                .HasColumnName("Description")
+                .HasColumnName("Bio")
                 .HasColumnType("NVARCHAR")
                 .IsRequired(true);
 

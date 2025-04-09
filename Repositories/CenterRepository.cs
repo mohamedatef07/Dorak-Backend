@@ -1,6 +1,7 @@
 ﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.CenterViewModel;
 using LinqKit;
 using Microsoft.IdentityModel.Tokens;
 
@@ -13,7 +14,7 @@ namespace Repositories
             
         }
         public PaginationViewModel<CenterViewModel> Search(string searchText = "", int pageNumber = 1,
-        int pageSize = 5)
+        int pageSize = 2)
         {
             var builder = PredicateBuilder.New<Center>();
             var old = builder;
@@ -26,10 +27,10 @@ namespace Repositories
                 builder = null;
             }
             var count = base.GetList(builder).Count();
-            //var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).Select(p => p.ToViewModel()).ToList();
+            var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).Select(p => p.ToViewModel()).ToList();
             return new PaginationViewModel<CenterViewModel>
             {
-               // Data = resultAfterPagination,
+                Data = resultAfterPagination,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 Total = count

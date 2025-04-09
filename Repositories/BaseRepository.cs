@@ -1,14 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Data;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-using System.Drawing.Printing;
 using System.Reflection;
 
 namespace Repositories
@@ -35,13 +27,9 @@ namespace Repositories
         {
             Table.Remove(entity);
         }
-        public void SaveChanges()
-        {
-            dbContext.SaveChanges();
-        }
         public T GetById(Expression<Func<T, bool>> predicate)
         {
-            return Table.FirstOrDefault(predicate);
+            return  Table.FirstOrDefault(predicate);
         }
         public IQueryable<T> GetAll()
         {
@@ -56,7 +44,6 @@ namespace Repositories
             }
 
             // order by
-
             var entityType = typeof(T);
             var property = entityType.GetProperty(Order_ColName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
@@ -69,7 +56,7 @@ namespace Repositories
             var propertyAccess = Expression.Property(parameter, property);
             var orderByExpression = Expression.Lambda(propertyAccess, parameter);
 
-            
+
             string methodName = isAscending ? "OrderBy" : "OrderByDescending";
             var resultExpression = Expression.Call(
                 typeof(Queryable),
@@ -78,7 +65,6 @@ namespace Repositories
                 Query.Expression,
                 Expression.Quote(orderByExpression)
             );
-
             return Query.Provider.CreateQuery<T>(resultExpression);
         }
         //Pagination
@@ -116,6 +102,5 @@ namespace Repositories
 
             return query;
         }
-
     }
 }

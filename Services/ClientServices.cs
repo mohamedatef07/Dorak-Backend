@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Data;
 using Dorak.Models;
 using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -12,11 +13,12 @@ namespace Services
 {
     public class ClientServices
     {
-        private ClientRepository clientRepository;
-
-        public ClientServices(ClientRepository _clientRepository) 
+        public ClientRepository clientRepository;
+        public CommitData commitData;
+        public ClientServices(ClientRepository _clientRepository,CommitData _commitData) 
         { 
             clientRepository = _clientRepository;
+            commitData = _commitData;
         }
 
         public async Task<IdentityResult> CreateClient(string userId, ClientRegisterViewModel model)
@@ -36,7 +38,7 @@ namespace Services
             };
 
             clientRepository.Add(client);
-            clientRepository.SaveChanges();
+            commitData.SaveChanges();
             return IdentityResult.Success;
         }
     }

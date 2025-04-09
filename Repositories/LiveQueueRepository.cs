@@ -9,7 +9,11 @@ namespace Repositories
 {
     public class LiveQueueRepository : BaseRepository<LiveQueue>
     {
-        public LiveQueueRepository(DorakContext dbContext) : base(dbContext) { }
+        public CommitData commitData;
+        public LiveQueueRepository(DorakContext dbContext, CommitData _commitData) : base(dbContext)
+        {
+            commitData = _commitData;
+        }
 
         // Get queue by status
         public async Task<List<LiveQueue>> GetByStatusAsync(string status)
@@ -95,13 +99,13 @@ namespace Repositories
 
         // update status
 
-        public async Task UpdateStatusAsync(int liveQueueId, string newStatus)
+        public void UpdateStatus(int liveQueueId, string newStatus)
         {
-            var queueEntry = await Table.FindAsync(liveQueueId);
+            var queueEntry = Table.Find(liveQueueId);
             if (queueEntry != null)
             {
                 queueEntry.Status = newStatus;
-                //await this.SaveChangesAsync();
+                commitData.SaveChanges();
             }
         }
 

@@ -8,8 +8,14 @@ namespace Dorak.Models
 	{
 		public void Configure(EntityTypeBuilder<ProviderAssignment> builder)
 		{
+            // Primary Key
+            builder.HasKey(ProviderAssignment => ProviderAssignment.AssignmentId);
 
-			builder.HasKey(ProviderAssignment => ProviderAssignment.AssignmentId);
+            // Relations
+            builder.HasMany(o => o.Shifts)
+                .WithOne(s => s.ProviderAssignment)
+                .HasForeignKey(s => s.ProviderAssignmentId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 	}
 }

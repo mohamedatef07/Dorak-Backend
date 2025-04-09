@@ -1,6 +1,7 @@
 ﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.CenterViewModel;
 using Repositories;
 using System.Linq.Expressions;
 
@@ -23,26 +24,35 @@ namespace Services
         {
             return centerRepository.GetById(c => c.CenterId == id);
         }
+        public void Edit(Center entity)
+        {
+            centerRepository.Edit(entity);
+            commitData.SaveChanges();
+        }
         public bool Delete(int id)
         {
-            var center = centerRepository.GetById(c => c.CenterId == id);
-            if (center != null)
+            try
             {
-                centerRepository.Delete(center);
-                commitData.SaveChanges();
-                return true;
+                var center = centerRepository.GetById(c => c.CenterId == id);
+                if (center != null)
+                {
+                    centerRepository.Delete(center);
+                    commitData.SaveChanges();
+                    return true;
+                }
+                return false;
             }
-            else
+            catch (Exception ex)
             {
-                return false;  
+                return false;
             }
         }
+
         public bool Active(int id)
         {
             var center = centerRepository.GetById(c => c.CenterId == id);
             if (center != null)
             {
-                //center.CenterStatus = CenterStatus.Active;
                 centerRepository.Edit(center);
                 commitData.SaveChanges();
                 return true;
@@ -57,7 +67,6 @@ namespace Services
             var center = centerRepository.GetById(c => c.CenterId == id);
             if (center != null)
             {
-                //center.CenterStatus = CenterStatus.Inactive;
                 centerRepository.Edit(center);
                 commitData.SaveChanges();
                 return true;
@@ -67,8 +76,9 @@ namespace Services
                 return false;
             }
         }
+
         public PaginationViewModel<CenterViewModel> Search(string searchText = "", int pageNumber = 1,
-                                                            int pageSize = 5)
+                                                            int pageSize = 2)
         {
             return centerRepository.Search(searchText, pageNumber, pageSize);
         }

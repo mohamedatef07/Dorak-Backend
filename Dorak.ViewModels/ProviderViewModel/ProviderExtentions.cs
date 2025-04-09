@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Models.Enums;
 
 namespace Dorak.ViewModels
 {
@@ -20,7 +19,7 @@ namespace Dorak.ViewModels
                 Specialization = viewModel.Specialization,
                 Bio = viewModel.Bio,
                 ExperienceYears = viewModel.ExperienceYears,
-                LicenseNumber   = viewModel.LicenseNumber,
+                LicenseNumber = viewModel.LicenseNumber,
                 Gender = viewModel.Gender,
                 Street = viewModel.Street,
                 City = viewModel.City,
@@ -28,7 +27,7 @@ namespace Dorak.ViewModels
                 Country = viewModel.Country,
                 BirthDate = viewModel.BirthDate,
                 Image = viewModel.Image,
-                Availability =viewModel.Availability,
+                Availability = viewModel.Availability,
                 EstimatedDuration = viewModel.EstimatedDuration
             };
         }

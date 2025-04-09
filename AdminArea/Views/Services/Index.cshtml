@@ -1,0 +1,82 @@
+﻿@using Dorak.ViewModels.ServiceViewModel
+@model PaginationViewModel<ServiceViewModel>
+
+@{
+    bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
+    bool canBack = Model.PageNumber <= 1;
+    int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+}
+
+@section styles {
+    <link rel="stylesheet" href="~/css/centerIndex.css" />
+}
+
+<div class="col-md-4 mb-4">
+    <form asp-controller="Services" asp-action="Index" method="get" class="g-3 d-flex gap-4">
+        <input type="text" class="form form-control" name="searchText" placeholder="Search Text" value="@Context.Request.Query["searchText"]" />
+        <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
+        <input type="submit" class="btn text-white search-btn" value="Search" />
+    </form>
+</div>
+
+<h1 class="text-center my-4">Service List</h1>
+
+<div class="container">
+    <table class="table table-striped table-hover table-bordered text-center align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Base Price</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var service in Model.Data)
+            {
+                <tr>
+                    <td>@service.ServiceId</td>
+                    <td>@service.ServiceName</td>
+                    <td>@service.Description</td>
+                    <td>@service.Priority</td>
+                    <td>@service.BasePrice</td>
+                    <td>
+                        <a asp-action="Edit" asp-controller="Services" asp-route-id="@service.ServiceId" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-action="Delete" asp-controller="Services" asp-route-id="@service.ServiceId" class="btn btn-sm btn-outline-primary">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-center align-items-center gap-2 pt-2 pb-2">
+        <button class="btn btn-primary" onclick="page('back')" disabled="@canBack">Back</button>
+        @for (int i = 1; i <= PageCount; i++)
+        {
+            <button class="btn btn-primary" onclick="pagenum('@i')">@i</button>
+        }
+        <button class="btn btn-primary" onclick="page('next')" disabled="@canNext">Next</button>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let form = document.getElementsByTagName("form")[0];
+
+        function page(btn) {
+            if (btn === "next") {
+                form.PageNumber.value++;
+            } else {
+                form.PageNumber.value--;
+            }
+            form.submit();
+        }
+
+        function pagenum(a) {
+            form.PageNumber.value = a;
+            form.submit();
+        }
+    </script>
+}

@@ -14,25 +14,21 @@ namespace API.Controllers
         {
             providerServices = _providerServices;
         }
-        //public IActionResult Index()
-        //{
-        //    return JsonResult(new {});
-        //}
         [HttpGet("ProviderInfo")]
         public IActionResult ProviderMainInfo(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                return BadRequest(new { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider ID is required", Status = 400 });
             }
 
             var provider = providerServices.GetProviderById(id);
 
             if (provider == null)
             {
-                return NotFound(new { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider not found", Status = 404 });
             }
-            var providerVM = new GetProviderMainInfo
+            var providerVM = new GetProviderMainInfoViewModel
             {
                 FirstName = provider.FirstName,
                 LastName = provider.LastName,
@@ -41,11 +37,31 @@ namespace API.Controllers
                 Rate = provider.Rate,
                 Image = provider.Image
             };
-            return Ok(new ApiResponse<GetProviderMainInfo>
+            return Ok(new ApiResponse<GetProviderMainInfoViewModel>
             {
                 Message = "Get Provider Info Successfully",
                 Status = 200,
                 Data = providerVM
+            });
+        }
+        [HttpGet("BookingInfo")]
+        public IActionResult ProviderBookingInfo(string providerId)
+        {
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return BadRequest(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider ID is required", Status = 400 });
+            }
+            var provider = providerServices.GetProviderById(providerId);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider not found", Status = 404 });
+            }
+            var providerBookingInfo = providerServices.GetProviderBookingInfo(providerId);
+            return Ok(new ApiResponse<GetProviderBookingInfoViewModel>
+            {
+                Message = "Get Provider  Booking Info Successfully",
+                Status = 200,
+                Data = providerBookingInfo
             });
         }
 

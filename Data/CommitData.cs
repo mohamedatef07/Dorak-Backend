@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Data
 {
-    public class CommitData
+    public  class CommitData
     {
         private DorakContext context;
         public CommitData(DorakContext _context)

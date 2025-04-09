@@ -17,7 +17,7 @@ namespace Dorak.Models
         public UserStatus? Status { get; set; } = UserStatus.none;
 
         public string? Image {  get; set; }
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
 
     }
 }

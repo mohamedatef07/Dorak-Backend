@@ -11,18 +11,19 @@ using Repositories;
 using Dorak.ViewModels.AccountViewModels;
 using Models.Enums;
 
+
 namespace Services
 {
     public class AccountServices
     {
-        AccountRepository accountRepository;
-        ClientServices clientServices;
-        ProviderServices providerServices;
-        OperatorServices operatorServices;
-        ProviderRepository providerRepository;
-        OperatorRepository operatorRepository;
-        AdminCenterManagement adminCenterManagement;
-        UserManager<User> userManager;
+        public AccountRepository accountRepository;
+        public ClientServices clientServices;
+        public ProviderServices providerServices;
+        public OperatorServices operatorServices;
+        public ProviderRepository providerRepository;
+        public OperatorRepository operatorRepository;
+        public AdminCenterManagement adminCenterManagement;
+        private UserManager<User> userManager;
         private readonly IConfiguration configuration;
         public AccountServices(AccountRepository _AccountRepository,
                                ClientServices _clientServices,
@@ -43,10 +44,10 @@ namespace Services
             userManager = _userManager;
         }
 
-        public async Task<string> getIdByUserName(string username) 
+        public async Task<string> getIdByUserName(string username)
         {
             var user = await accountRepository.FindByUserName(username);
-            return user?.Id; 
+            return user?.Id;
         }
 
         public async Task<IdentityResult> CreateAccount(RegisterationViewModel user)
@@ -73,7 +74,7 @@ namespace Services
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        //Gender = user.Gender,
+                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
                         Image = user.Image
                     });
                     if (operarorres.Succeeded)
@@ -81,17 +82,17 @@ namespace Services
                         return IdentityResult.Success;
                     }
                 }
-               // else if (user.Role == "Provider")
-                //{
-                   
+                else if (user.Role == "Provider")
+                {
+
                     var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Specialization = user.Specialization,
-                        Description = user.Description,
+                        Description = user.Bio,
                         ExperienceYears = user.ExperienceYears,
-                        ProviderType = user.ProviderType,
+                        ProviderType = ProviderTypes.FirstOrDefault(p => p.ToString().Equals(user.ProviderType, StringComparison.OrdinalIgnoreCase)),
                         LicenseNumber = user.LicenseNumber,
                         Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
                         BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
@@ -116,15 +117,16 @@ namespace Services
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,
                         Country = user.Country,
                         Image = user.Image
                     });
-                    if (clientRes.Succeeded) 
-                    { 
-                        return IdentityResult.Success; 
+                    if (clientRes.Succeeded)
+                    {
+                        return IdentityResult.Success;
                     }
                 }
             }
@@ -170,7 +172,7 @@ namespace Services
                 );
                 return new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             }
-            else if (result.IsLockedOut || result.IsNotAllowed) 
+            else if (result.IsLockedOut || result.IsNotAllowed)
             {
                 return string.Empty;
             }

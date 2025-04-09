@@ -1,0 +1,41 @@
+﻿@model Provider
+
+
+
+<form asp-controller="Provider" asp-action="edit" method="post">
+    <input class="form-control" asp-for="ProviderId" hidden />
+    <div class="form-group">
+        <label asp-for="FirstName">First Name</label>
+        <input class="form-control" asp-for="FirstName" />
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName">Last Name</label>
+        <input class="form-control" asp-for="LastName" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Specialization">Specialization</label>
+
+        <input class="form-control" asp-for="Specialization" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ExperienceYears">Experience Years</label>
+        <input class="form-control" asp-for="ExperienceYears" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Availability">Availability</label>
+
+        <input class="form-control" asp-for="Availability" />
+    </div>
+    <div class="form-group">
+        <label asp-for="LicenseNumber">License Number</label>
+        <input class="form-control" asp-for="LicenseNumber" />
+    </div>
+    <div class="form-group">
+        <label asp-for="EstimatedDuration">Estimated Duration</label>
+        <input class="form-control" asp-for="EstimatedDuration" />
+    </div>
+
+    <input class="btn btn-info" type="submit" value="Edit Provider" />
+</form>

@@ -1,0 +1,29 @@
+.table {
+    border-radius: 2rem;
+}
+
+.table thead tr,
+.table tbody tr {
+    text-align: center;
+}
+
+.table thead tr th {
+    padding: 1rem 0;
+    background-color: var(--main-bg-color-Light);
+    color: var(--side-bar-text-color-Light);
+}
+
+.table tbody tr td {
+    padding: 1rem 0;
+    color: var(--text-color-Light);
+    background-color: #f9f9fb;
+}
+
+div form .search-btn {
+    background-color: var(--main-bg-color-Light);
+    width: fit-content;
+}
+
+.main-bg-color {
+    background-color: #2a6f96;
+}

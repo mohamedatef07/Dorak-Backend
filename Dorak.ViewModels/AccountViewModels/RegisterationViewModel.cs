@@ -39,9 +39,9 @@ namespace Dorak.ViewModels.AccountViewModels
 
         // Shared fields (present in Client, Provider, AdminCenter)
         // Duplicated in ClientRegisterViewModel, ProviderRegisterViewModel, and AdminCenterViewModel
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string Gender { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public string? Gender { get; set; }
         public DateOnly? BirthDate { get; set; }
 
 
@@ -55,9 +55,9 @@ namespace Dorak.ViewModels.AccountViewModels
 
         // From ProviderRegisterViewModel
         public string? Specialization { get; set; }
-        public string? Description { get; set; }
+        public string? Bio { get; set; }
         public int? ExperienceYears { get; set; }
-        public ProviderType? ProviderType { get; set; }
+        public string? ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
         public DateOnly? ProviderBirthDate { get; set; }
         public string? PicName { get; set; }

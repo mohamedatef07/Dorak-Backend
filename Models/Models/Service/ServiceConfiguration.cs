@@ -11,20 +11,15 @@ namespace Dorak.Models
             builder.HasKey(service => service.ServiceId);
 
             //Relations One to One
-            builder.HasMany(service => service.CenterServices)
-                .WithOne(centerService => centerService.Service)
-                .HasForeignKey(centerService => centerService.ServiceId);
-
             builder.HasMany(service => service.ProviderServices)
                 .WithOne(providerService => providerService.Service)
-                .HasForeignKey(providerService => providerService.ServiceId);
+                .HasForeignKey(providerService => providerService.ServiceId)
+                 .OnDelete(DeleteBehavior.NoAction);
 
             //Properties
             builder.Property(service => service.ServiceName).IsRequired(true);
 
             builder.Property(service => service.Description).IsRequired(true);
-
-            builder.Property(service => service.Priority).IsRequired(true);
 
             builder.Property(service => service.BasePrice).IsRequired(true);
 

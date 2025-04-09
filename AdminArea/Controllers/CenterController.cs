@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Dorak.Models;
 using Repositories;
+using Dorak.Models.Enums;
 using Data;
 using Services;
 
@@ -12,10 +13,13 @@ namespace AdminArea.Controllers
     public class CenterController : Controller
     {
         public CenterServices centerServices;
-        public CenterController(CenterServices _centerServices)
+        public CommitData commitData;
+        public CenterController(CenterServices _centerServices, CommitData commitData)
         {
             centerServices = _centerServices;
+            this.commitData = commitData;
         }
+        [HttpGet]
         public IActionResult Index(string searchText = "", string centerName = "",
             string city = "", int pageNumber = 1,
             int pageSize = 5)
@@ -23,16 +27,6 @@ namespace AdminArea.Controllers
             var searchList = centerServices.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
             return View(searchList);
         }
-        //[HttpGet]
-        //public IActionResult Add()
-        //{
-        //    return View("Add");
-        //}
-        //[HttpPost]
-        //public IActionResult Add(Center center)
-        //{
-        //    return View("Add");
-        //}
         [HttpGet]
         public IActionResult Details(int centerId)
         {
@@ -70,5 +64,19 @@ namespace AdminArea.Controllers
             }
             return NotFound();
         }
+        [HttpPost]
+        public IActionResult ToggleStatus(int centerId, bool status)
+        {
+            var center = centerServices.GetById(centerId);
+            if (center == null)
+            {
+                return RedirectToAction("Index");
+            }
+            center.CenterStatus = status ? CenterStatus.Active : CenterStatus.Inactive;
+            centerServices.Edit(center);
+            commitData.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
     }
 }
