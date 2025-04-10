@@ -5,8 +5,8 @@ using Dorak.Models;
 using Repositories;
 using Data;
 using Services;
-using Dorak.ViewModels.ServiceVMs;
 using Dorak.ViewModels.ServiceViewModel;
+using Dorak.ViewModels;
 
 namespace AdminArea.Controllers
 {

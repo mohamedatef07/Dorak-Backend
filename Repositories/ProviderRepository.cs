@@ -40,6 +40,18 @@ namespace Repositories
         {
             return GetById(p => p.ProviderId == providerId);
         }
+        public void Edit(EditProviderViewModel provider)
+        {
+            var selected = GetById(p => p.ProviderId == provider.ProviderId);
+            selected.FirstName = provider.firstName;
+            selected.LastName = provider.lastName;
+            selected.EstimatedDuration = provider.EstimatedDuration;
+            selected.Specialization = provider.Specialization;
+            selected.LicenseNumber = provider.LicenseNumber;
+            selected.Availability = provider.Availability;
+            selected.ExperienceYears = provider.ExperienceYears;
+            base.Edit(selected);
+        }
     }
 }
 

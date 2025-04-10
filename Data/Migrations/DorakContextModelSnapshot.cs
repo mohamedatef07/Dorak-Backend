@@ -1230,7 +1230,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("Certifications")
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Provider");
