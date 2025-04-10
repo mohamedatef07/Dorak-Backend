@@ -1,7 +1,9 @@
 ﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
 using Dorak.ViewModels.CenterViewModel;
+using Microsoft.AspNetCore.Identity;
 using Repositories;
 using System.Linq.Expressions;
 
@@ -9,12 +11,23 @@ namespace Services
 {
     public class CenterServices
     {
-        public CenterRepository centerRepository;
+        private readonly CenterRepository centerRepository;
         public CommitData commitData;
-        public CenterServices(CenterRepository _centerRepository, CommitData _commitData)
+        private readonly ProviderAssignmentRepository providerAssignmentRepository;
+        private readonly ProviderRepository providerRepository;
+        private readonly AccountServices accountServices;
+
+        public CenterServices(CenterRepository _centerRepository,
+            CommitData _commitData,
+            ProviderAssignmentRepository _providerAssignmentRepository,
+            ProviderRepository _providerRepository,
+            AccountServices _accountServices)
         {
             centerRepository = _centerRepository;
             commitData = _commitData;
+            providerAssignmentRepository = _providerAssignmentRepository;
+            providerRepository = _providerRepository;
+            accountServices = _accountServices;
         }
         public List<Center> GetAll()
         {
@@ -81,6 +94,25 @@ namespace Services
                                                             int pageSize = 2)
         {
             return centerRepository.Search(searchText, pageNumber, pageSize);
+        }
+
+
+
+        public List<ProviderViewModel> GetProvidersOfCenter(int CenterId)
+        {
+            var center = GetById(CenterId);
+            var result = center.ProviderAssignments.Where(c => c.CenterId == CenterId).Select(res => res.Provider.toModelView()).ToList();
+            return result;
+        }
+
+        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user)
+        {
+            var userRes = await accountServices.CreateAccount(user);
+
+
+            commitData.SaveChanges();
+
+            return userRes;
         }
     }
 }
