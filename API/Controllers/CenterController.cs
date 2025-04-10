@@ -22,7 +22,12 @@ namespace API.Controllers
         {
 
             var res = centerServices.GetProvidersOfCenter(CenterId);
-            return Ok(res);
+            return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>>
+            {
+                Data = res,
+                Message = "Success",
+                Status=200
+            });
         }
 
 
@@ -33,5 +38,29 @@ namespace API.Controllers
             var res =  centerServices.AddProviderAsync(user);
             return Ok(res);
         }
+
+        [HttpPost]
+        [Route("DeleteProvider")]
+        public IActionResult DeleteProviderFromCenter(string ProviderId)
+        {
+            var res = centerServices.DeleteProviderfromCenter(ProviderId);
+            return Ok(new ApiResponse<string>
+            {
+                Data = res,
+                Message = "Success",
+                Status = 200
+            });
+        }
+
+
+        [HttpGet]
+        [Route("SearchProvider")]
+        public IActionResult SearchProvider(int centerId, string searchText = "", int pageNumber = 1,
+                                                            int pageSize = 2)
+        {
+            var res = centerServices.ProviderSearch(centerId, searchText, pageNumber, pageSize);
+            return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
+        }
+
     }
 }
