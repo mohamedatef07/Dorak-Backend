@@ -33,7 +33,18 @@ namespace AdminArea
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddScoped(typeof(RoleRepository));
             builder.Services.AddScoped(typeof(CommitData));
+            builder.Services.AddScoped(typeof(ProviderCenterService));
+            builder.Services.AddScoped(typeof(AccountServices));
+            builder.Services.AddScoped(typeof(AccountRepository));
 
+            builder.Services.AddScoped(typeof(AdminCenterManagement));
+            builder.Services.AddScoped(typeof(ClientRepository));
+            builder.Services.AddScoped(typeof(OperatorRepository));
+            builder.Services.AddScoped(typeof(AdminCenterRepository));
+            builder.Services.AddScoped(typeof(ClientServices));
+            builder.Services.AddScoped(typeof(OperatorServices));
+            builder.Services.AddScoped(typeof(AdminCenterServices));
+            builder.Services.AddScoped(typeof(AppointmentRepository));
 
 
             var app = builder.Build();

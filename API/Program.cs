@@ -46,6 +46,7 @@ namespace API
             builder.Services.AddScoped(typeof(S_Services));
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(CommitData));
+            builder.Services.AddScoped(typeof(CenterServices));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
@@ -88,7 +89,7 @@ namespace API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors();

@@ -55,5 +55,33 @@ namespace Dorak.ViewModels
                 EstimatedDuration = provider.EstimatedDuration
             };
         }
+        public static EditProviderViewModel ToEditModelView(this Provider provider)
+        {
+            return new EditProviderViewModel
+            {
+                ProviderId = provider.ProviderId,
+                firstName = provider.FirstName,
+                lastName = provider.LastName,
+                Specialization = provider.Specialization,
+                ExperienceYears = provider.ExperienceYears,
+                LicenseNumber = provider.LicenseNumber,
+                Availability = provider.Availability,
+                EstimatedDuration = provider.EstimatedDuration
+            };
+        }
+        public static Provider ToModelFromEdit(this EditProviderViewModel viewModel)
+        {
+            return new Provider
+            {
+                ProviderId = viewModel.ProviderId,
+                FirstName = viewModel.firstName,
+                LastName = viewModel.lastName,
+                Specialization = viewModel.Specialization,
+                ExperienceYears = viewModel.ExperienceYears,
+                LicenseNumber = viewModel.LicenseNumber,
+                Availability = viewModel.Availability,
+                EstimatedDuration = viewModel.EstimatedDuration
+            };
+        }
     }
 }

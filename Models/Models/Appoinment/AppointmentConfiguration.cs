@@ -17,11 +17,6 @@ namespace Dorak.Models
                    .HasForeignKey(Notifcation => Notifcation.AppointmentId)
                    .OnDelete(DeleteBehavior.NoAction);
 
-            //One-to-One Relations 
-            builder.HasOne(Appointment => Appointment.Service)
-                   .WithOne(Service => Service.Appointment)
-                   .HasForeignKey<Appointment>(Appointment => Appointment.ServiceId)
-                   .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

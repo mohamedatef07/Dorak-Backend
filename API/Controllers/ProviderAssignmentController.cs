@@ -15,7 +15,6 @@ namespace API.Controllers
         }
 
 
-
         [HttpPost]
         [Route("assign")]
         public IActionResult AssignProvider([FromBody] ProviderAssignmentViewModel model)

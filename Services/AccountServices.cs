@@ -36,7 +36,7 @@ namespace Services
         {
             accountRepository = _AccountRepository;
             clientServices = _clientServices;
-            providerServices = _providerServices;
+            // providerServices = _providerServices;
             operatorServices = _operatorServices;
             providerRepository = _ProviderRepository;
             configuration = _configuration;

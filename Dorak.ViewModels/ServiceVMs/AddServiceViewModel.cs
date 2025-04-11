@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Models.Enums;
 
-namespace Dorak.ViewModels.ServiceVMs
+namespace Dorak.ViewModels
 {
     public class AddServiceViewModel
     {
