@@ -938,7 +938,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "Admin")
                         .WithMany("AdminCentersManagement")
                         .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Center", "Center")
@@ -957,13 +957,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.LiveQueue", "LiveQueue")
                         .WithOne("Appointment")
                         .HasForeignKey("Dorak.Models.Appointment", "LiveQueueId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Operator", "Operator")
                         .WithMany("Appointments")
                         .HasForeignKey("OperatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.ProviderCenterService", "ProviderCenterService")
@@ -985,7 +985,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Appointments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("LiveQueue");
@@ -1017,7 +1017,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Operator", "Operator")
                         .WithMany("LiveQueues")
                         .HasForeignKey("OperatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Operator");
@@ -1034,13 +1034,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Payment", "Payment")
                         .WithMany("Notifications")
                         .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1066,13 +1066,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
                         .WithOne("Payment")
                         .HasForeignKey("Dorak.Models.Payment", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", "Client")
                         .WithMany("Payments")
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1085,7 +1085,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "User")
                         .WithOne("Provider")
                         .HasForeignKey("Dorak.Models.Provider", "ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -1102,7 +1102,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("ProviderAssignments")
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Center");
@@ -1153,7 +1153,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Operator", "Operator")
                         .WithMany("Shifts")
                         .HasForeignKey("OperatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.ProviderAssignment", "ProviderAssignment")
@@ -1172,7 +1172,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "Client")
                         .WithOne("Wallet")
                         .HasForeignKey("Dorak.Models.Wallet", "ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Client");
@@ -1183,7 +1183,7 @@ namespace Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -1192,7 +1192,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -1201,7 +1201,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -1210,13 +1210,13 @@ namespace Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -1225,7 +1225,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 

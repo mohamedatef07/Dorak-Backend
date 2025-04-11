@@ -192,11 +192,14 @@ namespace Services
 
             return "Shift created successfully!";
         }
+
+
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
+        
 
     }
 }

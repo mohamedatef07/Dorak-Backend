@@ -1,10 +1,10 @@
 ﻿ @using Models.Enums 
 
- @model Dorak.ViewModels.ServiceVMs.AddServiceViewModel 
- @{ 
-     ViewData["Title"] = "Add Service"; 
-     Layout = "_Layout"; 
- } 
+@model AddServiceViewModel
+@{
+    ViewData["Title"] = "Add Service";
+    Layout = "_Layout";
+}
 
  <h2 class="text-center my-4">Add New Service</h2> 
 
@@ -23,13 +23,12 @@
              <span asp-validation-for="Description" class="text-danger"></span> 
          </div> 
 
-         <div class="col-md-6"> 
-             <label asp-for="Priority" class="form-label"></label> 
-              <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ServicePriority>()" class="form-control">  
-                  <option value="">-- Select Priority --</option>  
-              </select>  
-             <span asp-validation-for="Priority" class="text-danger"></span> 
-         </div> 
+        <div class="col-md-6">
+            <label asp-for="Priority" class="form-label"></label>
+            <input asp-for="Priority" class="form-control" />
+
+            <span asp-validation-for="Priority" class="text-danger"></span>
+        </div>
 
          <div class="col-md-6"> 
              <label asp-for="BasePrice" class="form-label"></label> 

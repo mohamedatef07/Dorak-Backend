@@ -17,7 +17,7 @@ namespace Repositories
             var old = builder;
             if (!searchText.IsNullOrEmpty())
             {
-                builder = builder.And(i => i.FirstName.ToLower().Contains(searchText.ToLower()) || i.LastName.ToLower().Contains(searchText.ToLower()) || i.City.ToLower().Contains(searchText.ToLower()));
+                builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) || i.LastName.ToLower().Contains(searchText.ToLower()) || i.City.ToLower().Contains(searchText.ToLower())&&i.IsDeleted==false));
             }
 
             if (old == builder)
@@ -38,7 +38,19 @@ namespace Repositories
 
         public Provider GetProviderById(string providerId)
         {
-            return GetById(p => p.ProviderId == providerId);
+            return GetById(p => p.ProviderId == providerId&&p.IsDeleted==false);
+        }
+        public void Edit(EditProviderViewModel provider)
+        {
+            var selected = GetById(p => p.ProviderId == provider.ProviderId);
+            selected.FirstName = provider.firstName;
+            selected.LastName = provider.lastName;
+            selected.EstimatedDuration = provider.EstimatedDuration;
+            selected.Specialization = provider.Specialization;
+            selected.LicenseNumber = provider.LicenseNumber;
+            selected.Availability = provider.Availability;
+            selected.ExperienceYears = provider.ExperienceYears;
+            base.Edit(selected);
         }
     }
 }
