@@ -1,49 +1,49 @@
-﻿@using Models.Enums
+﻿ @using Models.Enums 
 
-@model Dorak.ViewModels.ServiceVMs.AddServiceViewModel
-@{
-    ViewData["Title"] = "Add Service";
-    Layout = "_Layout";
-}
+ @model Dorak.ViewModels.ServiceVMs.AddServiceViewModel 
+ @{ 
+     ViewData["Title"] = "Add Service"; 
+     Layout = "_Layout"; 
+ } 
 
-<h2 class="text-center my-4">Add New Service</h2>
+ <h2 class="text-center my-4">Add New Service</h2> 
 
-<div class="container">
-    <form asp-action="Add" method="post" class="row g-3">
+ <div class="container"> 
+     <form asp-action="Add" method="post" class="row g-3"> 
 
-        <div class="col-md-6">
-            <label asp-for="ServiceName" class="form-label"></label>
-            <input asp-for="ServiceName" class="form-control" />
-            <span asp-validation-for="ServiceName" class="text-danger"></span>
-        </div>
+         <div class="col-md-6"> 
+             <label asp-for="ServiceName" class="form-label"></label> 
+             <input asp-for="ServiceName" class="form-control" /> 
+             <span asp-validation-for="ServiceName" class="text-danger"></span> 
+         </div> 
 
-        <div class="col-md-6">
-            <label asp-for="Description" class="form-label"></label>
-            <input asp-for="Description" class="form-control" />
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+         <div class="col-md-6"> 
+             <label asp-for="Description" class="form-label"></label> 
+             <input asp-for="Description" class="form-control" /> 
+             <span asp-validation-for="Description" class="text-danger"></span> 
+         </div> 
 
-        <div class="col-md-6">
-            <label asp-for="Priority" class="form-label"></label>
-            <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ServicePriority>()" class="form-control">
-                <option value="">-- Select Priority --</option>
-            </select>
-            <span asp-validation-for="Priority" class="text-danger"></span>
-        </div>
+         <div class="col-md-6"> 
+             <label asp-for="Priority" class="form-label"></label> 
+              <select asp-for="Priority" asp-items="Html.GetEnumSelectList<ServicePriority>()" class="form-control">  
+                  <option value="">-- Select Priority --</option>  
+              </select>  
+             <span asp-validation-for="Priority" class="text-danger"></span> 
+         </div> 
 
-        <div class="col-md-6">
-            <label asp-for="BasePrice" class="form-label"></label>
-            <input asp-for="BasePrice" class="form-control" />
-            <span asp-validation-for="BasePrice" class="text-danger"></span>
-        </div>
+         <div class="col-md-6"> 
+             <label asp-for="BasePrice" class="form-label"></label> 
+             <input asp-for="BasePrice" class="form-control" /> 
+             <span asp-validation-for="BasePrice" class="text-danger"></span> 
+         </div> 
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-success">Add Service</button>
-            <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-        </div>
-    </form>
-</div>
+         <div class="col-12"> 
+             <button type="submit" class="btn btn-success">Add Service</button> 
+             <a asp-action="Index" class="btn btn-secondary">Cancel</a> 
+         </div> 
+     </form> 
+ </div> 
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+ @section Scripts { 
+     <partial name="_ValidationScriptsPartial" /> 
+ } 

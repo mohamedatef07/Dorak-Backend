@@ -10,7 +10,6 @@ namespace Data
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
-        public virtual DbSet<CenterService> CenterServices { get; set; }
         public virtual DbSet<Service> Services { get; set; }
         public virtual DbSet<Appointment> Appointments { get; set; }
         public virtual DbSet<Shift> Shifts { get; set; }
@@ -33,7 +32,6 @@ namespace Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.ApplyConfiguration(new CenterConfiguration { });
-            builder.ApplyConfiguration(new CenterServiceConfiguration { });
             builder.ApplyConfiguration(new ServiceConfiguration { });
             builder.ApplyConfiguration(new AdminCenterManagementConfiguration { });
             builder.ApplyConfiguration(new LiveQueueConfiguration { });

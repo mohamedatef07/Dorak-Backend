@@ -88,7 +88,7 @@ namespace API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-            
+
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors();

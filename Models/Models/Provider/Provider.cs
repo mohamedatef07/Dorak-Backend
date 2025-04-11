@@ -29,6 +29,5 @@ namespace Dorak.Models
         public virtual ICollection<ProviderCertification> Certifications { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
         public virtual ICollection<ProviderCenterService> ProviderCenterServices { get; set; }
-        public virtual ICollection<Appointment> Appointments { get; set; } 
     }
 }

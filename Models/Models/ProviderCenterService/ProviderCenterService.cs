@@ -5,7 +5,6 @@ namespace Dorak.Models
     public class ProviderCenterService
     {
         public int ProviderCenterServiceId { get; set; }
-
         public string ProviderId { get; set; }
         public virtual Provider Provider { get; set; }
         public int ServiceId { get; set; }
@@ -16,7 +15,6 @@ namespace Dorak.Models
         public decimal Price { get; set; }
         public int Priority { get; set; }
         public bool IsDeleted { get; set; }
-
         public virtual ICollection<Appointment> Appointments { get; set; }
     }
 }

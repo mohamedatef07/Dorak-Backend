@@ -19,7 +19,6 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
         public CommitData commitData;
-
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
@@ -100,21 +99,47 @@ namespace Services
 
             return "Provider assigned Succesfully!";
         }
-
-        //public GetProviderBookingInfoViewModel GetProviderBookingInfo(string providerId)
-        //{
-        //    var provider = GetProviderById(providerId);
-        //    var providerAssignment = provider.ProviderAssignments.FirstOrDefault(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
-        //    var providerService = provider.ProviderServices.FirstOrDefault(ps => ps.ProviderId == providerId);
-        //    var shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
-        //    return new GetProviderBookingInfoViewModel
-        //    {
-        //        CenterName = providerAssignment.Center.CenterName,
-        //        ServiceName = providerService.Service.ServiceName,
-        //        BasePrice = providerService.Service.BasePrice,
-        //        ShiftType = shift.ShiftType
-        //    };
-        //}
+        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
+        {
+            var provider = GetProviderById(providerId);
+            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+            List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
+            Shift shift;
+            bool IsMonth = false;
+            foreach (var providerAss in providerAssignments)
+            {
+                shift = shiftRepository.GetProviderAssignmentById(providerAss.AssignmentId);
+                var start = providerAss.StartDate.Value;
+                var end = providerAss.EndDate.Value;
+                for (DateTime i = start; i <=  end; i = i.AddDays(1)) 
+                {
+                    if (i.Date >= DateTime.Now.AddMonths(1))
+                    {
+                        IsMonth = true;
+                        break;
+                    }
+                    else if(i > DateTime.Now)
+                    {
+                        var NewShift = new GetProviderBookingInfoViewModel()
+                        {
+                            Date = i.Date.ToString(),
+                            StartTime = shift.StartTime,
+                            EndTime = shift.EndTime,
+                            ShiftType = shift.ShiftType,
+                            CenterId = providerAss.CenterId,
+                            ServiceId = providerAss.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == providerId).Select(se =>se.ServiceId ).ToList(),
+                        };
+                        shifts.Add(NewShift);
+                    }        
+                }
+                if (IsMonth) 
+                {
+                    break;
+                }
+            }
+            var providerCenterService = provider.ProviderCenterServices.FirstOrDefault(provider => provider.ProviderId == providerId);
+            return shifts;
+        }
 
 
         // Assign service to center
@@ -126,7 +151,7 @@ namespace Services
             if (!isAssigned)
                 return "Provider is not assigned to the selected center.";
 
-           
+
             var providerCenterService = new ProviderCenterService
             {
                 ProviderId = model.ProviderId,
@@ -159,7 +184,7 @@ namespace Services
                 EndTime = model.EndTime,
                 MaxPatientsPerDay = model.MaxPatientsPerDay,
                 IsDeleted = false,
-               
+
             };
 
             shiftRepository.Add(shift);

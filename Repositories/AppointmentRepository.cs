@@ -14,7 +14,7 @@ namespace Repositories
     {
         public CommitData CommitData;
 
-        public AppointmentRepository(DorakContext _dbContext, CommitData _commitData) : base(_dbContext) 
+        public AppointmentRepository(DorakContext _dbContext, CommitData _commitData) : base(_dbContext)
         {
             CommitData = _commitData;
         }
@@ -25,11 +25,11 @@ namespace Repositories
         }
         public async Task<IEnumerable<Appointment>> GetAppointmentsByProviderId(string providerId)
         {
-            return await Table.Where(a => a.ProviderId == providerId).ToListAsync();
+            return await Table.Where(a => a.ProviderCenterService.ProviderId == providerId).ToListAsync();
         }
         public async Task<IEnumerable<Appointment>> GetUpcomingAppointments()
         {
-            return await Table.Where(a=>a.AppointmentDate >= DateTime.Now).ToListAsync();
+            return await Table.Where(a => a.AppointmentDate >= DateTime.Now).ToListAsync();
         }
 
         public Appointment CreateAppoinment(Appointment appointment)
