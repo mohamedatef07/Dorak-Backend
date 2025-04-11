@@ -33,7 +33,7 @@ namespace Services
                 OperatorId = userId,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                //Gender = model.Gender,
+                Gender = model.Gender,
                 Image = model.Image
             };
 
@@ -67,6 +67,41 @@ namespace Services
             };
 
             return appointmentRepository.CreateAppoinment(appointment);
+        }
+        public bool SoftDelete(string operatorId)
+        {
+            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (SelectedOperator != null)
+            {
+                SelectedOperator.IsDeleted = true;
+                operatorRepository.Edit(SelectedOperator);
+                commitData.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+        public bool RestoreOperator(string operatorId)
+        {
+            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (SelectedOperator != null && SelectedOperator.IsDeleted == true)
+            {
+                SelectedOperator.IsDeleted = false;
+                operatorRepository.Edit(SelectedOperator);
+                commitData.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+        public bool IsExist(string operatorId)
+        {
+            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (SelectedOperator == null)
+                return false;
+
+            return true;
         }
     }
 }
