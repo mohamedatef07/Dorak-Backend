@@ -21,22 +21,13 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider ID is required", Status = 400 });
             }
-
             var provider = providerServices.GetProviderById(id);
 
             if (provider == null)
             {
                 return NotFound(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider not found", Status = 404 });
             }
-            var providerVM = new GetProviderMainInfoViewModel
-            {
-                FirstName = provider.FirstName,
-                LastName = provider.LastName,
-                Specialization = provider.Specialization,
-                Bio = provider.Bio,
-                Rate = provider.Rate,
-                Image = provider.Image
-            };
+            GetProviderMainInfoViewModel providerVM = providerServices.GetProviderMainInfo(provider);
             return Ok(new ApiResponse<GetProviderMainInfoViewModel>
             {
                 Message = "Get Provider Info Successfully",
@@ -56,14 +47,13 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider not found", Status = 404 });
             }
-            List<GetProviderBookingInfoViewModel> providerBookingInfo = providerServices.GetProviderBookingInfo(providerId);
-            return Ok(new ApiResponse<GetProviderBookingInfoViewModel>
+            List<GetProviderBookingInfoViewModel> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
+            return Ok(new ApiResponse<List<GetProviderBookingInfoViewModel>>
             {
                 Message = "Get Provider  Booking Info Successfully",
                 Status = 200,
-               // Data = providerBookingInfo
+                Data = providerBookingInfo
             });
         }
-
     }
 }

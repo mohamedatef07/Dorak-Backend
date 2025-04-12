@@ -61,8 +61,6 @@ namespace Services
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
-
-
         public Provider GetProviderById(string providerId)
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
@@ -80,6 +78,7 @@ namespace Services
         public void DeleteProvider(Provider provider)
         {
             providerRepository.Delete(provider);
+            commitData.SaveChanges();
         }
 
         // Assign provider to center
@@ -99,23 +98,34 @@ namespace Services
 
             return "Provider assigned Succesfully!";
         }
-        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
+        public GetProviderMainInfoViewModel GetProviderMainInfo(Provider provider)
         {
-            var provider = GetProviderById(providerId);
+            return new GetProviderMainInfoViewModel
+            {
+                FirstName = provider.FirstName,
+                LastName = provider.LastName,
+                Specialization = provider.Specialization,
+                Bio = provider.Bio,
+                Rate = provider.Rate,
+                Image = provider.Image
+            };
+        }
+        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(Provider provider)
+        {
             var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
             List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
             Shift shift;
-            bool IsMonth = false;
-            foreach (var providerAss in providerAssignments)
+            bool IsMonthPassed = false;
+            foreach (var providerAssignment in providerAssignments)
             {
-                shift = shiftRepository.GetProviderAssignmentById(providerAss.AssignmentId);
-                var start = providerAss.StartDate.Value;
-                var end = providerAss.EndDate.Value;
+                shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
+                var start = providerAssignment.StartDate.Value;
+                var end = providerAssignment.EndDate.Value;
                 for (DateTime i = start; i <=  end; i = i.AddDays(1)) 
                 {
                     if (i.Date >= DateTime.Now.AddMonths(1))
                     {
-                        IsMonth = true;
+                        IsMonthPassed = true;
                         break;
                     }
                     else if(i > DateTime.Now)
@@ -126,21 +136,20 @@ namespace Services
                             StartTime = shift.StartTime,
                             EndTime = shift.EndTime,
                             ShiftType = shift.ShiftType,
-                            CenterId = providerAss.CenterId,
-                            ServiceId = providerAss.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == providerId).Select(se =>se.ServiceId ).ToList(),
+                            CenterId = providerAssignment.CenterId,
+                            ServiceId = providerAssignment.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == provider.ProviderId).Select(se =>se.ServiceId ).ToList(),
                         };
                         shifts.Add(NewShift);
                     }        
                 }
-                if (IsMonth) 
+                if (IsMonthPassed) 
                 {
                     break;
                 }
             }
-            var providerCenterService = provider.ProviderCenterServices.FirstOrDefault(provider => provider.ProviderId == providerId);
+            ProviderCenterService providerCenterService = provider.ProviderCenterServices.FirstOrDefault(ps => ps.ProviderId == provider.ProviderId);
             return shifts;
         }
-
 
         // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
@@ -192,14 +201,11 @@ namespace Services
 
             return "Shift created successfully!";
         }
-
-
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
-        }
-        
+        }  
 
     }
 }
