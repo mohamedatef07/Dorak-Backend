@@ -938,7 +938,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "Admin")
                         .WithMany("AdminCentersManagement")
                         .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Center", "Center")
@@ -980,7 +980,8 @@ namespace Data.Migrations
 
                     b.HasOne("Dorak.Models.TemporaryClient", "TemporaryClient")
                         .WithMany("Appointments")
-                        .HasForeignKey("TemporaryClientId");
+                        .HasForeignKey("TemporaryClientId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Appointments")
@@ -1034,13 +1035,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Payment", "Payment")
                         .WithMany("Notifications")
                         .HasForeignKey("PaymentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1066,13 +1067,13 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
                         .WithOne("Payment")
                         .HasForeignKey("Dorak.Models.Payment", "AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", "Client")
                         .WithMany("Payments")
                         .HasForeignKey("ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1085,7 +1086,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "User")
                         .WithOne("Provider")
                         .HasForeignKey("Dorak.Models.Provider", "ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("User");
@@ -1102,7 +1103,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("ProviderAssignments")
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Center");
@@ -1142,7 +1143,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("Certifications")
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Provider");
@@ -1172,7 +1173,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", "Client")
                         .WithOne("Wallet")
                         .HasForeignKey("Dorak.Models.Wallet", "ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Client");
