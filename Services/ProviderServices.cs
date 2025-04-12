@@ -112,7 +112,7 @@ namespace Services
         }
         public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(Provider provider)
         {
-            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+            var providerAssignments = providerAssignmentRepository.GetCurrentAssignmentsForProvider(provider.ProviderId);
             List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
             Shift shift;
             bool IsMonthPassed = false;

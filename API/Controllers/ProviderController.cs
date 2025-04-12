@@ -7,7 +7,7 @@ using Services;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/{controller}")]
+    [Route("api/[controller]")]
     public class ProviderController : ControllerBase
     {
         public ProviderServices providerServices;
@@ -17,8 +17,8 @@ namespace API.Controllers
             providerServices = _providerServices;
             this.providerCardService = providerCardService;
         }
-        [HttpGet("ProviderInfo")]
-        public IActionResult ProviderMainInfo(string id)
+        [HttpGet("MainInfo")]
+        public IActionResult ProviderMainInfo([FromQuery] string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -39,7 +39,7 @@ namespace API.Controllers
             });
         }
         [HttpGet("BookingInfo")]
-        public IActionResult ProviderBookingInfo(string providerId)
+        public IActionResult ProviderBookingInfo([FromQuery]string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
@@ -51,6 +51,10 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderBookingInfoViewModel> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
+            if(providerBookingInfo == null)
+            {
+                return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider booking info not found", Status = 404 });
+            }
             return Ok(new ApiResponse<List<GetProviderBookingInfoViewModel>>
             {
                 Message = "Get Provider  Booking Info Successfully",
@@ -58,7 +62,6 @@ namespace API.Controllers
                 Data = providerBookingInfo
             });
         }
-
 
         [HttpGet("cards")]
         public IActionResult GetDoctorCards()
@@ -109,11 +112,5 @@ namespace API.Controllers
                 Data = doctors
             });
         }
-
-
-
-
-
-
     }
 }
