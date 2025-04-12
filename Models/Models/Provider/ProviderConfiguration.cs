@@ -15,16 +15,18 @@ namespace Dorak.Models
             //Relations
             builder.HasOne(p => p.User)
                 .WithOne(u => u.Provider)
-                .HasForeignKey<Provider>(p => p.ProviderId);
+                .HasForeignKey<Provider>(p => p.ProviderId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(p=>p.Certifications)
                 .WithOne(c=>c.Provider)
                 .HasForeignKey(c=>c.ProviderId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(p => p.ProviderAssignments)
                 .WithOne(pa => pa.Provider)
-                .HasForeignKey(pa => pa.ProviderId);
+                .HasForeignKey(pa => pa.ProviderId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(p => p.ProviderCenterServices)
                 .WithOne(pcs => pcs.Provider)

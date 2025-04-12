@@ -980,12 +980,13 @@ namespace Data.Migrations
 
                     b.HasOne("Dorak.Models.TemporaryClient", "TemporaryClient")
                         .WithMany("Appointments")
-                        .HasForeignKey("TemporaryClientId");
+                        .HasForeignKey("TemporaryClientId")
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Dorak.Models.User", "User")
                         .WithMany("Appointments")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LiveQueue");
@@ -1142,7 +1143,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Provider", "Provider")
                         .WithMany("Certifications")
                         .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Provider");
@@ -1183,7 +1184,7 @@ namespace Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -1192,7 +1193,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -1201,7 +1202,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -1210,13 +1211,13 @@ namespace Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -1225,7 +1226,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
