@@ -7,7 +7,7 @@ using Services;
 namespace API.Controllers
 {
     [ApiController]
-    [Route("api/{controller}")]
+    [Route("api/[controller]")]
     public class ProviderController : ControllerBase
     {
         public ProviderServices providerServices;
@@ -17,29 +17,20 @@ namespace API.Controllers
             providerServices = _providerServices;
             this.providerCardService = providerCardService;
         }
-        [HttpGet("ProviderInfo")]
-        public IActionResult ProviderMainInfo(string id)
+        [HttpGet("MainInfo")]
+        public IActionResult ProviderMainInfo([FromQuery] string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
                 return BadRequest(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider ID is required", Status = 400 });
             }
-
             var provider = providerServices.GetProviderById(id);
 
             if (provider == null)
             {
                 return NotFound(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider not found", Status = 404 });
             }
-            var providerVM = new GetProviderMainInfoViewModel
-            {
-                FirstName = provider.FirstName,
-                LastName = provider.LastName,
-                Specialization = provider.Specialization,
-                Bio = provider.Bio,
-                Rate = provider.Rate,
-                Image = provider.Image
-            };
+            GetProviderMainInfoViewModel providerVM = providerServices.GetProviderMainInfo(provider);
             return Ok(new ApiResponse<GetProviderMainInfoViewModel>
             {
                 Message = "Get Provider Info Successfully",
@@ -48,7 +39,7 @@ namespace API.Controllers
             });
         }
         [HttpGet("BookingInfo")]
-        public IActionResult ProviderBookingInfo(string providerId)
+        public IActionResult ProviderBookingInfo([FromQuery]string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
@@ -59,15 +50,18 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider not found", Status = 404 });
             }
-            List<GetProviderBookingInfoViewModel> providerBookingInfo = providerServices.GetProviderBookingInfo(providerId);
-            return Ok(new ApiResponse<GetProviderBookingInfoViewModel>
+            List<GetProviderBookingInfoViewModel> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
+            if(providerBookingInfo == null)
+            {
+                return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider booking info not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetProviderBookingInfoViewModel>>
             {
                 Message = "Get Provider  Booking Info Successfully",
                 Status = 200,
-               // Data = providerBookingInfo
+                Data = providerBookingInfo
             });
         }
-
 
         [HttpGet("cards")]
         public IActionResult GetDoctorCards()
@@ -118,11 +112,5 @@ namespace API.Controllers
                 Data = doctors
             });
         }
-
-
-
-
-
-
     }
 }

@@ -41,5 +41,7 @@ namespace Dorak.ViewModels.AccountViewModels
         public string Image { get; set; }
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
+        public decimal Rate { get; set; }
+
     }
 }
