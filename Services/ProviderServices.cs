@@ -110,10 +110,10 @@ namespace Services
                 Image = provider.Image
             };
         }
-        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(Provider provider)
+        public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(Provider provider)
         {
             var providerAssignments = providerAssignmentRepository.GetCurrentAssignmentsForProvider(provider.ProviderId);
-            List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
+            List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
             Shift shift;
             bool IsMonthPassed = false;
             foreach (var providerAssignment in providerAssignments)
@@ -130,7 +130,7 @@ namespace Services
                     }
                     else if(i > DateTime.Now)
                     {
-                        var NewShift = new GetProviderBookingInfoViewModel()
+                        var NewShift = new GetProviderBookingInfoDTO()
                         {
                             Date = i.Date.ToString(),
                             StartTime = shift.StartTime,
@@ -147,7 +147,6 @@ namespace Services
                     break;
                 }
             }
-            ProviderCenterService providerCenterService = provider.ProviderCenterServices.FirstOrDefault(ps => ps.ProviderId == provider.ProviderId);
             return shifts;
         }
 
