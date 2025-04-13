@@ -18,7 +18,7 @@ namespace Dorak.ViewModels.AccountViewModels
         public string Specialization { get; set; }
 
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Value must be at least 3 characters")]
-        public string Description { get; set; }
+        public string Bio { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
         public int? ExperienceYears { get; set; }

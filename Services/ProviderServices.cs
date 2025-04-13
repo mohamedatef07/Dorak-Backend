@@ -49,7 +49,7 @@ namespace Services
                 Country = model.Country,
                 ExperienceYears = model.ExperienceYears,
                 LicenseNumber = model.LicenseNumber,
-                Bio = model.Description,
+                Bio = model.Bio,
                 EstimatedDuration = model.EstimatedDuration,
                 Availability = model.Availability,
                 //RATE

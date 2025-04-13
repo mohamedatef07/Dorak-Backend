@@ -100,5 +100,14 @@ namespace Services
 
             return true;
         }
+        public IQueryable<Operator> GetAllOperators()
+        {
+            var operators = operatorRepository.GetAll().Where(t=>t.IsDeleted!=true);
+            if(operators != null)
+            {
+                return operators;
+            }
+            return null;
+        }
     }
 }

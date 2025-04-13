@@ -36,7 +36,7 @@ namespace Services
         {
             accountRepository = _AccountRepository;
             clientServices = _clientServices;
-            // providerServices = _providerServices;
+            providerServices = _providerServices;
             operatorServices = _operatorServices;
             providerRepository = _ProviderRepository;
             configuration = _configuration;
@@ -90,7 +90,7 @@ namespace Services
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Specialization = user.Specialization,
-                        Description = user.Bio,
+                        Bio = user.Bio,
                         ExperienceYears = user.ExperienceYears,
                         ProviderType = ProviderTypes.FirstOrDefault(p => p.ToString().Equals(user.ProviderType, StringComparison.OrdinalIgnoreCase)),
                         LicenseNumber = user.LicenseNumber,

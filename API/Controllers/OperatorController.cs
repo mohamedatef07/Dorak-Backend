@@ -17,6 +17,17 @@ namespace API.Controllers
             operatorServices = _operatorServices;
         }
 
+        [HttpGet("GetAll")]
+        public IActionResult GetAll()
+        {
+            var result = operatorServices.GetAllOperators();
+            if (result != null) 
+            {
+                return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfull get of operators", Data =  });
+            }
+            return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "No operators exist" });
+        }
+
         [HttpGet("Delete")]
         public IActionResult Delete(string operatorid)
         {
