@@ -18,13 +18,13 @@ namespace API.Controllers
             this.providerCardService = providerCardService;
         }
         [HttpGet("MainInfo")]
-        public IActionResult ProviderMainInfo([FromQuery] string id)
+        public IActionResult ProviderMainInfo([FromQuery] string providerId)
         {
-            if (string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(providerId))
             {
                 return BadRequest(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider ID is required", Status = 400 });
             }
-            var provider = providerServices.GetProviderById(id);
+            var provider = providerServices.GetProviderById(providerId);
 
             if (provider == null)
             {
@@ -43,19 +43,19 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider ID is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider not found", Status = 404 });
             }
-            List<GetProviderBookingInfoViewModel> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
+            List<GetProviderBookingInfoDTO> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
             if(providerBookingInfo == null)
             {
-                return NotFound(new ApiResponse<GetProviderBookingInfoViewModel> { Message = "Provider booking info not found", Status = 404 });
+                return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider booking info not found", Status = 404 });
             }
-            return Ok(new ApiResponse<List<GetProviderBookingInfoViewModel>>
+            return Ok(new ApiResponse<List<GetProviderBookingInfoDTO>>
             {
                 Message = "Get Provider  Booking Info Successfully",
                 Status = 200,

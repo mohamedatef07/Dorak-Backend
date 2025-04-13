@@ -8,9 +8,9 @@ namespace Dorak.Models.Enums
 {
     public enum AppointmentStatus
     {
-        Confirmed = 1,
-        not_Confirm = 2,
-        Cancelled = 3,
-        
+        none,
+        Confirmed,
+        Pending,
+        Cancelled
     }
 }
