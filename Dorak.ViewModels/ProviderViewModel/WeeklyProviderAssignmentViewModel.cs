@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 
 namespace Dorak.ViewModels
 {
-    public class ProviderAssignmentViewModel
+    public class WeeklyProviderAssignmentViewModel
     {
         public string ProviderId { get; set; }
         public int CenterId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateTime? StartDate { get; set; }
         public AssignmentType AssignmentType { get; set; }
-
-
+        public List<int> WorkingDays { get; set; }
     }
 }

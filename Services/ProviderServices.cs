@@ -18,6 +18,7 @@ namespace Services
         public ProviderAssignmentRepository providerAssignmentRepository;
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
+
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
@@ -81,7 +82,7 @@ namespace Services
             commitData.SaveChanges();
         }
 
-        // Assign provider to center
+        // Assign provider to center manually - for visitor provider
         public string AssignProviderToCenter(ProviderAssignmentViewModel model)
         {
             var assignment = new ProviderAssignment
@@ -90,7 +91,9 @@ namespace Services
                 CenterId = model.CenterId,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate,
-                AssignmentType = model.AssignmentType
+                AssignmentType = model.AssignmentType,
+                IsDeleted = false
+
             };
 
             providerAssignmentRepository.Add(assignment);
@@ -98,22 +101,186 @@ namespace Services
 
             return "Provider assigned Succesfully!";
         }
-        public GetProviderMainInfoViewModel GetProviderMainInfo(Provider provider)
+
+        // Assign provider to center weekly - for permanent provider
+
+        public string AssignProviderToCenterWithWorkingDays(WeeklyProviderAssignmentViewModel model)
         {
-            return new GetProviderMainInfoViewModel
+            if (model.WorkingDays == null || !model.WorkingDays.Any())
+                return "Please select at least one working day.";
+
+            if (model.StartDate == null)
+                return "Please provide a start date.";
+
+            DateOnly startDate = DateOnly.FromDateTime(model.StartDate.Value);
+            DateOnly currentDate = startDate;
+            DateOnly? rangeStart = null;
+
+            List<ProviderAssignment> assignments = new List<ProviderAssignment>();
+
+            for (int i = 0; i < 30; i++)
             {
-                FirstName = provider.FirstName,
-                LastName = provider.LastName,
-                Specialization = provider.Specialization,
-                Bio = provider.Bio,
-                Rate = provider.Rate,
-                Image = provider.Image
-            };
+                int dayOfWeek = (int)currentDate.DayOfWeek;
+
+                if (model.WorkingDays.Contains(dayOfWeek))
+                {
+                    if (rangeStart == null)
+                    {
+                        rangeStart = currentDate;
+                    }
+                }
+                else
+                {
+                    if (rangeStart != null)
+                    {
+                        
+                        assignments.Add(new ProviderAssignment
+                        {
+                            ProviderId = model.ProviderId,
+                            CenterId = model.CenterId,
+                            AssignmentType = model.AssignmentType,
+                            StartDate = rangeStart.Value.ToDateTime(TimeOnly.MinValue),
+                            EndDate = currentDate.AddDays(-1).ToDateTime(TimeOnly.MinValue),
+                            IsDeleted = false
+                        });
+
+                        rangeStart = null;
+                    }
+                }
+
+                currentDate = currentDate.AddDays(1);
+            }
+
+            if (rangeStart != null)
+            {
+                assignments.Add(new ProviderAssignment
+                {
+                    ProviderId = model.ProviderId,
+                    CenterId = model.CenterId,
+                    AssignmentType = model.AssignmentType,
+                    StartDate = rangeStart.Value.ToDateTime(TimeOnly.MinValue),
+                    EndDate = currentDate.AddDays(-1).ToDateTime(TimeOnly.MinValue),
+                    IsDeleted = false
+                });
+            }
+
+            foreach (var assignment in assignments)
+            {
+                providerAssignmentRepository.Add(assignment);
+            }
+
+            commitData.SaveChanges();
+            return "Weekly assignment completed successfully.";
         }
-        public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(Provider provider)
+
+        // background service to reassign 
+        public string RegenerateWeeklyAssignments()
+{
+    var weeklyAssignments = providerAssignmentRepository.GetAll()
+        .Where(pa => pa.AssignmentType == AssignmentType.Permanent && pa.StartDate.HasValue && pa.EndDate.HasValue && pa.IsDeleted == false)
+        .ToList();
+
+    if (!weeklyAssignments.Any())
+        return "No weekly assignments found.";
+
+    foreach (var existing in weeklyAssignments)
+    {
+        string providerId = existing.ProviderId;
+        int centerId = existing.CenterId;
+
+        List<int> workingDays = new List<int>();
+        var start = existing.StartDate.Value;
+        var end = existing.EndDate.Value;
+        for (DateTime date = start; date <= end; date = date.AddDays(1))
         {
-            var providerAssignments = providerAssignmentRepository.GetCurrentAssignmentsForProvider(provider.ProviderId);
-            List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
+            int dayOfWeek = (int)date.DayOfWeek;
+            if (!workingDays.Contains(dayOfWeek))
+                workingDays.Add(dayOfWeek);
+        }
+
+        DateOnly startDate = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly currentDate = startDate;
+        DateOnly? rangeStart = null;
+        List<ProviderAssignment> newAssignments = new();
+
+        for (int i = 0; i < 30; i++)
+        {
+            int dow = (int)currentDate.DayOfWeek;
+
+            if (workingDays.Contains(dow))
+            {
+                rangeStart ??= currentDate;
+            }
+            else if (rangeStart != null)
+            {
+                var startDT = rangeStart.Value.ToDateTime(TimeOnly.MinValue);
+                var endDT = currentDate.AddDays(-1).ToDateTime(TimeOnly.MinValue);
+
+                bool alreadyExists = providerAssignmentRepository.GetAll()
+                    .Any(a => a.ProviderId == providerId && a.CenterId == centerId &&
+                              a.StartDate == startDT && a.EndDate == endDT &&
+                              a.AssignmentType == AssignmentType.Permanent && a.IsDeleted == false);
+
+                if (!alreadyExists)
+                {
+                    newAssignments.Add(new ProviderAssignment
+                    {
+                        ProviderId = providerId,
+                        CenterId = centerId,
+                        StartDate = startDT,
+                        EndDate = endDT,
+                        AssignmentType = AssignmentType.Permanent,
+                        IsDeleted = false
+                    });
+                }
+
+                rangeStart = null;
+            }
+
+            currentDate = currentDate.AddDays(1);
+        }
+
+        
+        if (rangeStart != null)
+        {
+            var startDT = rangeStart.Value.ToDateTime(TimeOnly.MinValue);
+            var endDT = currentDate.AddDays(-1).ToDateTime(TimeOnly.MinValue);
+
+            bool alreadyExists = providerAssignmentRepository.GetAll()
+                .Any(a => a.ProviderId == providerId && a.CenterId == centerId &&
+                          a.StartDate == startDT && a.EndDate == endDT &&
+                          a.AssignmentType == AssignmentType.Permanent && a.IsDeleted == false);
+
+            if (!alreadyExists)
+            {
+                newAssignments.Add(new ProviderAssignment
+                {
+                    ProviderId = providerId,
+                    CenterId = centerId,
+                    StartDate = startDT,
+                    EndDate = endDT,
+                    AssignmentType = AssignmentType.Permanent,
+                    IsDeleted = false
+                });
+            }
+        }
+
+        foreach (var assignment in newAssignments)
+        {
+            providerAssignmentRepository.Add(assignment);
+        }
+    }
+
+            commitData.SaveChanges();
+            return "30-day weekly assignments regenerated successfully.";
+}
+
+
+        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
+        {
+            var provider = GetProviderById(providerId);
+            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+            List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
             Shift shift;
             bool IsMonthPassed = false;
             foreach (var providerAssignment in providerAssignments)
