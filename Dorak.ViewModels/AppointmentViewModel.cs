@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Dorak.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -14,8 +15,7 @@ namespace Dorak.ViewModels
         public DateTime AppointmentDate { get; set; }
 
         [Required]
-        [StringLength(50, ErrorMessage = "Confirmation Status cannot exceed 50 characters.")]
-        public string ConfirmationStatus { get; set; }
+        public AppointmentStatus AppointmentStatus { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
@@ -30,9 +30,9 @@ namespace Dorak.ViewModels
         [Range(0, double.MaxValue, ErrorMessage = "Additional Fees must be a positive number.")]
         public decimal AdditionalFees { get; set; }
 
-        public DateTime EstimatedTime { get; set; }
-        public DateTime ExactTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public TimeOnly EstimatedTime { get; set; }
+        public TimeOnly ExactTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
         [Required]
         public string OperatorId { get; set; }

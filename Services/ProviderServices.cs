@@ -62,8 +62,6 @@ namespace Services
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
-
-
         public Provider GetProviderById(string providerId)
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
@@ -81,6 +79,7 @@ namespace Services
         public void DeleteProvider(Provider provider)
         {
             providerRepository.Delete(provider);
+            commitData.SaveChanges();
         }
 
         // Assign provider to center manually - for visitor provider
@@ -283,42 +282,40 @@ namespace Services
             var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
             List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
             Shift shift;
-            bool IsMonth = false;
-            foreach (var providerAss in providerAssignments)
+            bool IsMonthPassed = false;
+            foreach (var providerAssignment in providerAssignments)
             {
-                shift = shiftRepository.GetProviderAssignmentById(providerAss.AssignmentId);
-                var start = providerAss.StartDate.Value;
-                var end = providerAss.EndDate.Value;
+                shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
+                var start = providerAssignment.StartDate.Value;
+                var end = providerAssignment.EndDate.Value;
                 for (DateTime i = start; i <=  end; i = i.AddDays(1)) 
                 {
                     if (i.Date >= DateTime.Now.AddMonths(1))
                     {
-                        IsMonth = true;
+                        IsMonthPassed = true;
                         break;
                     }
                     else if(i > DateTime.Now)
                     {
-                        var NewShift = new GetProviderBookingInfoViewModel()
+                        var NewShift = new GetProviderBookingInfoDTO()
                         {
                             Date = i.Date.ToString(),
                             StartTime = shift.StartTime,
                             EndTime = shift.EndTime,
                             ShiftType = shift.ShiftType,
-                            CenterId = providerAss.CenterId,
-                            ServiceId = providerAss.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == providerId).Select(se =>se.ServiceId ).ToList(),
+                            CenterId = providerAssignment.CenterId,
+                            ServiceId = providerAssignment.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == provider.ProviderId).Select(se =>se.ServiceId ).ToList(),
                         };
                         shifts.Add(NewShift);
                     }        
                 }
-                if (IsMonth) 
+                if (IsMonthPassed) 
                 {
                     break;
                 }
             }
-            var providerCenterService = provider.ProviderCenterServices.FirstOrDefault(provider => provider.ProviderId == providerId);
             return shifts;
         }
-
 
         // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
@@ -370,14 +367,11 @@ namespace Services
 
             return "Shift created successfully!";
         }
-
-
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
-        }
-        
+        }  
 
     }
 }

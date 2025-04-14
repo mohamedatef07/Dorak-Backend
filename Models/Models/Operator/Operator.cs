@@ -14,7 +14,7 @@ namespace Dorak.Models
 
         public virtual ICollection<LiveQueue> LiveQueues { get; set; }
 
-        //public virtual ICollection<Shift> Shifts { get; set; }
-        //public virtual ICollection<Appointment> Appointments { get; set; }
+        public virtual ICollection<Shift> Shifts { get; set; }
+        public virtual ICollection<Appointment> Appointments { get; set; }
     }
 }

@@ -82,21 +82,20 @@ namespace Data.Migrations
                     b.Property<DateTime>("AppointmentDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("ConfirmationStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("AppointmentStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("EndTime")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime>("EstimatedTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("EstimatedTime")
+                        .HasColumnType("time");
 
-                    b.Property<DateTime>("ExactTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("ExactTime")
+                        .HasColumnType("time");
 
                     b.Property<decimal>("Fees")
                         .HasColumnType("decimal(18,2)");
@@ -656,7 +655,7 @@ namespace Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ShiftId"));
 
-                    b.Property<TimeSpan>("EndTime")
+                    b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
 
                     b.Property<bool>("IsDeleted")
@@ -668,10 +667,13 @@ namespace Data.Migrations
                     b.Property<int>("ProviderAssignmentId")
                         .HasColumnType("int");
 
+                    b.Property<DateOnly>("ShiftDate")
+                        .HasColumnType("date");
+
                     b.Property<int>("ShiftType")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan>("StartTime")
+                    b.Property<TimeOnly>("StartTime")
                         .HasColumnType("time");
 
                     b.HasKey("ShiftId");
