@@ -16,20 +16,20 @@ namespace Dorak.Models
                 .HasForeignKey<Operator>(o => o.OperatorId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(o => o.Shifts)
-                .WithOne(s => s.Operator)
-                .HasForeignKey(s => s.OperatorId)
-                .OnDelete(DeleteBehavior.NoAction);
+            //builder.HasMany(o => o.Shifts)
+            //    .WithOne(s => s.Operator)
+            //    .HasForeignKey(s => s.OperatorId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(o => o.LiveQueues)
                 .WithOne(lq => lq.Operator)
                 .HasForeignKey(lq => lq.OperatorId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(o => o.Appointments)
-                .WithOne(a => a.Operator)
-                .HasForeignKey(a => a.OperatorId)
-                .OnDelete(DeleteBehavior.NoAction);
+            //builder.HasMany(o => o.Appointments)
+            //    .WithOne(a => a.Operator)
+            //    .HasForeignKey(a => a.OperatorId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
             //Properties
             builder.Property(c => c.FirstName)
