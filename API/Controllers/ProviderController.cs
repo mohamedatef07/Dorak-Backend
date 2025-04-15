@@ -52,7 +52,7 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderBookingInfoDTO> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
-            if(providerBookingInfo == null)
+            if (providerBookingInfo == null)
             {
                 return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider booking info not found", Status = 404 });
             }
@@ -64,7 +64,7 @@ namespace API.Controllers
             });
         }
         [HttpGet("Schedule")]
-        public IActionResult GetScheduleDetails([FromQuery] string providerId)
+        public IActionResult ScheduleDetails([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
@@ -88,7 +88,7 @@ namespace API.Controllers
             });
         }
         [HttpGet("ScheduleDetails")]
-        public IActionResult GetAllScheduleDetails([FromQuery] string providerId)
+        public IActionResult AllScheduleDetails([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
