@@ -9,6 +9,8 @@ using Repositories;
 using Services;
 using System.Text;
 using System.Text.Json.Serialization;
+using Hangfire;
+using Hangfire.SqlServer;
 
 namespace API
 {
@@ -20,11 +22,31 @@ namespace API
 
             // Add services to the container
             builder.Services.AddControllersWithViews();
-            builder.Services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<DorakContext>();
+
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
 
+            builder.Services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<DorakContext>();
+
+            // ?? Hangfire Configuration
+            builder.Services.AddHangfire(config => config
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DorakDB"), new SqlServerStorageOptions
+                {
+                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
+                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
+                    QueuePollInterval = TimeSpan.FromSeconds(15),
+                    UseRecommendedIsolationLevel = true,
+                    DisableGlobalLocks = true
+                }));
+
+            builder.Services.AddHangfireServer();
+
+            // Dependency Injections
             builder.Services.AddScoped(typeof(CenterRepository));
             builder.Services.AddScoped(typeof(AccountRepository));
             builder.Services.AddScoped(typeof(AdminCenterManagement));
@@ -49,13 +71,11 @@ namespace API
             builder.Services.AddScoped(typeof(CenterServices));
             builder.Services.AddScoped(typeof(ProviderCardService));
 
-
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             });
 
-            //Authentication
             builder.Services.AddAuthentication(option =>
             {
                 option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -73,17 +93,14 @@ namespace API
                 };
             });
 
-
             builder.Services.AddCors(option => option.AddDefaultPolicy(
                 i => i.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()
-                ));
-
-
+            ));
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            var app = builder.Build();
 
+            var app = builder.Build();
 
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
@@ -95,11 +112,28 @@ namespace API
             app.UseStaticFiles();
             app.UseRouting();
             app.UseCors();
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
+
+            // ?? Hangfire Dashboard
+            app.UseHangfireDashboard();
+
+            // ?? Schedule Recurring Job
+            using (var scope = app.Services.CreateScope())
+            {
+                var providerServices = scope.ServiceProvider.GetRequiredService<ProviderServices>();
+                var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
+
+                recurringJobManager.AddOrUpdate(
+                    "RegenerateWeeklyAssignmentsJob",
+                    () => providerServices.RegenerateWeeklyAssignments(),
+                    Cron.Daily);
+            }
+
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=index}");
+
             app.MapControllers();
             app.Run();
         }
