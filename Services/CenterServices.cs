@@ -114,7 +114,7 @@ namespace Services
 
 
         //error
-        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user, int centerId, DateTime _startdate, DateTime _enddate, ProviderType _assignmentType)
+        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user, int centerId, DateTime _startdate, DateTime _enddate, AssignmentType _assignmentType)
         {
             try
             {
@@ -135,7 +135,7 @@ namespace Services
                             ProviderId = providerId
                         };
 
-                        providerServices.AssignProviderToCenter(providerAssignmentViewModel);
+                       providerServices.AssignProviderToCenter(providerAssignmentViewModel);
                         commitData.SaveChanges();
                     }
                 }
