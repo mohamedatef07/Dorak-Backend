@@ -2,9 +2,12 @@
 {
     public enum ShiftType
     {
-        None,
+        none,
         NotStarted,
         OnGoing,
-        Completed
+        Completed,
+        Cancelled,
+        Paused,
+        Missed
     }
 }

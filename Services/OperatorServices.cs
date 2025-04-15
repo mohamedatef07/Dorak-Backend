@@ -47,7 +47,7 @@ namespace Services
             var appointment = new Appointment
             {
                 AppointmentDate = model.AppointmentDate,
-                ConfirmationStatus = model.ConfirmationStatus,
+                AppointmentStatus = model.AppointmentStatus,
                 Type = model.Type,
                 Fees = model.Fees,
                 AdditionalFees = model.AdditionalFees,

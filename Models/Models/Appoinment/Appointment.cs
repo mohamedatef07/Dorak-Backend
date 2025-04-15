@@ -1,18 +1,20 @@
-﻿namespace Dorak.Models
+﻿using Dorak.Models.Enums;
+
+namespace Dorak.Models
 {
     public class Appointment
     {
         public int AppointmentId { get; set; }
         public DateTime AppointmentDate { get; set; }
-        public string ConfirmationStatus { get; set; }
+        public AppointmentStatus AppointmentStatus { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public string Type { get; set; }
         public decimal Fees { get; set; }
         public decimal AdditionalFees { get; set; }
-        public DateTime EstimatedTime { get; set; }
-        public DateTime ExactTime { get; set; }
-        public DateTime EndTime { get; set; }
+        public TimeOnly EstimatedTime { get; set; }
+        public TimeOnly ExactTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
         public int LiveQueueId { get; set; }
