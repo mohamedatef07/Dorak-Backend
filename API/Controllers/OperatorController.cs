@@ -23,7 +23,7 @@ namespace API.Controllers
             var result = operatorServices.GetAllOperators();
             if (result != null) 
             {
-                return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfull get of operators", Data =  });
+                return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfull get of operators"});
             }
             return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "No operators exist" });
         }

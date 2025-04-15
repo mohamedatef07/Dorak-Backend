@@ -26,6 +26,12 @@ namespace Dorak.Models.Models.Wallet
         {
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).FirstOrDefault();
         }
+        
+        public IQueryable<Shift> GetShiftsWithDateAndCenterId(DateOnly _date, int _centerId)
+        {
+            return GetAll().Where(s => s.ShiftDate == _date).Where(s => s.ProviderAssignment.CenterId == _centerId);
+        }
+
 
     }
 }

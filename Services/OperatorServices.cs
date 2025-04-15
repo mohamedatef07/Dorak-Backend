@@ -23,7 +23,7 @@ namespace Services
             operatorRepository = _operatorRepository;
             clientRepository = _clientRepository;
             appointmentRepository = _appointmentRepository;
-            this.commitData = _commitData;
+            commitData = _commitData;
         }
 
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
@@ -42,29 +42,29 @@ namespace Services
             return IdentityResult.Success;
         }
 
-        public Appointment CreateAppointment(AppointmentViewModel model)
-        {
-            var appointment = new Appointment
-            {
-                AppointmentDate = model.AppointmentDate,
-                AppointmentStatus = model.AppointmentStatus,
-                Type = model.Type,
-                Fees = model.Fees,
-                AdditionalFees = model.AdditionalFees,
-                EstimatedTime = model.EstimatedTime,
-                ExactTime = model.ExactTime,
-                EndTime = model.EndTime,
-                OperatorId = model.OperatorId,
-                LiveQueueId = model.LiveQueueId,
-                ShiftId = model.ShiftId,
-                UserId = model.UserId,
-                TemporaryClientId = model.TemporaryClientId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+        //public Appointment CreateAppointment(AppointmentViewModel model)
+        //{
+        //    var appointment = new Appointment
+        //    {
+        //        AppointmentDate = model.AppointmentDate,
+        //        AppointmentStatus = model.AppointmentStatus,
+        //        Type = model.Type,
+        //        Fees = model.Fees,
+        //        AdditionalFees = model.AdditionalFees,
+        //        EstimatedTime = model.EstimatedTime,
+        //        ExactTime = model.ExactTime,
+        //        EndTime = model.EndTime,
+        //        OperatorId = model.OperatorId,
+        //        LiveQueueId = model.LiveQueueId,
+        //        ShiftId = model.ShiftId,
+        //        UserId = model.UserId,
+        //        TemporaryClientId = model.TemporaryClientId,
+        //        CreatedAt = DateTime.UtcNow,
+        //        UpdatedAt = DateTime.UtcNow
+        //    };
 
-            return appointmentRepository.CreateAppoinment(appointment);
-        }
+        //    return appointmentRepository.CreateAppoinment(appointment);
+        //}
         public bool SoftDelete(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);

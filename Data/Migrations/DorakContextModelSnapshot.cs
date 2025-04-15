@@ -85,6 +85,9 @@ namespace Data.Migrations
                     b.Property<int>("AppointmentStatus")
                         .HasColumnType("int");
 
+                    b.Property<int>("ClientType")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -99,6 +102,9 @@ namespace Data.Migrations
 
                     b.Property<decimal>("Fees")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
 
                     b.Property<int>("LiveQueueId")
                         .HasColumnType("int");
@@ -115,10 +121,6 @@ namespace Data.Migrations
 
                     b.Property<int?>("TemporaryClientId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("datetime2");

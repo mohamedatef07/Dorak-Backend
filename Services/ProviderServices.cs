@@ -9,6 +9,7 @@ using Repositories;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using Dorak.ViewModels.ShiftViewModel;
 
 namespace Services
 {
