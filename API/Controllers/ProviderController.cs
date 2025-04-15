@@ -99,6 +99,7 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider not found", Status = 404 });
             }
+            return Ok();
             //List<GetAllProviderScheduleDetailsDTO> scheduleDetails = providerServices.GetProviderAllScheduleDetails(provider.ProviderAssignments);
             //if (scheduleDetails == null)
             //{
