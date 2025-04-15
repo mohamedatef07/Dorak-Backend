@@ -22,9 +22,13 @@ namespace Dorak.Models.Models.Wallet
         {
             return await Table.Where(s=>s.ProviderAssignment.CenterId == centerId).ToListAsync();
         }
-        public Shift GetProviderAssignmentById(int ProviderAssignmentId)
+        public Shift GetShiftByAssignmentId(int ProviderAssignmentId)
         {
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).FirstOrDefault();
+        }
+        public List<Shift> GetAllShiftsByAssignmentId(int ProviderAssignmentId)
+        {
+            return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).ToList();
         }
 
     }

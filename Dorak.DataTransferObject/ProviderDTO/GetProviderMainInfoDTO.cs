@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dorak.ViewModels
+namespace Dorak.DataTransferObject
 {
-    public class GetProviderMainInfoViewModel
+    public class GetProviderMainInfoDTO
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

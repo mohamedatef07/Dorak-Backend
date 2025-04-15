@@ -9,6 +9,8 @@ using Repositories;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using Dorak.DataTransferObject;
+
 
 namespace Services
 {
@@ -65,7 +67,6 @@ namespace Services
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
         }
-
         public List<Provider> GetAllProviders()
         {
             return providerRepository.GetAll().ToList();
@@ -98,9 +99,9 @@ namespace Services
 
             return "Provider assigned Succesfully!";
         }
-        public GetProviderMainInfoViewModel GetProviderMainInfo(Provider provider)
+        public GetProviderMainInfoDTO GetProviderMainInfo(Provider provider)
         {
-            return new GetProviderMainInfoViewModel
+            return new GetProviderMainInfoDTO
             {
                 FirstName = provider.FirstName,
                 LastName = provider.LastName,
@@ -118,36 +119,84 @@ namespace Services
             bool IsMonthPassed = false;
             foreach (var providerAssignment in providerAssignments)
             {
-                shift = shiftRepository.GetProviderAssignmentById(providerAssignment.AssignmentId);
+                shift = shiftRepository.GetShiftByAssignmentId(providerAssignment.AssignmentId);
                 var start = providerAssignment.StartDate.Value;
                 var end = providerAssignment.EndDate.Value;
-                for (DateTime i = start; i <=  end; i = i.AddDays(1)) 
+                for (DateTime i = start; i <= end; i = i.AddDays(1))
                 {
                     if (i.Date >= DateTime.Now.AddMonths(1))
                     {
                         IsMonthPassed = true;
                         break;
                     }
-                    else if(i > DateTime.Now)
+                    else if (i > DateTime.Now)
                     {
-                        var NewShift = new GetProviderBookingInfoDTO()
+                        var newShift = new GetProviderBookingInfoDTO()
                         {
                             Date = i.Date.ToString(),
                             StartTime = shift.StartTime,
                             EndTime = shift.EndTime,
                             ShiftType = shift.ShiftType,
                             CenterId = providerAssignment.CenterId,
-                            ServiceId = providerAssignment.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == provider.ProviderId).Select(se =>se.ServiceId ).ToList(),
+                            ServiceId = providerAssignment.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == provider.ProviderId).Select(se => se.ServiceId).ToList(),
                         };
-                        shifts.Add(NewShift);
-                    }        
+                        shifts.Add(newShift);
+                    }
                 }
-                if (IsMonthPassed) 
+                if (IsMonthPassed)
                 {
                     break;
                 }
             }
             return shifts;
+        }
+        public List<GetProviderScheduleDetailsDTO> GetScheduleDetails(Provider provider)
+        {
+            var providerAssignments = providerAssignmentRepository.GetCurrentAssignmentsForProvider(provider.ProviderId);
+            List<GetProviderScheduleDetailsDTO> shiftDetails = new List<GetProviderScheduleDetailsDTO>();
+            List<Shift> shifts = new List<Shift>();
+            foreach (var providerAssignment in providerAssignments)
+            {
+                shifts = shiftRepository.GetAllShiftsByAssignmentId(providerAssignment.AssignmentId);
+                                                                                                                                                                          
+                foreach (var shift in shifts)
+                {
+                    var newShift = new GetProviderScheduleDetailsDTO
+                    {
+                        CenterId = shift.ProviderAssignment.CenterId,
+                        ShiftId = shift.ShiftId,
+                        ShiftType = shift.ShiftType,
+                        StartTime = shift.StartTime,
+                        EndTime = shift.EndTime,
+                        StartDate = shift.ProviderAssignment.StartDate,
+                        EndDate = shift.ProviderAssignment.EndDate
+                    };
+                    shiftDetails.Add(newShift);
+                }
+            }
+            return shiftDetails;
+        }
+        public List<GetAllProviderScheduleDetailsDTO> GetAllScheduleDetails(int shiftId)
+        {
+            Shift shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
+            List<GetAllProviderScheduleDetailsDTO> shiftDetails = new List<GetAllProviderScheduleDetailsDTO>();
+            foreach (var Appointment in shift.Appointments)
+            {
+                var newShift = new GetAllProviderScheduleDetailsDTO
+                {
+                    CenterId = shift.ProviderAssignment.CenterId,
+                    ShiftId = shift.ShiftId,
+                    ShiftType = shift.ShiftType,
+                    StartTime = shift.StartTime,
+                    EndTime = shift.EndTime,
+                    TotalAppointments = shift.Appointments.Count(),
+                    AverageEstimatedTime = Appointment.EstimatedTime,
+                    ApprovedAppointments = shift.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Confirmed).Count(),
+                    PendingAppointments = shift.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Pending).Count()
+                };
+                shiftDetails.Add(newShift);
+            }
+            return shiftDetails;
         }
 
         // Assign service to center
@@ -204,7 +253,7 @@ namespace Services
                                                             int pageSize = 2)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
-        }  
+        }
 
     }
 }
