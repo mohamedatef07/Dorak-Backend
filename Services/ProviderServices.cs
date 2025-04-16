@@ -10,6 +10,7 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using Dorak.DataTransferObject;
+using System.Data.Entity.Core.Common;
 
 
 namespace Services
@@ -291,7 +292,7 @@ namespace Services
         //Get Provider Booking Information
         public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(Provider provider)
         {
-            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+            var providerAssignments = provider.ProviderAssignments;//.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
             List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
             Shift shift;
             bool IsMonthPassed = false;
@@ -309,6 +310,10 @@ namespace Services
                     }
                     else if (i > DateTime.Now)
                     {
+                        if (shift == null) //null ref exception because shift is null
+                        {
+                            continue;
+                        }
                         var newShift = new GetProviderBookingInfoDTO()
                         {
                             Date = i.Date.ToString(),
@@ -356,7 +361,7 @@ namespace Services
             return shiftDetails;
         }
         // Get all schedule details with full information
-        public List<GetAllProviderScheduleDetailsDTO> GetAllScheduleDetails(int shiftId)
+        public List<GetAllProviderScheduleDetailsDTO> GetAllProviderScheduleDetails(int shiftId)
         {
             Shift shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
             List<GetAllProviderScheduleDetailsDTO> shiftDetails = new List<GetAllProviderScheduleDetailsDTO>();
@@ -378,7 +383,24 @@ namespace Services
             }
             return shiftDetails;
         }
-
+        public List<GetAllProviderScheduleDetailsDTO> GetAllScheduleDetails(Provider provider)
+        {
+            List<GetAllProviderScheduleDetailsDTO> scheduleDetails = new List<GetAllProviderScheduleDetailsDTO>();
+            foreach (var Assignment in provider.ProviderAssignments)
+            {
+                int assignmentId = Assignment.AssignmentId;
+                List<Shift> shifts = shiftRepository.GetAllShiftsByAssignmentId(assignmentId);
+                foreach (Shift shift in shifts)
+                {
+                    List<GetAllProviderScheduleDetailsDTO> schedule = GetAllProviderScheduleDetails(shift.ShiftId);
+                    foreach (var scheduleDetail in schedule)
+                    {
+                        scheduleDetails.Add(scheduleDetail);
+                    }
+                }
+            }
+            return scheduleDetails;
+        }
         // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
         {
