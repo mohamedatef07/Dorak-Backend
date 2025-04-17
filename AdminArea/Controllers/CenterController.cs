@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Dorak.Models;
 using Repositories;
-using Dorak.Models.Enums;
 using Data;
 using Services;
+using Models.Enums;
 
 namespace AdminArea.Controllers
 {

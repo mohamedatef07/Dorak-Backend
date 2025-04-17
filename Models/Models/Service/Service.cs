@@ -1,4 +1,5 @@
-﻿using Models.Enums;
+﻿using Dorak.Models;
+using Models.Enums;
 using System;
 
 namespace Dorak.Models

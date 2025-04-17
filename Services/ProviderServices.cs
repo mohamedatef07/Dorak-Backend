@@ -12,6 +12,7 @@ using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
 
+using Dorak.ViewModels.ShiftViewModel;
 
 namespace Services
 {
@@ -53,7 +54,7 @@ namespace Services
                 Country = model.Country,
                 ExperienceYears = model.ExperienceYears,
                 LicenseNumber = model.LicenseNumber,
-                Bio = model.Description,
+                Bio = model.Bio,
                 EstimatedDuration = model.EstimatedDuration,
                 Availability = model.Availability,
                 //RATE
@@ -434,21 +435,26 @@ namespace Services
             var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
             if (assignment == null)
                 return "Invalid provider assignment ID.";
+            //var start =assignment.StartDate;
+            //var end =assignment.EndDate;
+            //int duration = (int)(end.Value.CompareTo(start));
+            //for (int i = 0; i <= duration; i++)
+            //{
+                var shift = new Shift
+                {
+                    ProviderAssignmentId = model.ProviderAssignmentId,
+                    ShiftType = model.ShiftType,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime,
+                    MaxPatientsPerDay = model.MaxPatientsPerDay,
+                    ShiftDate=(DateTime)assignment.StartDate,
+                    IsDeleted = false,
 
-            var shift = new Shift
-            {
-                ProviderAssignmentId = model.ProviderAssignmentId,
-                ShiftType = model.ShiftType,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
-                MaxPatientsPerDay = model.MaxPatientsPerDay,
-                IsDeleted = false,
+                };
 
-            };
-
-            shiftRepository.Add(shift);
-            commitData.SaveChanges();
-
+                shiftRepository.Add(shift);
+                commitData.SaveChanges();
+            //}
             return "Shift created successfully!";
         }
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
