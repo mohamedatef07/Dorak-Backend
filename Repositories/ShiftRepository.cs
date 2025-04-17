@@ -23,7 +23,7 @@ namespace Dorak.Models.Models.Wallet
         {
             return await Table.Where(s=>s.ProviderAssignment.CenterId == centerId).ToListAsync();
         }
-        public Shift GetProviderAssignmentById(int ProviderAssignmentId)
+        public Shift GetShiftByAssignmentId(int ProviderAssignmentId)
         {
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).FirstOrDefault();
         }
@@ -31,6 +31,10 @@ namespace Dorak.Models.Models.Wallet
         public IQueryable<Shift> GetShiftsWithDateAndCenterId(DateOnly _date, int _centerId)
         {
             return GetAll().Where(s => s.ShiftDate == _date).Where(s => s.ProviderAssignment.CenterId == _centerId);
+        }
+        public List<Shift> GetAllShiftsByAssignmentId(int ProviderAssignmentId)
+        {
+            return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).ToList();
         }
 
         public Shift LiveQueueShift()

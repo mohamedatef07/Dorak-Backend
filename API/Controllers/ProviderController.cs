@@ -1,4 +1,6 @@
-﻿using Dorak.Models;
+﻿using Dorak.DataTransferObject;
+using Dorak.Models;
+using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Dorak.ViewModels.DoctorCardVMs;
 using Microsoft.AspNetCore.Mvc;
@@ -22,16 +24,16 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider ID is required", Status = 400 });
             }
             var provider = providerServices.GetProviderById(providerId);
 
             if (provider == null)
             {
-                return NotFound(new ApiResponse<GetProviderMainInfoViewModel> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider not found", Status = 404 });
             }
-            GetProviderMainInfoViewModel providerVM = providerServices.GetProviderMainInfo(provider);
-            return Ok(new ApiResponse<GetProviderMainInfoViewModel>
+            GetProviderMainInfoDTO providerVM = providerServices.GetProviderMainInfo(provider);
+            return Ok(new ApiResponse<GetProviderMainInfoDTO>
             {
                 Message = "Get Provider Info Successfully",
                 Status = 200,
@@ -51,7 +53,7 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderBookingInfoDTO> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
-            if(providerBookingInfo == null)
+            if (providerBookingInfo == null || !providerBookingInfo.Any())
             {
                 return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider booking info not found", Status = 404 });
             }
@@ -60,6 +62,54 @@ namespace API.Controllers
                 Message = "Get Provider  Booking Info Successfully",
                 Status = 200,
                 Data = providerBookingInfo
+            });
+        }
+        [HttpGet("ScheduleDetails")]
+        public IActionResult ScheduleDetails([FromQuery] string providerId)
+        {
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return BadRequest(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider ID is required", Status = 400 });
+            }
+            Provider provider = providerServices.GetProviderById(providerId);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider not found", Status = 404 });
+            }
+            List<GetProviderScheduleDetailsDTO> scheduleDetails = providerServices.GetScheduleDetails(provider);
+            if (scheduleDetails == null || !scheduleDetails.Any())
+            {
+                return NotFound(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider schedule details not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetProviderScheduleDetailsDTO>>
+            {
+                Message = "Get Provider schedule details Successfully",
+                Status = 200,
+                Data = scheduleDetails
+            });
+        }
+        [HttpGet("AllScheduleDetails")]
+        public IActionResult AllScheduleDetails([FromQuery] string providerId)
+        {
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return BadRequest(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider ID is required", Status = 400 });
+            }
+            Provider provider = providerServices.GetProviderById(providerId);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider not found", Status = 404 });
+            }
+            List<GetAllProviderScheduleDetailsDTO> allScheduleDetails = providerServices.GetAllScheduleDetails(provider);
+            if (allScheduleDetails == null || !allScheduleDetails.Any())
+            {
+                return NotFound(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider schedule details not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>>
+            {
+                Message = "Get Provider schedule details Successfully",
+                Status = 200,
+                Data = allScheduleDetails
             });
         }
 
