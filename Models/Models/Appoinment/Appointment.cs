@@ -17,7 +17,7 @@ namespace Dorak.Models
         public TimeOnly EndTime { get; set; }
         public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
-        public int LiveQueueId { get; set; }
+        //public int LiveQueueId { get; set; }
         public virtual LiveQueue LiveQueue { get; set; }
         public int ProviderCenterServiceId { get; set; }
         public virtual ProviderCenterService ProviderCenterService { get; set; }

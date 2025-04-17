@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models.Enums
 {
-    public enum ClientType
+    public enum ProviderTitle
     {
-        Unknown,
-        Normal,
-        Consultation,
-        Urgent,
-        MedicalRep
+        Professor =1,
+        Lecturer,
+        Consultant,
+        Specialist
     }
 }

@@ -2,7 +2,7 @@
 using Models.Enums;
 using System;
 
-namespace Dorak.ViewModels.Service
+namespace Dorak.Models
 {
     public class Service
     {

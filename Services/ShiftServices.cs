@@ -26,7 +26,7 @@ namespace Services
             commitData = _commitData;
         }
 
-        public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateOnly _shiftDate, int centerId)
+        public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateTime _shiftDate, int centerId)
         {
             var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate,centerId);
             return shifts.Select(shift => shift.ShiftToShiftVM());
@@ -40,7 +40,7 @@ namespace Services
 
         //public IQueryable<Appointment> LiveShiftAppointments()
         //{
-        //    var 
+        //    var
         //    var LiveQueue = shiftRepository.get
         //}
     }

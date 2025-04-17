@@ -15,7 +15,7 @@ namespace Dorak.ViewModels
             {
                 ShiftId = _shift.ShiftId,
                 ShiftType = _shift.ShiftType,
-                ShiftDate = _shift.ShiftDate,
+                //ShiftDate = _shift.ShiftDate,
                 StartTime = _shift.StartTime,
                 EndTime = _shift.EndTime,
                 MaxPatientsPerDay = _shift.MaxPatientsPerDay,

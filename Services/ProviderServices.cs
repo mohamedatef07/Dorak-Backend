@@ -295,14 +295,6 @@ namespace Services
         {
             var providerAssignments = provider.ProviderAssignments;//.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
             List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
-}
-
-
-        public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(string providerId)
-        {
-            var provider = GetProviderById(providerId);
-            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
-            List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
             Shift shift;
             bool IsMonthPassed = false;
             foreach (var providerAssignment in providerAssignments)

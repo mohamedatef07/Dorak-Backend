@@ -18,8 +18,4 @@
     <ProjectReference Include="..\Models\Dorak.Models.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="OperatorDTO\" />
-  </ItemGroup>
-
 </Project>

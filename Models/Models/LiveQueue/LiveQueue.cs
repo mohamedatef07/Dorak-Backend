@@ -11,6 +11,9 @@
         public int Capacity { get; set; }
         public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
+        public int AppointmentId { get; set; }
         public virtual Appointment Appointment { get; set; }
+        public int ShiftId { get; set; }
+        public virtual Shift Shift { get; set; }
     }
 }

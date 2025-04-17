@@ -30,7 +30,7 @@ namespace API.Controllers
         }
 
         [HttpGet("GetShifts")]
-        public IActionResult GetShifts(DateOnly Date, int CenterId)
+        public IActionResult GetShifts(DateTime Date, int CenterId)
         {
             var shifts = shiftServices.GetShiftsWithDateAndCenterId(Date, CenterId);
             if (shifts != null)

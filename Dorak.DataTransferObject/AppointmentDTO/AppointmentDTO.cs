@@ -1,4 +1,4 @@
-﻿using Dorak.Models.Enums;
+﻿using Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -24,7 +24,7 @@ namespace Dorak.ViewModels
         public TimeOnly? EndTime { get; set; }
         public bool? IsChecked { get; set; }
         public string? OperatorId { get; set; }
-        public int? LiveQueueId { get; set; }
+        public int? LiveQueueId { get; set; }   // CHANGED
         public string? ProviderId { get; set; }
         public int? CenterId { get; set; }
         public int? ServiceId { get; set; }
