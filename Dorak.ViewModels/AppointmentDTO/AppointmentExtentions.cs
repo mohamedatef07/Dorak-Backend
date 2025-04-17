@@ -21,7 +21,8 @@ namespace Dorak.ViewModels
                 AppointmentStatus = appointment.AppointmentStatus,
                 AdditionalFees = appointment.AdditionalFees,
                 AppointmentDate = appointment.AppointmentDate,
-
+                CreatedAt = appointment.CreatedAt,
+                ExactTime = appointment.ExactTime
             };
         }
     }

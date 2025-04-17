@@ -29,10 +29,20 @@ namespace Services
         public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateOnly _shiftDate, int centerId)
         {
             var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate,centerId);
-            return (IQueryable<ShiftDTO>)shifts.Select(shift => shift.ShiftToShiftVM()).ToList();
+            return shifts.Select(shift => shift.ShiftToShiftVM());
         } 
 
-        //public IQueryable<>
+        public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
+        {
+            var appointments = _appointmentRepository.GetAllAppointmentForShift(ShiftId);
+            return appointments.Select(app => app.AppointmentToAppointmentDTO());
+        }
+
+        //public IQueryable<Appointment> LiveShiftAppointments()
+        //{
+        //    var 
+        //    var LiveQueue = shiftRepository.get
+        //}
     }
 
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Data;
+using Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Repositories;
 
@@ -32,6 +33,12 @@ namespace Dorak.Models.Models.Wallet
             return GetAll().Where(s => s.ShiftDate == _date).Where(s => s.ProviderAssignment.CenterId == _centerId);
         }
 
+        public Shift LiveQueueShift()
+        {
+            var today = DateOnly.FromDateTime(DateTime.Now);
+            var now = TimeOnly.FromDateTime(DateTime.Now);
 
+            return Table.Where(lq => lq.ShiftDate == today).Where(lq => lq.StartTime <= now).Where(lq => lq.ShiftType != ShiftType.Completed).FirstOrDefault();
+        }
     }
 }

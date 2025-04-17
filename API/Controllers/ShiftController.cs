@@ -3,6 +3,7 @@ using Services;
 using Models.Enums;
 using Dorak.ViewModels;
 using Dorak.ViewModels.ShiftViewModel;
+using Dorak.Models;
 
 namespace API.Controllers
 {
@@ -38,6 +39,19 @@ namespace API.Controllers
                 
             }
             return Ok( new ApiResponse<ShiftDTO> { Status = 400, Message = "Error on retriving Data"});
+        }
+
+        [HttpGet("GetAppointment")]
+        public IActionResult GetAppointment(int ShiftId) 
+        {
+            var Appointments = shiftServices.GetAppointmentByShiftId(ShiftId);
+            if (Appointments != null)
+            {
+                return Ok(new ApiResponse<IQueryable<AppointmentDTO>> { Status = 200, Message = "Successfully retrive Data", Data = Appointments });
+
+            }
+            return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on retriving Data" });
+
         }
     }
 }

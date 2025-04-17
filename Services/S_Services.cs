@@ -1,9 +1,9 @@
 ﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.Service;
 using Dorak.ViewModels.ServiceViewModel;
 using Repositories;
-using System.Linq.Expressions;
 
 namespace Services
 {

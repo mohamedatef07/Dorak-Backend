@@ -277,11 +277,11 @@ namespace Services
 }
 
 
-        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
+        public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(string providerId)
         {
             var provider = GetProviderById(providerId);
             var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
-            List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
+            List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
             Shift shift;
             bool IsMonthPassed = false;
             foreach (var providerAssignment in providerAssignments)
@@ -351,21 +351,26 @@ namespace Services
             var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
             if (assignment == null)
                 return "Invalid provider assignment ID.";
+            //var start =assignment.StartDate;
+            //var end =assignment.EndDate;
+            //int duration = (int)(end.Value.CompareTo(start));
+            //for (int i = 0; i <= duration; i++)
+            //{
+                var shift = new Shift
+                {
+                    ProviderAssignmentId = model.ProviderAssignmentId,
+                    ShiftType = model.ShiftType,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime,
+                    MaxPatientsPerDay = model.MaxPatientsPerDay,
+                    ShiftDate=(DateTime)assignment.StartDate,
+                    IsDeleted = false,
 
-            var shift = new Shift
-            {
-                ProviderAssignmentId = model.ProviderAssignmentId,
-                ShiftType = model.ShiftType,
-                StartTime = model.StartTime,
-                EndTime = model.EndTime,
-                MaxPatientsPerDay = model.MaxPatientsPerDay,
-                IsDeleted = false,
+                };
 
-            };
-
-            shiftRepository.Add(shift);
-            commitData.SaveChanges();
-
+                shiftRepository.Add(shift);
+                commitData.SaveChanges();
+            //}
             return "Shift created successfully!";
         }
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,

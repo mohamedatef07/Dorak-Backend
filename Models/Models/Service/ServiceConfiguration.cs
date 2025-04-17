@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Dorak.Models
+namespace Dorak.ViewModels.Service
 {
     public class ServiceConfiguration : IEntityTypeConfiguration<Service>
     {

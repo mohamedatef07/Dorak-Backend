@@ -1,4 +1,5 @@
-﻿using Models.Enums;
+﻿using Dorak.ViewModels.Service;
+using Models.Enums;
 
 namespace Dorak.Models
 {
