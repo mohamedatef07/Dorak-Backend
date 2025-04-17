@@ -14,10 +14,12 @@ namespace API.Controllers
     {
         public ProviderServices providerServices;
         public ProviderCardService providerCardService;
-        public ProviderController(ProviderServices _providerServices, ProviderCardService providerCardService)
+        public ShiftServices shiftServices;
+        public ProviderController(ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices)
         {
             providerServices = _providerServices;
             this.providerCardService = providerCardService;
+            shiftServices = _shiftServices;
         }
         [HttpGet("MainInfo")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -88,28 +90,24 @@ namespace API.Controllers
                 Data = scheduleDetails
             });
         }
-        [HttpGet("AllScheduleDetails")]
-        public IActionResult AllScheduleDetails([FromQuery] string providerId)
+        [HttpGet("ShiftDetails")]
+        public IActionResult ShiftDetails([FromQuery] int shiftId)
         {
-            if (string.IsNullOrWhiteSpace(providerId))
+            //Shift shift = shiftServices.GetShiftById(shiftId);
+            //if (shift == null)
+            //{
+            //    return NotFound(new ApiResponse<GetShiftDetailsDTO> { Message = "Provider not found", Status = 404 });
+            //}
+            GetShiftDetailsDTO shiftDetails = providerServices.GetShiftDetails(shiftId);
+            if (shiftDetails == null)
             {
-                return BadRequest(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider ID is required", Status = 400 });
+                return NotFound(new ApiResponse<GetShiftDetailsDTO> { Message = "Provider schedule details not found", Status = 404 });
             }
-            Provider provider = providerServices.GetProviderById(providerId);
-            if (provider == null)
-            {
-                return NotFound(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider not found", Status = 404 });
-            }
-            List<GetAllProviderScheduleDetailsDTO> allScheduleDetails = providerServices.GetAllScheduleDetails(provider);
-            if (allScheduleDetails == null || !allScheduleDetails.Any())
-            {
-                return NotFound(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>> { Message = "Provider schedule details not found", Status = 404 });
-            }
-            return Ok(new ApiResponse<List<GetAllProviderScheduleDetailsDTO>>
+            return Ok(new ApiResponse<GetShiftDetailsDTO>
             {
                 Message = "Get Provider schedule details Successfully",
                 Status = 200,
-                Data = allScheduleDetails
+                Data = shiftDetails
             });
         }
 
