@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace Models.Enums
 {
-    public enum AssignmentType
+    public enum ClientType
     {
-        Permanent = 1, 
-        Visiting = 2
+        Unknown,
+        Normal,
+        Consultation,
+        Urgent,
+        MedicalRep
     }
 }

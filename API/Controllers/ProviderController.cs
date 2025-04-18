@@ -42,7 +42,7 @@ namespace API.Controllers
             });
         }
         [HttpGet("BookingInfo")]
-        public IActionResult ProviderBookingInfo([FromQuery]string providerId)
+        public IActionResult ProviderBookingInfo([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
@@ -150,8 +150,8 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<List<ProviderCardViewModel>>
                 {
-                    Message = $"No doctors available on {date}.",
-                    Status = 404,
+                    Message = "Day is required",
+                    Status = 400,
                     Data = new List<ProviderCardViewModel>()
                 });
             }
