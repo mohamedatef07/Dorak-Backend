@@ -90,7 +90,7 @@ namespace Services
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Specialization = user.Specialization,
-                        Description = user.Bio,
+                        Bio = user.Bio,
                         ExperienceYears = user.ExperienceYears,
                         ProviderType = ProviderTypes.FirstOrDefault(p => p.ToString().Equals(user.ProviderType, StringComparison.OrdinalIgnoreCase)),
                         LicenseNumber = user.LicenseNumber,

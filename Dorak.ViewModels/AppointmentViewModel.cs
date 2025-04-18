@@ -1,5 +1,4 @@
-﻿using Dorak.Models.Enums;
-using Models.Enums;
+﻿using Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
