@@ -11,7 +11,7 @@ namespace Dorak.Models
             //Primary Key
             builder.HasKey(Shift => Shift.ShiftId);
 
-            //One-to-Many Relations 
+            //One - to - Many Relations
             builder.HasMany(Shift => Shift.Appointments)
                    .WithOne(Appointment => Appointment.Shift)
                    .HasForeignKey(Appointment => Appointment.ShiftId)
