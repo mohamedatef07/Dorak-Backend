@@ -151,7 +151,7 @@ namespace Services
                 {
                     if (rangeStart != null)
                     {
-                        
+
                         assignments.Add(new ProviderAssignment
                         {
                             ProviderId = model.ProviderId,
@@ -389,6 +389,7 @@ namespace Services
                 };
             return shiftDetails;
         }
+        // Get center Services
         public List<GetCenterServicesShiftDTO> GetCenterServices(Provider provider)
         {
             var providerCenterServices = provider.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId).ToList();
