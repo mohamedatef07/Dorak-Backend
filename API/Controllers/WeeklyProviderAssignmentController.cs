@@ -17,12 +17,12 @@ namespace API.Controllers
                 providerService = _providerService;
             }
 
-            //[HttpPost("assignweekly")]
-            //public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
-            //{
-            //   // var result = providerService.AssignProviderToCenterWithWorkingDays(model);
-            //   // return Ok(new { message = result });
-            //}
+            [HttpPost("assignweekly")]
+            public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
+            {
+                var result = providerService.AssignProviderToCenterWithWorkingDays(model);
+                return Ok(new { message = result });
+            }
         }
     }
 

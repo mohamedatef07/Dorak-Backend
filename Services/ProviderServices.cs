@@ -100,7 +100,18 @@ namespace Services
             };
 
             providerAssignmentRepository.Add(assignment);
+
             commitData.SaveChanges();
+
+            foreach (ShiftViewModel shift in model.Shifts )
+            {
+
+                CreateShift(shift,assignment);
+
+            }
+
+            
+            
 
             return "Provider assigned Succesfully!";
         }
@@ -430,9 +441,10 @@ namespace Services
         }
 
         // Create shift
-        public string CreateShift(ShiftViewModel model)
+        public string CreateShift(ShiftViewModel model, ProviderAssignment assignment)
         {
-            var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
+            //var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
+
             if (assignment == null)
                 return "Invalid provider assignment ID.";
             //var start =assignment.StartDate;
