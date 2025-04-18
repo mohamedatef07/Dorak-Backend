@@ -298,47 +298,47 @@ namespace Services
         }
 
 
-        //public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
-        //{
-        //    var provider = GetProviderById(providerId);
-        //    var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
-        //    List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
-        //    Shift shift;
-        //    bool IsMonth = false;
-        //    foreach (var providerAss in providerAssignments)
-        //    {
-        //        shift = shiftRepository.GetProviderAssignmentById(providerAss.AssignmentId);
-        //        var start = providerAss.StartDate.Value;
-        //        var end = providerAss.EndDate.Value;
-        //        for (DateTime i = start; i <=  end; i = i.AddDays(1)) 
-        //        {
-        //            if (i.Date >= DateTime.Now.AddMonths(1))
-        //            {
-        //                IsMonth = true;
-        //                break;
-        //            }
-        //            else if(i > DateTime.Now)
-        //            {
-        //                var NewShift = new GetProviderBookingInfoViewModel()
-        //                {
-        //                    Date = i.Date.ToString(),
-        //                    StartTime = shift.StartTime,
-        //                    EndTime = shift.EndTime,
-        //                    ShiftType = shift.ShiftType,
-        //                    CenterId = providerAss.CenterId,
-        //                    ServiceId = providerAss.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == providerId).Select(se =>se.ServiceId ).ToList(),
-        //                };
-        //                shifts.Add(NewShift);
-        //            }        
-        //        }
-        //        if (IsMonth) 
-        //        {
-        //            break;
-        //        }
-        //    }
-        //    var providerCenterService = provider.ProviderCenterServices.FirstOrDefault(provider => provider.ProviderId == providerId);
-        //    return shifts;
-        //}
+        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
+        {
+            var provider = GetProviderById(providerId);
+            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
+            List<GetProviderBookingInfoViewModel> shifts = new List<GetProviderBookingInfoViewModel>();
+            Shift shift;
+            bool IsMonth = false;
+            foreach (var providerAss in providerAssignments)
+            {
+                shift = shiftRepository.GetProviderAssignmentById(providerAss.AssignmentId);
+                var start = providerAss.StartDate.Value;
+                var end = providerAss.EndDate.Value;
+                for (DateTime i = start; i <= end; i = i.AddDays(1))
+                {
+                    if (i.Date >= DateTime.Now.AddMonths(1))
+                    {
+                        IsMonth = true;
+                        break;
+                    }
+                    else if (i > DateTime.Now)
+                    {
+                        var NewShift = new GetProviderBookingInfoViewModel()
+                        {
+                            Date = i.Date.ToString(),
+                            StartTime = shift.StartTime,
+                            EndTime = shift.EndTime,
+                            ShiftType = shift.ShiftType,
+                            CenterId = providerAss.CenterId,
+                            ServiceId = providerAss.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == providerId).Select(se => se.ServiceId).ToList(),
+                        };
+                        shifts.Add(NewShift);
+                    }
+                }
+                if (IsMonth)
+                {
+                    break;
+                }
+            }
+            var providerCenterService = provider.ProviderCenterServices.FirstOrDefault(provider => provider.ProviderId == providerId);
+            return shifts;
+        }
 
         // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
