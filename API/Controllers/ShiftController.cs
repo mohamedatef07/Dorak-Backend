@@ -36,7 +36,7 @@ namespace API.Controllers
             if (shifts != null)
             {
                 return Ok( new ApiResponse<IQueryable<ShiftDTO>> { Status = 200, Message = "Successfully retrive Data", Data = shifts });
-                
+
             }
             return Ok( new ApiResponse<ShiftDTO> { Status = 400, Message = "Error on retriving Data"});
         }
