@@ -305,9 +305,8 @@ namespace Services
             commitData.SaveChanges();
             return "30-day weekly assignments regenerated successfully.";
         }
-
-
-        public List<GetProviderBookingInfoViewModel> GetProviderBookingInfo(string providerId)
+        //Get provider main Information 
+        public GetProviderMainInfoDTO GetProviderMainInfo(Provider provider)
         {
             return new GetProviderMainInfoDTO
             {
