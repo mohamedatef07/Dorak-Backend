@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Data;
 using Dorak.Models;
+using Dorak.Models;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using Repositories;
 
@@ -23,7 +23,7 @@ namespace Services
             operatorRepository = _operatorRepository;
             clientRepository = _clientRepository;
             appointmentRepository = _appointmentRepository;
-            this.commitData = _commitData;
+            commitData = _commitData;
         }
 
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
@@ -33,7 +33,7 @@ namespace Services
                 OperatorId = userId,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
-                //Gender = model.Gender,
+                Gender = model.Gender,
                 Image = model.Image
             };
 
@@ -42,28 +42,72 @@ namespace Services
             return IdentityResult.Success;
         }
 
-        public Appointment CreateAppointment(AppointmentViewModel model)
-        {
-            var appointment = new Appointment
-            {
-                AppointmentDate = model.AppointmentDate,
-                ConfirmationStatus = model.ConfirmationStatus,
-                Type = model.Type,
-                Fees = model.Fees,
-                AdditionalFees = model.AdditionalFees,
-                EstimatedTime = model.EstimatedTime,
-                ExactTime = model.ExactTime,
-                EndTime = model.EndTime,
-                OperatorId = model.OperatorId,
-                LiveQueueId = model.LiveQueueId,
-                ShiftId = model.ShiftId,
-                UserId = model.UserId,
-                TemporaryClientId = model.TemporaryClientId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+        //public Appointment CreateAppointment(AppointmentViewModel model)
+        //{
+        //    var appointment = new Appointment
+        //    {
+        //        AppointmentDate = model.AppointmentDate,
+        //        AppointmentStatus = model.AppointmentStatus,
+        //        Type = model.Type,
+        //        Fees = model.Fees,
+        //        AdditionalFees = model.AdditionalFees,
+        //        EstimatedTime = model.EstimatedTime,
+        //        ExactTime = model.ExactTime,
+        //        EndTime = model.EndTime,
+        //        OperatorId = model.OperatorId,
+        //        LiveQueueId = model.LiveQueueId,
+        //        ShiftId = model.ShiftId,
+        //        UserId = model.UserId,
+        //        TemporaryClientId = model.TemporaryClientId,
+        //        CreatedAt = DateTime.UtcNow,
+        //        UpdatedAt = DateTime.UtcNow
+        //    };
 
-            return appointmentRepository.CreateAppoinment(appointment);
+        //    return appointmentRepository.CreateAppoinment(appointment);
+        //}
+        public bool SoftDelete(string operatorId)
+        {
+            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (SelectedOperator != null)
+            {
+                SelectedOperator.IsDeleted = true;
+                operatorRepository.Edit(SelectedOperator);
+                commitData.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+        public bool RestoreOperator(string operatorId)
+        {
+            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (SelectedOperator != null && SelectedOperator.IsDeleted == true)
+            {
+                SelectedOperator.IsDeleted = false;
+                operatorRepository.Edit(SelectedOperator);
+                commitData.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+        public bool IsExist(string operatorId)
+        {
+            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (SelectedOperator == null)
+                return false;
+
+            return true;
+        }
+        public IQueryable<Operator> GetAllOperators()
+        {
+            var operators = operatorRepository.GetAll().Where(t=>t.IsDeleted!=true);
+            if(operators != null)
+            {
+                return operators;
+            }
+            return null;
         }
     }
 }

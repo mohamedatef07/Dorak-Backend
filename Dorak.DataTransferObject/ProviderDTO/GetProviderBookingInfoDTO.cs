@@ -6,16 +6,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dorak.ViewModels
+namespace Dorak.DataTransferObject
 {
-    public class GetProviderBookingInfoViewModel
+    public class GetProviderBookingInfoDTO
     {
         public int CenterId { get; set; }
         public List<int> ServiceId { get; set; }
         public ShiftType ShiftType { get; set; }
         public string Date {  get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
 
     }
 }

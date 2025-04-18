@@ -1,5 +1,6 @@
 ﻿using Data;
 using Dorak.Models;
+using System.Linq;
 
 namespace Repositories
 {
@@ -11,6 +12,11 @@ namespace Repositories
         
             var Assignment = GetById(A=>A.ProviderId==providerId);
             return Assignment;
+        }
+        public List<ProviderAssignment> GetCurrentAssignmentsForProvider(string providerId)
+        {
+            var assignments = GetList(pa => pa.ProviderId == providerId && pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now).ToList();
+            return assignments;
         }
 
     }

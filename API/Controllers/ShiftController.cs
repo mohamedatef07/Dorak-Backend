@@ -2,6 +2,8 @@
 using Services;
 using Models.Enums;
 using Dorak.ViewModels;
+using Dorak.ViewModels.ShiftViewModel;
+using Dorak.Models;
 
 namespace API.Controllers
 {
@@ -10,10 +12,12 @@ namespace API.Controllers
     public class ShiftController : ControllerBase
     {
         private readonly ProviderServices providerServices;
+        private readonly ShiftServices shiftServices;
 
-        public ShiftController(ProviderServices _providerServices)
+        public ShiftController(ProviderServices _providerServices, ShiftServices _shiftServices)
         {
             providerServices = _providerServices;
+            shiftServices = _shiftServices;
         }
 
         //[HttpPost("create")]

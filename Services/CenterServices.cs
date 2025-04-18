@@ -6,7 +6,9 @@ using Dorak.ViewModels.CenterViewModel;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Models.Enums;
 using Repositories;
+using System.Data.Entity.Core.Common;
 using System.Linq.Expressions;
 
 namespace Services
@@ -18,18 +20,20 @@ namespace Services
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
         private readonly ProviderRepository providerRepository;
         private readonly AccountServices accountServices;
+        private readonly ProviderServices providerServices;
 
         public CenterServices(CenterRepository _centerRepository,
             CommitData _commitData,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ProviderRepository _providerRepository,
-            AccountServices _accountServices)
+            AccountServices _accountServices,ProviderServices _providerServices)
         {
             centerRepository = _centerRepository;
             commitData = _commitData;
             providerAssignmentRepository = _providerAssignmentRepository;
             providerRepository = _providerRepository;
             accountServices = _accountServices;
+            providerServices = _providerServices;
         }
         public List<Center> GetAll()
         {
@@ -110,14 +114,39 @@ namespace Services
 
 
         //error
-        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user)
+        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user, int centerId, DateTime _startdate, DateTime _enddate, AssignmentType _assignmentType)
         {
-            var userRes = await accountServices.CreateAccount(user);
+            try
+            {
+                var userRes = await accountServices.CreateAccount(user);
 
+                if (userRes.Succeeded)
+                {
+                    var providerId = await accountServices.getIdByUserName(user.UserName);
 
-            commitData.SaveChanges();
+                    if (!string.IsNullOrEmpty(providerId))
+                    {
+                        var providerAssignmentViewModel = new ProviderAssignmentViewModel
+                        {
+                            AssignmentType = _assignmentType,
+                            CenterId = centerId,
+                            EndDate = _enddate,
+                            StartDate = _startdate,
+                            ProviderId = providerId
+                        };
 
-            return userRes;
+                       providerServices.AssignProviderToCenter(providerAssignmentViewModel);
+                        commitData.SaveChanges();
+                    }
+                }
+
+                return userRes;
+            }
+            catch (Exception ex)
+            {
+                // log exception or handle error
+                return IdentityResult.Failed(new IdentityError { Description = $"Error: {ex.Message}" });
+            }
         }
 
         //delete provider from center
@@ -135,18 +164,21 @@ namespace Services
         public PaginationViewModel<ProviderViewModel> ProviderSearch( int centerId, string searchText = "", int pageNumber = 1,
         int pageSize = 2)
         {
-            var builder = PredicateBuilder.New<Provider>();
-            var old = builder;
+            var builder = PredicateBuilder.New<Provider>(true);
+            builder= builder.And(i=>i.ProviderAssignments.Any(p=>p.CenterId==centerId && p.IsDeleted==false));
             if (!searchText.IsNullOrEmpty())
             {
-                builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) || i.LastName.ToLower().Contains(searchText.ToLower()) || i.City.ToLower().Contains(searchText.ToLower()) && i.IsDeleted == false));
-                builder= builder.And(i=>i.ProviderAssignments.Select(p=>p.CenterId==centerId).FirstOrDefault());
+                builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) ||
+                i.LastName.ToLower().Contains(searchText.ToLower()) ||
+                i.City.ToLower().Contains(searchText.ToLower()) 
+                && i.IsDeleted == false));
+            }
+            else
+            {
+                builder = builder.And(i => i.IsDeleted == false);
             }
 
-            if (old == builder)
-            {
-                builder = null;
-            }
+
 
             var count = providerRepository.GetList(builder).Count();
             var resultAfterPagination = providerRepository.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).Select(p => p.toModelView()).ToList();
@@ -159,7 +191,6 @@ namespace Services
             };
         }
 
-
-
+        
     }
 }

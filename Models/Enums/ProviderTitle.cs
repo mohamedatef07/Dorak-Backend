@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models.Enums
 {
-    public enum AppointmentStatus
+    public enum ProviderTitle
     {
-        none,
-        Confirmed,
-        Pending,
-        Cancelled
+        Professor =1,
+        Lecturer,
+        Consultant,
+        Specialist
     }
 }

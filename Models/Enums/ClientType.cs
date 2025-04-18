@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace Models.Enums
 {
-    public enum AppointmentStatus
+    public enum ClientType
     {
-        none,
-        Confirmed,
-        Pending,
-        Cancelled
+        Unknown,
+        Normal,
+        Consultation,
+        Urgent,
+        MedicalRep
     }
 }

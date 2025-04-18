@@ -1,8 +1,11 @@
 ﻿using Dorak.ViewModels;
 using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Models.Enums;
 using Services;
+using System.Threading.Tasks;
 
 namespace API.Controllers
 {
@@ -31,13 +34,25 @@ namespace API.Controllers
         }
 
 
-        [HttpPost]
-        [Route("AddProvider")]
-        public IActionResult AddProvider(RegisterationViewModel user)
+        [HttpPost]  //provider or assignment !!!!!!!! Type
+        [Route("addProviderAndAssignIt")]
+
+        public async Task<IActionResult> AddProvider(RegisterationViewModel user, int centerId , DateTime startdate, DateTime enddate, AssignmentType assignmentType) 
         {
-            var res =  centerServices.AddProviderAsync(user);
-            return Ok(res);
+            var res = await centerServices.AddProviderAsync(user, centerId, startdate, enddate, assignmentType);
+
+            if (res.Succeeded)
+            {
+                return Ok("Provider created and assigned to center successfully!");
+            }
+            else
+            {
+                return BadRequest(res.Errors);
+            }
         }
+
+
+
 
         [HttpPost]
         [Route("DeleteProvider")]
