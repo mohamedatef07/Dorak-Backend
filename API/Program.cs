@@ -11,8 +11,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
-using Hangfire;
-using Hangfire.SqlServer;
+
 
 namespace API
 {
@@ -29,9 +28,6 @@ namespace API
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
-
-            builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<DorakContext>();
 
             // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()

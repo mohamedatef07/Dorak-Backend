@@ -8,7 +8,6 @@ namespace Dorak.Models
     {
         public int ShiftId { get; set; }
         public ShiftType ShiftType { get; set; }
-        public DateTime ShiftDate { get; set; }
         public int ProviderAssignmentId { get; set; }
         public DateTime ShiftDate { get; set; }
         public TimeOnly StartTime { get; set; }
