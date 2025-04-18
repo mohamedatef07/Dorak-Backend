@@ -33,22 +33,6 @@ namespace API
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
 
-            // ?? Hangfire Configuration
-            builder.Services.AddHangfire(config => config
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DorakDB"), new SqlServerStorageOptions
-                {
-                    CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-                    SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-                    QueuePollInterval = TimeSpan.FromSeconds(15),
-                    UseRecommendedIsolationLevel = true,
-                    DisableGlobalLocks = true
-                }));
-
-            builder.Services.AddHangfireServer();
-
             // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
@@ -119,7 +103,6 @@ namespace API
             builder.Services.AddCors(option => option.AddDefaultPolicy(
                 i => i.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()
             ));
-            ));
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -151,7 +134,7 @@ namespace API
 
                 recurringJobManager.AddOrUpdate(
                     "RegenerateWeeklyAssignmentsJob",
-                    () => providerServices.RegenerateWeeklyAssignmentsFor30Days(),
+                    () => providerServices.RegenerateWeeklyAssignments(),
                     Cron.Daily);
             }
 
