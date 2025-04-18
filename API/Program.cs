@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
 
+
 namespace API
 {
     public class Program
@@ -23,10 +24,12 @@ namespace API
             // Add services to the container
             builder.Services.AddControllersWithViews();
 
+
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
 
+            // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
 
@@ -100,6 +103,7 @@ namespace API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline
@@ -133,6 +137,7 @@ namespace API
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=index}");
+
 
             app.MapControllers();
             app.Run();

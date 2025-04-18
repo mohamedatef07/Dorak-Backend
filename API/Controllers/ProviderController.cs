@@ -97,7 +97,7 @@ namespace API.Controllers
                 {
                     Message = "Day is required",
                     Status = 400,
-                    Data = new List<ProviderCardViewModel>()  
+                    Data = new List<ProviderCardViewModel>()
                 });
             }
 

@@ -14,5 +14,7 @@ namespace Dorak.ViewModels
         public DateTime? StartDate { get; set; }
         public AssignmentType AssignmentType { get; set; }
         public List<int> WorkingDays { get; set; }
+
+        public List<ShiftViewModel> Shifts { get; set; }    
     }
 }
