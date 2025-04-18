@@ -38,12 +38,15 @@ namespace Dorak.Models.Models.Wallet
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).ToList();
         }
 
-        public Shift LiveQueueShift()
+        public IQueryable<Shift> LiveQueueShift()
         {
-            var today = DateTime.Now;
-            var now = TimeOnly.FromDateTime(DateTime.Now);
+            var now = DateTime.Now;
+            var today = now.Date;
+            var currentTime = TimeOnly.FromDateTime(now);
 
-            return Table.Where(lq => lq.ShiftDate == today).Where(lq => lq.StartTime <= now).Where(lq => lq.ShiftType != ShiftType.Completed).FirstOrDefault();
+            return Table.Where(lq => lq.ShiftDate.Date <= today &&
+                                    lq.StartTime <= currentTime &&
+                                    lq.ShiftType != ShiftType.Completed);
         }
     }
 }

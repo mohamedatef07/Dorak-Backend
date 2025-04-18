@@ -12,7 +12,6 @@ using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
 
-using Dorak.ViewModels.ShiftViewModel;
 
 namespace Services
 {

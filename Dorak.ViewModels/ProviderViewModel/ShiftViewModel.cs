@@ -1,7 +1,7 @@
 ﻿using Models.Enums;
 using System;
 
-namespace Dorak.ViewModels.ShiftViewModel
+namespace Dorak.ViewModels
 {
     public class ShiftViewModel
     {

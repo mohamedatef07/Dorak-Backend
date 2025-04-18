@@ -13,16 +13,52 @@ namespace Dorak.ViewModels
         {
             return new AppointmentDTO
             {
+                appointmentId = appointment.AppointmentId,
                 FirstName = appointment.User.Client.FirstName,
                 LastName = appointment.User.Client.LastName,
-                clientType = appointment.ClientType,
-                EstimatedTime = appointment.EstimatedTime,
-                Fees = appointment.Fees,
-                AppointmentStatus = appointment.AppointmentStatus,
-                AdditionalFees = appointment.AdditionalFees,
                 AppointmentDate = appointment.AppointmentDate,
+                AppointmentStatus = appointment.AppointmentStatus,
                 CreatedAt = appointment.CreatedAt,
-                ExactTime = appointment.ExactTime
+                UpdatedAt = appointment.UpdatedAt,
+                clientType = appointment.ClientType,
+                Fees = appointment.Fees,
+                AdditionalFees = appointment.AdditionalFees,
+                EstimatedTime = appointment.EstimatedTime,
+                ExactTime = appointment.ExactTime,
+                EndTime = appointment.EndTime,
+                IsChecked = appointment.IsChecked,
+                OperatorId = appointment.OperatorId,
+                ProviderId = appointment.ProviderCenterService.ProviderId,
+                CenterId = appointment.ProviderCenterService.CenterId,
+                ServiceId = appointment.ProviderCenterService.ServiceId,
+                ShiftId = appointment.ShiftId,
+                UserId = appointment.UserId,
+                TemporaryClientId = appointment.TemporaryClientId
+
+            };
+        }
+        public static Appointment AppointmentDTOToAppointment(this AppointmentDTO appointmentDTO)
+        {
+
+
+            return new Appointment
+            {
+                AppointmentId = appointmentDTO.appointmentId,
+                AppointmentDate = appointmentDTO.AppointmentDate,
+                AppointmentStatus = appointmentDTO.AppointmentStatus,
+                CreatedAt = appointmentDTO.CreatedAt,
+                UpdatedAt = appointmentDTO.UpdatedAt,
+                ClientType = appointmentDTO.clientType,
+                Fees = appointmentDTO.Fees,
+                AdditionalFees = appointmentDTO.AdditionalFees,
+                EstimatedTime = appointmentDTO.EstimatedTime,
+                ExactTime = appointmentDTO.ExactTime,
+                EndTime = appointmentDTO.EndTime,
+                IsChecked = appointmentDTO.IsChecked ?? false,
+                OperatorId = appointmentDTO.OperatorId,
+                ShiftId = appointmentDTO.ShiftId,
+                UserId = appointmentDTO.UserId,
+                TemporaryClientId = appointmentDTO.TemporaryClientId ?? null
             };
         }
     }

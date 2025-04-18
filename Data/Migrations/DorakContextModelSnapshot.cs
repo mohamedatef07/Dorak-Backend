@@ -266,20 +266,17 @@ namespace Data.Migrations
                     b.Property<int>("AppointmentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ArrivalTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly?>("ArrivalTime")
+                        .HasColumnType("time");
 
-                    b.Property<int>("Capacity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CurrentQueuePosition")
+                    b.Property<int?>("CurrentQueuePosition")
                         .HasColumnType("int");
 
                     b.Property<int>("EstimatedDuration")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("EstimatedTime")
-                        .HasColumnType("datetime2");
+                    b.Property<TimeOnly>("EstimatedTime")
+                        .HasColumnType("time");
 
                     b.Property<string>("OperatorId")
                         .IsRequired()
@@ -513,6 +510,9 @@ namespace Data.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("providerTitle")
+                        .HasColumnType("int");
+
                     b.Property<int>("providerType")
                         .HasColumnType("int");
 
@@ -665,6 +665,9 @@ namespace Data.Migrations
 
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
+
+                    b.Property<int>("EstimatedDuration")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");

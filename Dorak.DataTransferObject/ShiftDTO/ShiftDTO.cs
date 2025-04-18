@@ -15,8 +15,6 @@ namespace Dorak.ViewModels
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public int MaxPatientsPerDay { get; set; }
-
-
         public int CenterId { get; set; }
         public string OperatorId { get; set; }
         public string ProviderId { get; set; }
