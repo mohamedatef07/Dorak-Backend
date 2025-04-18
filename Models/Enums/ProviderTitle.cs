@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Models.Enums
 {
-    public enum AssignmentType
+    public enum ProviderTitle
     {
-        Permanent = 1, 
-        Visiting = 2
+        Professor =1,
+        Lecturer,
+        Consultant,
+        Specialist
     }
 }

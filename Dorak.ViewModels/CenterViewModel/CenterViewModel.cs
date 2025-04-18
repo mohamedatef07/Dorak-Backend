@@ -1,5 +1,5 @@
-﻿    using Dorak.Models.Enums;
-using Dorak.Models;
+﻿using Dorak.Models;
+using Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Dorak.ViewModels.CenterViewModel
