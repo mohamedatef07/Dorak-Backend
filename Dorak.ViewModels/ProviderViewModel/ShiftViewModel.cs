@@ -7,8 +7,8 @@ namespace Dorak.ViewModels
     {
         public int ProviderAssignmentId { get; set; }
         public ShiftType ShiftType { get; set; }
-        public TimeSpan StartTime { get; set; }
-        public TimeSpan EndTime { get; set; }
+        public TimeOnly StartTime { get; set; }
+        public TimeOnly EndTime { get; set; }
         public int MaxPatientsPerDay { get; set; }
     }
 }
