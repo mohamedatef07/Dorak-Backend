@@ -21,51 +21,6 @@ namespace API.Controllers
             this.providerCardService = providerCardService;
             shiftServices = _shiftServices;
         }
-        [HttpGet("MainInfo")]
-        public IActionResult ProviderMainInfo([FromQuery] string providerId)
-        {
-            if (string.IsNullOrWhiteSpace(providerId))
-            {
-                return BadRequest(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider ID is required", Status = 400 });
-            }
-            var provider = providerServices.GetProviderById(providerId);
-
-            if (provider == null)
-            {
-                return NotFound(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider not found", Status = 404 });
-            }
-            GetProviderMainInfoDTO providerVM = providerServices.GetProviderMainInfo(provider);
-            return Ok(new ApiResponse<GetProviderMainInfoDTO>
-            {
-                Message = "Get Provider Info Successfully",
-                Status = 200,
-                Data = providerVM
-            });
-        }
-        [HttpGet("BookingInfo")]
-        public IActionResult ProviderBookingInfo([FromQuery]string providerId)
-        {
-            if (string.IsNullOrWhiteSpace(providerId))
-            {
-                return BadRequest(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider ID is required", Status = 400 });
-            }
-            Provider provider = providerServices.GetProviderById(providerId);
-            if (provider == null)
-            {
-                return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider not found", Status = 404 });
-            }
-            List<GetProviderBookingInfoDTO> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
-            if (providerBookingInfo == null || !providerBookingInfo.Any())
-            {
-                return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider booking info not found", Status = 404 });
-            }
-            return Ok(new ApiResponse<List<GetProviderBookingInfoDTO>>
-            {
-                Message = "Get Provider  Booking Info Successfully",
-                Status = 200,
-                Data = providerBookingInfo
-            });
-        }
         [HttpGet("ScheduleDetails")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
         {
@@ -93,19 +48,14 @@ namespace API.Controllers
         [HttpGet("ShiftDetails")]
         public IActionResult ShiftDetails([FromQuery] int shiftId)
         {
-            //Shift shift = shiftServices.GetShiftById(shiftId);
-            //if (shift == null)
-            //{
-            //    return NotFound(new ApiResponse<GetShiftDetailsDTO> { Message = "Provider not found", Status = 404 });
-            //}
             GetShiftDetailsDTO shiftDetails = providerServices.GetShiftDetails(shiftId);
             if (shiftDetails == null)
             {
-                return NotFound(new ApiResponse<GetShiftDetailsDTO> { Message = "Provider schedule details not found", Status = 404 });
+                return NotFound(new ApiResponse<GetShiftDetailsDTO> { Message = "Shift details not found", Status = 404 });
             }
             return Ok(new ApiResponse<GetShiftDetailsDTO>
             {
-                Message = "Get Provider schedule details Successfully",
+                Message = "Get shift details Successfully",
                 Status = 200,
                 Data = shiftDetails
             });
