@@ -16,13 +16,13 @@ namespace API.Controllers
             providerServices = _providerServices;
         }
 
-        [HttpPost("create")]
-        public IActionResult ManageProviderSchedule([FromBody] ShiftViewModel model)
-        {
+        //[HttpPost("create")]
+        //public IActionResult ManageProviderSchedule([FromBody] ShiftViewModel model)
+        //{
 
-            var result = providerServices.CreateShift(model);
+        //    var result = providerServices.CreateShift(model);
 
-            return Ok(new { message = result });
-        }
+        //    return Ok(new { message = result });
+        //}
     }
 }
