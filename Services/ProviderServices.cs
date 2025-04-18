@@ -108,9 +108,6 @@ namespace Services
 
             }
 
-            
-            
-
             return "Provider assigned Succesfully!";
         }
 
@@ -175,7 +172,6 @@ namespace Services
                     IsDeleted = false
                 });
             }
-
 
 
             foreach (var assignment in assignments)
@@ -368,14 +364,8 @@ namespace Services
         }
 
         // Create shift
-        public string CreateShift(ShiftViewModel model, ProviderAssignment assignment)
+        public void CreateShift(ShiftViewModel model, ProviderAssignment assignment)
         {
-
-            if (assignment == null)
-                return "Invalid provider assignment ID.";
-
-            if (!assignment.StartDate.HasValue || !assignment.EndDate.HasValue)
-                return "Provider assignment dates are missing.";
 
             DateTime currentDate = assignment.StartDate.Value.Date;
             DateTime endDate = assignment.EndDate.Value.Date;
@@ -384,7 +374,7 @@ namespace Services
             {
                 var shift = new Shift
                 {
-                    ProviderAssignmentId = assignment.AssignmentId,
+                  
                     ShiftType = model.ShiftType,
                     StartTime = model.StartTime,
                     EndTime = model.EndTime,
@@ -398,8 +388,6 @@ namespace Services
             }
 
             commitData.SaveChanges();
-
-            return "Shifts created successfully for the assignment date range!";
         }
 
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
