@@ -26,11 +26,11 @@ namespace Services
             commitData = _commitData;
         }
 
-        public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateTime _shiftDate, int centerId)
-        {
-            var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
-            return shifts.Select(shift => shift.ShiftToShiftVM());
-        }
+        //public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateTime _shiftDate, int centerId)
+        //{
+        //    var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
+        //    return shifts.Select(shift => shift.ShiftToShiftVM());
+        //}
 
         public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
         {
