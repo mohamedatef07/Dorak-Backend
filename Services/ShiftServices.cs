@@ -1,6 +1,4 @@
-﻿using Dorak.Models;
-using Dorak.Models.Models.Wallet;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,9 +18,7 @@ namespace Services
         AppointmentRepository _appointmentRepository;
         public CommitData commitData;
 
-        public ShiftServices(ShiftRepository _shiftRepository,CenterRepository _centerRepository, AppointmentRepository appointmentRepository, CommitData _commitData)
-        public ShiftRepository shiftRepository;
-        public ShiftServices(ShiftRepository _shiftRepository)
+        public ShiftServices(ShiftRepository _shiftRepository, CenterRepository _centerRepository, AppointmentRepository appointmentRepository, CommitData _commitData)
         {
             shiftRepository = _shiftRepository;
             centerRepository = _centerRepository;
@@ -32,16 +28,14 @@ namespace Services
 
         public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateTime _shiftDate, int centerId)
         {
-            var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate,centerId);
+            var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
             return shifts.Select(shift => shift.ShiftToShiftVM());
-        } 
+        }
 
         public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
-        public Shift GetShiftById(int shiftId)
         {
             var appointments = _appointmentRepository.GetAllAppointmentForShift(ShiftId);
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
-            return shiftRepository.GetById(shift => shift.ShiftId == shiftId);
         }
 
         //public IQueryable<Appointment> LiveShiftAppointments()

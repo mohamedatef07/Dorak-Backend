@@ -11,8 +11,11 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
+using Dorak.DataTransferObject.ShiftDTO;
 
-using Dorak.ViewModels.ShiftViewModel;
+
+
+
 
 namespace Services
 {
@@ -22,6 +25,7 @@ namespace Services
         public ProviderAssignmentRepository providerAssignmentRepository;
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
+        public ServicesRepository servicesRepository;
 
         public CommitData commitData;
         public ProviderServices(
@@ -29,13 +33,14 @@ namespace Services
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
-            CommitData _commitData)
+            CommitData _commitData , ServicesRepository _servicesRepository)
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
             shiftRepository = _shiftRepository;
             providerCenterServiceRepository = _providerCenterServiceRepository;
             commitData = _commitData;
+            servicesRepository = _servicesRepository;
         }
 
         // Creating a New User-Provider 
@@ -293,47 +298,33 @@ namespace Services
         //Get Provider Booking Information
         public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(Provider provider)
         {
-            var providerAssignments = provider.ProviderAssignments;//.Where(pa => pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now);
-            List<GetProviderBookingInfoDTO> shifts = new List<GetProviderBookingInfoDTO>();
-            Shift shift;
-            bool IsMonthPassed = false;
+            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate >= DateTime.Now || pa.EndDate >= DateTime.Now);
+            List<GetProviderBookingInfoDTO> bookingInfo = new List<GetProviderBookingInfoDTO>();
+            List<Shift> shifts = new List<Shift>();
             foreach (var providerAssignment in providerAssignments)
             {
-
-                shift = shiftRepository.GetShiftByAssignmentId(providerAssignment.AssignmentId);
-                var start = providerAssignment.StartDate.Value;
-                var end = providerAssignment.EndDate.Value;
-                for (DateTime i = start; i <= end; i = i.AddDays(1))
+                shifts = shiftRepository.GetAllShiftsByAssignmentId(providerAssignment.AssignmentId);
+                foreach (var shift in shifts)
                 {
-                    if (i.Date >= DateTime.Now.AddMonths(1))
+                    if(shift.ShiftDate.ToDateTime(TimeOnly.MinValue) >= DateTime.Now.AddMonths(1))
                     {
-                        IsMonthPassed = true;
                         break;
                     }
-                    else if (i > DateTime.Now)
+                    else if (shift.ShiftDate.ToDateTime(TimeOnly.MinValue) >= DateTime.Now)
                     {
-                        if (shift == null) //null ref exception because shift is null
-                        {
-                            continue;
-                        }
                         var newShift = new GetProviderBookingInfoDTO()
                         {
-                            Date = i.Date.ToString(),
                             StartTime = shift.StartTime,
                             EndTime = shift.EndTime,
                             ShiftType = shift.ShiftType,
                             CenterId = providerAssignment.CenterId,
-                            ServiceId = providerAssignment.Provider.ProviderCenterServices.Where(pas => pas.ProviderId == provider.ProviderId).Select(se => se.ServiceId).ToList(),
+                            Date = shift.ShiftDate
                         };
-                        shifts.Add(newShift);
+                        bookingInfo.Add(newShift);
                     }
                 }
-                if (IsMonthPassed)
-                {
-                    break;
-                }
-            }
-            return shifts;
+             }
+            return bookingInfo;
         }
         // Get schedule setails
         public List<GetProviderScheduleDetailsDTO> GetScheduleDetails(Provider provider)
@@ -365,19 +356,35 @@ namespace Services
         public GetShiftDetailsDTO GetShiftDetails(int shiftId) 
         {
             Shift shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
-                var newShift = new GetShiftDetailsDTO
+            GetShiftDetailsDTO shiftDetails = new GetShiftDetailsDTO
                 {
                     CenterId = shift.ProviderAssignment.CenterId,
                     ShiftId = shift.ShiftId,
                     ShiftType = shift.ShiftType,
                     StartTime = shift.StartTime,
                     EndTime = shift.EndTime,
-                    TotalAppointments = shift.Appointments.Count(),
                     EstimatedDuration = shift.EstimatedDuration,
+                    TotalAppointments = shift.Appointments.Count(),
                     ApprovedAppointments = shift.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Confirmed).Count(),
                     PendingAppointments = shift.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Pending).Count()
                 };
-            return newShift;
+            return shiftDetails;
+        }
+        public List<GetCenterServicesShiftDTO> GetCenterServices(Provider provider)
+        {
+            var providerCenterServices = provider.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId).ToList();
+            List< GetCenterServicesShiftDTO >  pcs = new List< GetCenterServicesShiftDTO >();
+            
+            foreach (var providerCenterService in providerCenterServices)
+            {
+                GetCenterServicesShiftDTO centerServicesShiftDTO = new GetCenterServicesShiftDTO
+                {
+                    Center = providerCenterService.Center,
+                    Services = providerCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == providerCenterService.Center.CenterId).Select(pcs => pcs.Service).ToList()
+                };
+                pcs.Add(centerServicesShiftDTO);
+            }
+            return pcs;
         }
         // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
@@ -424,7 +431,7 @@ namespace Services
                     StartTime = model.StartTime,
                     EndTime = model.EndTime,
                     MaxPatientsPerDay = model.MaxPatientsPerDay,
-                    ShiftDate=(DateTime)assignment.StartDate,
+                    ShiftDate=assignment.StartDate,
                     IsDeleted = false,
 
                 };
