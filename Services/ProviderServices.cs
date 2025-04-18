@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
+using Dorak.DataTransferObject;
 
 
 namespace Services
@@ -22,19 +23,26 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
 
+        public UserManager<User> userManager;
+
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
+            UserManager<User> _userManager,
             CommitData _commitData)
+
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
             shiftRepository = _shiftRepository;
             providerCenterServiceRepository = _providerCenterServiceRepository;
+            userManager = _userManager;
             commitData = _commitData;
+
+
         }
 
         // Creating a New User-Provider 
@@ -342,7 +350,7 @@ namespace Services
             foreach (var providerAssignment in providerAssignments)
             {
                 shifts = shiftRepository.GetAllShiftsByAssignmentId(providerAssignment.AssignmentId);
-                                                                                                                                                                          
+
                 foreach (var shift in shifts)
                 {
                     var newShift = new GetProviderScheduleDetailsDTO
@@ -457,5 +465,53 @@ namespace Services
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
 
+        //////
+
+
+        public async Task<string> UpdateDoctorProfile(UpdateProviderProfileDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (provider == null)
+                return "Provider not found.";
+
+            // Update Provider Info
+            provider.FirstName = model.FirstName;
+            provider.LastName = model.LastName;
+            provider.BirthDate = model.BirthDate;
+            provider.Gender = model.Gender;
+            provider.Image = model.Image;
+
+            providerRepository.Edit(provider);
+
+            // Update Identity User Info
+            var user = await userManager.FindByIdAsync(model.ProviderId);
+            if (user != null)
+            {
+                user.Email = model.Email;
+                user.PhoneNumber = model.Phone;
+
+                var updateResult = await userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    var errorMessages = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                    return $"Failed to update user account: {errorMessages}";
+                }
+            }
+            else
+            {
+                return "User not found in Identity.";
+            }
+
+            commitData.SaveChanges();
+
+            return "Doctor profile updated successfully.";
+
+        }
     }
-}
+    }
+
+    
+
+
+
+

@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -27,8 +27,7 @@ namespace API
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
 
-            builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<DorakContext>();
+          
 
             // ?? Hangfire Configuration
             builder.Services.AddHangfire(config => config
@@ -100,7 +99,14 @@ namespace API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+            builder.Services.AddIdentity<User, IdentityRole>()
+             .AddEntityFrameworkStores<DorakContext>()
+             .AddDefaultTokenProviders();
+
+
+            // بناء التطبيق (لا تكرر هذا السطر)
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
