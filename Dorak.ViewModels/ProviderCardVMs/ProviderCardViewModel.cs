@@ -17,6 +17,7 @@ namespace Dorak.ViewModels.DoctorCardVMs
             public string City { get; set; }
             public decimal Price { get; set; }
         }
+
 }
 
 

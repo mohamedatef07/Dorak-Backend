@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -105,6 +105,7 @@ namespace API
 
 
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
