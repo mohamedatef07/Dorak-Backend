@@ -30,7 +30,7 @@ namespace Services
         {
             var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate,centerId);
             return shifts.Select(shift => shift.ShiftToShiftVM());
-        } 
+        }
 
         public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
         {
