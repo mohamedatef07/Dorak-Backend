@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dorak.DataTransferObject
 {
-    public class GetAllProviderScheduleDetailsDTO
+    public class GetShiftDetailsDTO
     {
         public int CenterId { get; set; }
         public int ShiftId { get; set; }
@@ -15,7 +15,7 @@ namespace Dorak.DataTransferObject
         public int TotalAppointments { get; set; }
         public int ApprovedAppointments { get; set; }
         public int PendingAppointments { get; set; }
-        public TimeOnly AverageEstimatedTime { get; set; }
+        public double EstimatedDuration { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
     }

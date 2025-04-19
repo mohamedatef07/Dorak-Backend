@@ -113,9 +113,6 @@ namespace Data.Migrations
                     b.Property<int>("ProviderCenterServiceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ShiftId")
-                        .HasColumnType("int");
-
                     b.Property<int?>("TemporaryClientId")
                         .HasColumnType("int");
 
@@ -131,8 +128,6 @@ namespace Data.Migrations
                     b.HasIndex("OperatorId");
 
                     b.HasIndex("ProviderCenterServiceId");
-
-                    b.HasIndex("ShiftId");
 
                     b.HasIndex("TemporaryClientId");
 
@@ -285,22 +280,15 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int>("ShiftId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("LiveQueueId");
 
-                    b.HasIndex("AppointmentId")
-                        .IsUnique();
+                    b.HasIndex("AppointmentId");
 
                     b.HasIndex("OperatorId");
-
-                    b.HasIndex("ShiftId")
-                        .IsUnique();
 
                     b.ToTable("LiveQueues");
                 });
@@ -513,6 +501,9 @@ namespace Data.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("providerTitle")
+                        .HasColumnType("int");
+
                     b.Property<int>("providerType")
                         .HasColumnType("int");
 
@@ -665,6 +656,9 @@ namespace Data.Migrations
 
                     b.Property<TimeOnly>("EndTime")
                         .HasColumnType("time");
+
+                    b.Property<int>("EstimatedDuration")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -976,12 +970,6 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Dorak.Models.Shift", "Shift")
-                        .WithMany("Appointments")
-                        .HasForeignKey("ShiftId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Dorak.Models.TemporaryClient", "TemporaryClient")
                         .WithMany("Appointments")
                         .HasForeignKey("TemporaryClientId")
@@ -996,8 +984,6 @@ namespace Data.Migrations
                     b.Navigation("Operator");
 
                     b.Navigation("ProviderCenterService");
-
-                    b.Navigation("Shift");
 
                     b.Navigation("TemporaryClient");
 
@@ -1018,9 +1004,9 @@ namespace Data.Migrations
             modelBuilder.Entity("Dorak.Models.LiveQueue", b =>
                 {
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
-                        .WithOne("LiveQueue")
-                        .HasForeignKey("Dorak.Models.LiveQueue", "AppointmentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .WithMany()
+                        .HasForeignKey("AppointmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Operator", "Operator")
@@ -1029,17 +1015,9 @@ namespace Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Dorak.Models.Shift", "Shift")
-                        .WithOne("LiveQueue")
-                        .HasForeignKey("Dorak.Models.LiveQueue", "ShiftId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.Navigation("Appointment");
 
                     b.Navigation("Operator");
-
-                    b.Navigation("Shift");
                 });
 
             modelBuilder.Entity("Dorak.Models.Notification", b =>
@@ -1250,9 +1228,6 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Dorak.Models.Appointment", b =>
                 {
-                    b.Navigation("LiveQueue")
-                        .IsRequired();
-
                     b.Navigation("Notifications");
 
                     b.Navigation("Payment")
@@ -1304,14 +1279,6 @@ namespace Data.Migrations
             modelBuilder.Entity("Dorak.Models.Service", b =>
                 {
                     b.Navigation("ProviderCenterServices");
-                });
-
-            modelBuilder.Entity("Dorak.Models.Shift", b =>
-                {
-                    b.Navigation("Appointments");
-
-                    b.Navigation("LiveQueue")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Dorak.Models.TemporaryClient", b =>

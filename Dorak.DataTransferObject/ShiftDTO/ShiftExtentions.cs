@@ -21,7 +21,7 @@ namespace Dorak.ViewModels
                 MaxPatientsPerDay = _shift.MaxPatientsPerDay,
                 CenterId = _shift.ProviderAssignment.CenterId,
                 ProviderId = _shift.ProviderAssignment.ProviderId,
-                OperatorId = _shift.OperatorId
+                //OperatorId = _shift.OperatorId
             };
         }
     }
