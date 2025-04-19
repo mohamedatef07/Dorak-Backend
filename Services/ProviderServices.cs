@@ -17,6 +17,8 @@ using Dorak.DataTransferObject.ShiftDTO;
 
 
 
+
+
 namespace Services
 {
     public class ProviderServices
@@ -26,14 +28,16 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
         public ServicesRepository servicesRepository;
-
+        public UserManager<IdentityUser> userManager;
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
+            UserManager<IdentityUser> _userManager,
             CommitData _commitData , ServicesRepository _servicesRepository)
+
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
