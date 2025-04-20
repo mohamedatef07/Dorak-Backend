@@ -5,8 +5,8 @@ namespace Dorak.Models
     public class ProviderAssignment
     {
         public int AssignmentId { get; set; }
-        public DateTime? StartDate { get; set; } = DateTime.Now;
-        public DateTime? EndDate { get; set; } = DateTime.Now;
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now;
         public AssignmentType AssignmentType { get; set; }
         public bool IsDeleted { get; set; }
         public string ProviderId { get; set; }

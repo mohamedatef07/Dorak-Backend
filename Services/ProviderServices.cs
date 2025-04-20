@@ -96,31 +96,31 @@ namespace Services
         }
 
         // Assign provider to center manually - for visitor provider
-        //public string AssignProviderToCenter(ProviderAssignmentViewModel model)
-        //{
-        //    var assignment = new ProviderAssignment
-        //    {
-        //        ProviderId = model.ProviderId,
-        //        CenterId = model.CenterId,
-        //        StartDate = model.StartDate,
-        //        EndDate = model.EndDate,
-        //        AssignmentType = model.AssignmentType,
-        //        IsDeleted = false
+        public string AssignProviderToCenter(ProviderAssignmentViewModel model)
+        {
+            var assignment = new ProviderAssignment
+            {
+                ProviderId = model.ProviderId,
+                CenterId = model.CenterId,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                AssignmentType = model.AssignmentType,
+                IsDeleted = false
 
-        //    };
+            };
 
-        //    providerAssignmentRepository.Add(assignment);
-        //    commitData.SaveChanges();
+            providerAssignmentRepository.Add(assignment);
+            commitData.SaveChanges();
 
-        //    foreach (ShiftViewModel shift in model.Shifts )
-        //    {
+            foreach (ShiftViewModel shift in model.Shifts)
+            {
 
-        //        CreateShift(shift,assignment);
+                CreateShift(shift, assignment);
 
-        //    }
+            }
 
-        //    return "Provider assigned Succesfully!";
-        //}
+            return "Provider assigned Succesfully!";
+        }
 
         // Assign provider to center weekly - for permanent provider
 
@@ -198,7 +198,7 @@ namespace Services
         public string RegenerateWeeklyAssignments()
         {
             var weeklyAssignments = providerAssignmentRepository.GetAll()
-                .Where(pa => pa.AssignmentType == AssignmentType.Permanent && pa.StartDate.HasValue && pa.EndDate.HasValue && pa.IsDeleted == false)
+                .Where(pa => pa.AssignmentType == AssignmentType.Permanent && pa.StartDate != null && pa.EndDate != null && pa.IsDeleted == false)
                 .ToList();
 
             if (!weeklyAssignments.Any())
@@ -210,8 +210,8 @@ namespace Services
                 int centerId = existing.CenterId;
 
                 List<int> workingDays = new List<int>();
-                var start = existing.StartDate.Value;
-                var end = existing.EndDate.Value;
+                var start = existing.StartDate;
+                var end = existing.EndDate;
                 for (DateTime date = start; date <= end; date = date.AddDays(1))
                 {
                     int dayOfWeek = (int)date.DayOfWeek;
@@ -319,11 +319,11 @@ namespace Services
                 shifts = shiftRepository.GetAllShiftsByAssignmentId(providerAssignment.AssignmentId);
                 foreach (var shift in shifts)
                 {
-                    if(shift.ShiftDate.ToDateTime(TimeOnly.MinValue) >= DateTime.Now.AddMonths(1))
+                    if(shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now.AddMonths(1)))
                     {
                         break;
                     }
-                    else if (shift.ShiftDate.ToDateTime(TimeOnly.MinValue) >= DateTime.Now)
+                    else if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now))
                     {
                         var newShift = new GetProviderBookingInfoDTO()
                         {
@@ -431,8 +431,8 @@ namespace Services
         public void CreateShift(ShiftViewModel model, ProviderAssignment assignment)
         {
 
-            DateTime currentDate = assignment.StartDate.Value.Date;
-            DateTime endDate = assignment.EndDate.Value.Date;
+            DateTime currentDate = assignment.StartDate;
+            DateTime endDate = assignment.EndDate;
 
             while (currentDate <= endDate)
             {
@@ -443,9 +443,9 @@ namespace Services
                     StartTime = model.StartTime,
                     EndTime = model.EndTime,
                     MaxPatientsPerDay = model.MaxPatientsPerDay,
-                    ShiftDate = assignment.StartDate,
+                    ShiftDate = DateOnly.FromDateTime(assignment.StartDate),
                     IsDeleted = false,
-                    ShiftDate = currentDate
+                    //ShiftDate = currentDate 
                 };
 
                 shiftRepository.Add(shift);
