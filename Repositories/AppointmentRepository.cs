@@ -39,7 +39,7 @@ namespace Repositories
             return appointment;
         }
 
-        public void MakeAppointment(AppointmentViewModel appointmentViewModel);
+        //public void MakeAppointment(AppointmentViewModel appointmentViewModel);
 
         public IQueryable<Appointment> GetAllAppointmentForShift(int ShiftId)
         {

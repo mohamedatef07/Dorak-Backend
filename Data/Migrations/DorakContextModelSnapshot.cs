@@ -294,7 +294,8 @@ namespace Data.Migrations
 
                     b.HasKey("LiveQueueId");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
 
                     b.HasIndex("OperatorId");
 
@@ -537,7 +538,7 @@ namespace Data.Migrations
                     b.Property<int>("CenterId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -547,7 +548,7 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("AssignmentId");
@@ -984,7 +985,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Shift", "Shift")
                         .WithMany("Appointments")
                         .HasForeignKey("ShiftId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.TemporaryClient", "TemporaryClient")
@@ -1023,9 +1024,9 @@ namespace Data.Migrations
             modelBuilder.Entity("Dorak.Models.LiveQueue", b =>
                 {
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne("LiveQueue")
+                        .HasForeignKey("Dorak.Models.LiveQueue", "AppointmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Operator", "Operator")
@@ -1037,7 +1038,7 @@ namespace Data.Migrations
                     b.HasOne("Dorak.Models.Shift", "Shift")
                         .WithOne("LiveQueue")
                         .HasForeignKey("Dorak.Models.LiveQueue", "ShiftId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1255,6 +1256,9 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Dorak.Models.Appointment", b =>
                 {
+                    b.Navigation("LiveQueue")
+                        .IsRequired();
+
                     b.Navigation("Notifications");
 
                     b.Navigation("Payment")
