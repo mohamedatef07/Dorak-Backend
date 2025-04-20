@@ -3,6 +3,7 @@ using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Dorak.ViewModels.DoctorCardVMs;
+using Dorak.DataTransferObject;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
@@ -19,6 +20,7 @@ namespace API.Controllers
         {
             providerServices = _providerServices;
             this.providerCardService = providerCardService;
+            shiftServices = _shiftServices;
         }
         [HttpGet("ScheduleDetails")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
@@ -88,11 +90,13 @@ namespace API.Controllers
         }
 
         [HttpGet("filter-by-day")]
-        public IActionResult FilterByDay([FromQuery] string day)
+        public IActionResult FilterByDay([FromQuery] DateOnly date)
         {
-            if (string.IsNullOrWhiteSpace(day))
+            var doctors = providerCardService.FilterByDay(date);
+
+            if (!doctors.Any())
             {
-                return BadRequest(new ApiResponse<List<ProviderCardViewModel>>
+                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
                 {
                     Message = "Day is required",
                     Status = 400,
@@ -100,14 +104,32 @@ namespace API.Controllers
                 });
             }
 
-            var doctors = providerCardService.FilterByDay(day);
-
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
-                Message = $"Doctors available on {day} retrieved successfully.",
+                Message = $"Doctors available on {date} retrieved successfully.",
                 Status = 200,
                 Data = doctors
             });
         }
+
+        [HttpPut("update-profile")]
+        public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string> { Message = "Invalid data", Status = 400 });
+
+            var result = await providerServices.UpdateDoctorProfile(model);
+
+            return Ok(new ApiResponse<string>
+            {
+                Message = result,
+                Status = 200,
+                Data = result
+            });
+        }
+
+
+
+
     }
 }

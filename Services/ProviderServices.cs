@@ -17,6 +17,8 @@ using Dorak.DataTransferObject.ShiftDTO;
 
 
 
+
+
 namespace Services
 {
     public class ProviderServices
@@ -26,19 +28,22 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
         public ServicesRepository servicesRepository;
-
+        public UserManager<IdentityUser> userManager;
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
+            UserManager<IdentityUser> _userManager,
             CommitData _commitData , ServicesRepository _servicesRepository)
+
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
             shiftRepository = _shiftRepository;
             providerCenterServiceRepository = _providerCenterServiceRepository;
+            userManager = _userManager;
             commitData = _commitData;
             servicesRepository = _servicesRepository;
         }
@@ -107,6 +112,13 @@ namespace Services
             providerAssignmentRepository.Add(assignment);
             commitData.SaveChanges();
 
+            foreach (ShiftViewModel shift in model.Shifts )
+            {
+
+                CreateShift(shift,assignment);
+
+            }
+
             return "Provider assigned Succesfully!";
         }
 
@@ -171,6 +183,7 @@ namespace Services
                     IsDeleted = false
                 });
             }
+
 
             foreach (var assignment in assignments)
             {
@@ -370,7 +383,7 @@ namespace Services
                 };
             return shiftDetails;
         }
-        //Get Provider Center Services
+        // Get center Services
         public List<GetCenterServicesShiftDTO> GetCenterServices(Provider provider)
         {
             var providerCenterServices = provider.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId).ToList();
@@ -415,27 +428,32 @@ namespace Services
         }
 
         // Create shift
-        //public string CreateShift(ShiftViewModel model)
-        //{
-        //    var assignment = providerAssignmentRepository.GetById(a => a.AssignmentId == model.ProviderAssignmentId);
-        //    if (assignment == null)
-        //        return "Invalid provider assignment ID.";
-        //    //var start =assignment.StartDate;
-        //    //var end =assignment.EndDate;
-        //    //int duration = (int)(end.Value.CompareTo(start));
-        //    //for (int i = 0; i <= duration; i++)
-        //    //{
-        //        var shift = new Shift
-        //        {
-        //            ProviderAssignmentId = model.ProviderAssignmentId,
-        //            ShiftType = model.ShiftType,
-        //            StartTime = model.StartTime,
-        //            EndTime = model.EndTime,
-        //            MaxPatientsPerDay = model.MaxPatientsPerDay,
-        //            ShiftDate=assignment.StartDate,
-        //            IsDeleted = false,
+        public void CreateShift(ShiftViewModel model, ProviderAssignment assignment)
+        {
 
-        //        };
+            DateTime currentDate = assignment.StartDate.Value.Date;
+            DateTime endDate = assignment.EndDate.Value.Date;
+
+            while (currentDate <= endDate)
+            {
+                var shift = new Shift
+                {
+                  
+                    ShiftType = model.ShiftType,
+                    StartTime = model.StartTime,
+                    EndTime = model.EndTime,
+                    MaxPatientsPerDay = model.MaxPatientsPerDay,
+                    ShiftDate=assignment.StartDate,
+                    IsDeleted = false,
+                    ShiftDate = currentDate
+                };
+
+                shiftRepository.Add(shift);
+                currentDate = currentDate.AddDays(1);
+            }
+
+            commitData.SaveChanges();
+        }
 
         //        shiftRepository.Add(shift);
         //        commitData.SaveChanges();
@@ -448,5 +466,53 @@ namespace Services
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
 
+        //////
+
+
+        public async Task<string> UpdateDoctorProfile(UpdateProviderProfileDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (provider == null)
+                return "Provider not found.";
+
+            // Update Provider Info
+            provider.FirstName = model.FirstName;
+            provider.LastName = model.LastName;
+            provider.BirthDate = model.BirthDate;
+            provider.Gender = model.Gender;
+            provider.Image = model.Image;
+
+            providerRepository.Edit(provider);
+
+            // Update Identity User Info
+            var user = await userManager.FindByIdAsync(model.ProviderId);
+            if (user != null)
+            {
+                user.Email = model.Email;
+                user.PhoneNumber = model.Phone;
+
+                var updateResult = await userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    var errorMessages = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                    return $"Failed to update user account: {errorMessages}";
+                }
+            }
+            else
+            {
+                return "User not found in Identity.";
+            }
+
+            commitData.SaveChanges();
+
+            return "Doctor profile updated successfully.";
+
+        }
     }
-}
+    }
+
+    
+
+
+
+
