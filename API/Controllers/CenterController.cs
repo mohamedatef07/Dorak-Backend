@@ -37,7 +37,7 @@ namespace API.Controllers
         [HttpPost]  //provider or assignment !!!!!!!! Type
         [Route("addProviderAndAssignIt")]
 
-        public async Task<IActionResult> AddProvider(RegisterationViewModel user, int centerId , DateTime startdate, DateTime enddate, AssignmentType assignmentType) 
+        public async Task<IActionResult> AddProvider(RegisterationViewModel user, int centerId, DateTime startdate, DateTime enddate, AssignmentType assignmentType)
         {
             var res = await centerServices.AddProviderAsync(user, centerId, startdate, enddate, assignmentType);
 

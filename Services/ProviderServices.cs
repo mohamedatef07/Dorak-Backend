@@ -28,14 +28,14 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
         public ServicesRepository servicesRepository;
-        public UserManager<IdentityUser> userManager;
+        public UserManager<User> userManager;
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
-            UserManager<IdentityUser> _userManager,
+            UserManager<User> _userManager,
             CommitData _commitData , ServicesRepository _servicesRepository)
 
         {
@@ -96,31 +96,31 @@ namespace Services
         }
 
         // Assign provider to center manually - for visitor provider
-        public string AssignProviderToCenter(ProviderAssignmentViewModel model)
-        {
-            var assignment = new ProviderAssignment
-            {
-                ProviderId = model.ProviderId,
-                CenterId = model.CenterId,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                AssignmentType = model.AssignmentType,
-                IsDeleted = false
+        //public string AssignProviderToCenter(ProviderAssignmentViewModel model)
+        //{
+        //    var assignment = new ProviderAssignment
+        //    {
+        //        ProviderId = model.ProviderId,
+        //        CenterId = model.CenterId,
+        //        StartDate = model.StartDate,
+        //        EndDate = model.EndDate,
+        //        AssignmentType = model.AssignmentType,
+        //        IsDeleted = false
 
-            };
+        //    };
 
-            providerAssignmentRepository.Add(assignment);
-            commitData.SaveChanges();
+        //    providerAssignmentRepository.Add(assignment);
+        //    commitData.SaveChanges();
 
-            foreach (ShiftViewModel shift in model.Shifts )
-            {
+        //    foreach (ShiftViewModel shift in model.Shifts )
+        //    {
 
-                CreateShift(shift,assignment);
+        //        CreateShift(shift,assignment);
 
-            }
+        //    }
 
-            return "Provider assigned Succesfully!";
-        }
+        //    return "Provider assigned Succesfully!";
+        //}
 
         // Assign provider to center weekly - for permanent provider
 
@@ -438,12 +438,12 @@ namespace Services
             {
                 var shift = new Shift
                 {
-                  
+
                     ShiftType = model.ShiftType,
                     StartTime = model.StartTime,
                     EndTime = model.EndTime,
                     MaxPatientsPerDay = model.MaxPatientsPerDay,
-                    ShiftDate=assignment.StartDate,
+                    ShiftDate = assignment.StartDate,
                     IsDeleted = false,
                     ShiftDate = currentDate
                 };
@@ -454,12 +454,6 @@ namespace Services
 
             commitData.SaveChanges();
         }
-
-        //        shiftRepository.Add(shift);
-        //        commitData.SaveChanges();
-        //    //}
-        //    return "Shift created successfully!";
-        //}
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {

@@ -4,7 +4,6 @@ using Models.Enums;
 using Dorak.ViewModels;
 using Dorak.Models;
 
-
 namespace API.Controllers
 {
     [Route("api/[controller]")]
@@ -20,9 +19,6 @@ namespace API.Controllers
             shiftServices = _shiftServices;
         }
 
-        //[HttpPost("create")]
-        //public IActionResult ManageProviderSchedule([FromBody] ShiftViewModel model)
-        //{
 
         [HttpGet("GetShifts")]
         public IActionResult GetShifts(DateTime Date, int CenterId)
