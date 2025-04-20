@@ -28,14 +28,14 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
         public ServicesRepository servicesRepository;
-        public UserManager<IdentityUser> userManager;
+        public UserManager<User> userManager;
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
-            UserManager<IdentityUser> _userManager,
+            UserManager<User> _userManager,
             CommitData _commitData , ServicesRepository _servicesRepository)
 
         {
@@ -76,13 +76,10 @@ namespace Services
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
-
-
         public Provider GetProviderById(string providerId)
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
         }
-
         public List<Provider> GetAllProviders()
         {
             return providerRepository.GetAll().ToList();
@@ -95,35 +92,35 @@ namespace Services
         public void DeleteProvider(Provider provider)
         {
             providerRepository.Delete(provider);
+            commitData.SaveChanges();
         }
 
         // Assign provider to center manually - for visitor provider
-        public string AssignProviderToCenter(ProviderAssignmentViewModel model)
-        {
-            var assignment = new ProviderAssignment
-            {
-                ProviderId = model.ProviderId,
-                CenterId = model.CenterId,
-                StartDate = model.StartDate,
-                EndDate = model.EndDate,
-                AssignmentType = model.AssignmentType,
-                IsDeleted = false
+        //public string AssignProviderToCenter(ProviderAssignmentViewModel model)
+        //{
+        //    var assignment = new ProviderAssignment
+        //    {
+        //        ProviderId = model.ProviderId,
+        //        CenterId = model.CenterId,
+        //        StartDate = model.StartDate,
+        //        EndDate = model.EndDate,
+        //        AssignmentType = model.AssignmentType,
+        //        IsDeleted = false
 
-            };
+        //    };
 
-            providerAssignmentRepository.Add(assignment);
+        //    providerAssignmentRepository.Add(assignment);
+        //    commitData.SaveChanges();
 
-            commitData.SaveChanges();
+        //    foreach (ShiftViewModel shift in model.Shifts )
+        //    {
 
-            foreach (ShiftViewModel shift in model.Shifts )
-            {
+        //        CreateShift(shift,assignment);
 
-                CreateShift(shift,assignment);
+        //    }
 
-            }
-
-            return "Provider assigned Succesfully!";
-        }
+        //    return "Provider assigned Succesfully!";
+        //}
 
         // Assign provider to center weekly - for permanent provider
 
@@ -191,28 +188,20 @@ namespace Services
             foreach (var assignment in assignments)
             {
                 providerAssignmentRepository.Add(assignment);
-
-                foreach (ShiftViewModel shift in model.Shifts)
-                {
-
-                    CreateShift(shift, assignment);
-
-                }
             }
 
             commitData.SaveChanges();
             return "Weekly assignment completed successfully.";
         }
 
-        // background service to rescedule 
-
+        // background service to reassign 
         public string RegenerateWeeklyAssignments()
         {
             var weeklyAssignments = providerAssignmentRepository.GetAll()
                 .Where(pa => pa.AssignmentType == AssignmentType.Permanent && pa.StartDate.HasValue && pa.EndDate.HasValue && pa.IsDeleted == false)
                 .ToList();
 
-    if (!weeklyAssignments.Any())
+            if (!weeklyAssignments.Any())
                 return "No weekly assignments found.";
 
             foreach (var existing in weeklyAssignments)
@@ -449,12 +438,12 @@ namespace Services
             {
                 var shift = new Shift
                 {
-                  
+
                     ShiftType = model.ShiftType,
                     StartTime = model.StartTime,
                     EndTime = model.EndTime,
                     MaxPatientsPerDay = model.MaxPatientsPerDay,
-                    ShiftDate=assignment.StartDate,
+                    ShiftDate = assignment.StartDate,
                     IsDeleted = false,
                     ShiftDate = currentDate
                 };
@@ -465,7 +454,6 @@ namespace Services
 
             commitData.SaveChanges();
         }
-
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {

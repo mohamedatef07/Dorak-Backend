@@ -39,11 +39,11 @@ namespace Repositories
             return appointment;
         }
 
-        //public void MakeAppointment(AppointmentViewModel appointmentViewModel);
+        public void MakeAppointment(AppointmentViewModel appointmentViewModel);
 
-        //public IQueryable<Appointment> GetAllAppointmentForShift(int ShiftId)
-        //{
-        //    return GetAll().Where(a => a.ShiftId == ShiftId);
-        //}
+        public IQueryable<Appointment> GetAllAppointmentForShift(int ShiftId)
+        {
+            return GetAll().Where(a => a.ShiftId == ShiftId);
+        }
     }
 }

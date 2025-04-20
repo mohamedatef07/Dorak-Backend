@@ -73,6 +73,7 @@ namespace API
             builder.Services.AddScoped(typeof(CommitData));
             builder.Services.AddScoped(typeof(CenterServices));
             builder.Services.AddScoped(typeof(ProviderCardService));
+            builder.Services.AddScoped(typeof (ShiftServices));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {

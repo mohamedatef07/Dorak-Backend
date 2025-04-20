@@ -26,7 +26,7 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider id is required", Status = 400 });
             }
             var provider = providerServices.GetProviderById(providerId);
 
@@ -34,12 +34,12 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider not found", Status = 404 });
             }
-            GetProviderMainInfoDTO providerVM = providerServices.GetProviderMainInfo(provider);
+            GetProviderMainInfoDTO mainInfo = providerServices.GetProviderMainInfo(provider);
             return Ok(new ApiResponse<GetProviderMainInfoDTO>
             {
                 Message = "Get Provider Info Successfully",
                 Status = 200,
-                Data = providerVM
+                Data = mainInfo
             });
         }
         [HttpGet("BookingInfo")]
@@ -47,7 +47,7 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider id is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
@@ -68,11 +68,11 @@ namespace API.Controllers
         }
 
         [HttpGet("CenterServices")]
-        public IActionResult GetCenterServices([FromQuery] string providerId)
+        public IActionResult CenterServices([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetCenterServicesShiftDTO> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetCenterServicesShiftDTO> { Message = "Provider id is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
@@ -86,7 +86,7 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<List<GetCenterServicesShiftDTO>>
             {
-                Message = "Get Provider  center services Successfully",
+                Message = "Get provider center services Successfully",
                 Status = 200,
                 Data = centerServices
             });
