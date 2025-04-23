@@ -1,4 +1,5 @@
-﻿using Dorak.ViewModels;
+﻿using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.ViewModels;
 using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Services;
@@ -151,6 +152,20 @@ namespace API.Controllers
         {
             await _accountServices.Signout();
             return Ok(new { Message = "Sign out Successfully", Status = 200 });
+        }
+
+        //change password
+        [HttpPut("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        {
+            var result = await _accountServices.ChangePasswordAsync(model);
+
+            return Ok(new ApiResponse<string>
+            {
+                Message = result,
+                Status = 200,
+                Data = result
+            });
         }
     }
 }

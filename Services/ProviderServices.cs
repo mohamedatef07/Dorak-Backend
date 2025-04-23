@@ -12,9 +12,7 @@ using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
 using Dorak.DataTransferObject.ShiftDTO;
-
-
-
+using Dorak.DataTransferObject.ProviderDTO;
 
 
 
@@ -28,14 +26,14 @@ namespace Services
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
         public ServicesRepository servicesRepository;
-        public UserManager<IdentityUser> userManager;
+        public UserManager<User> userManager;
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
-            UserManager<IdentityUser> _userManager,
+            UserManager<User> _userManager,
             CommitData _commitData , ServicesRepository _servicesRepository)
 
         {
@@ -445,23 +443,23 @@ namespace Services
             DateTime currentDate = assignment.StartDate.Value.Date;
             DateTime endDate = assignment.EndDate.Value.Date;
 
-            while (currentDate <= endDate)
-            {
-                var shift = new Shift
-                {
+            //while (currentDate <= endDate)
+            //{
+            //    var shift = new Shift
+            //    {
                   
-                    ShiftType = model.ShiftType,
-                    StartTime = model.StartTime,
-                    EndTime = model.EndTime,
-                    MaxPatientsPerDay = model.MaxPatientsPerDay,
-                    ShiftDate=assignment.StartDate,
-                    IsDeleted = false,
-                    ShiftDate = currentDate
-                };
+            //        ShiftType = model.ShiftType,
+            //        StartTime = model.StartTime,
+            //        EndTime = model.EndTime,
+            //        MaxPatientsPerDay = model.MaxPatientsPerDay,
+            //        ShiftDate=assignment.StartDate,
+            //        IsDeleted = false,
+            //        ShiftDate = currentDate
+            //    };
 
-                shiftRepository.Add(shift);
-                currentDate = currentDate.AddDays(1);
-            }
+            //    shiftRepository.Add(shift);
+            //    currentDate = currentDate.AddDays(1);
+            //}
 
             commitData.SaveChanges();
         }
@@ -514,8 +512,29 @@ namespace Services
             return "Doctor profile updated successfully.";
 
         }
+
+        public string UpdateProfessionalInfo(UpdateProviderProfessionalInfoDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (provider == null)
+                return "Provider not found.";
+
+            provider.Specialization = model.Specialization;
+            provider.ExperienceYears = model.ExperienceYears;
+            provider.LicenseNumber = model.LicenseNumber;
+            provider.Bio = model.Bio;
+
+            providerRepository.Edit(provider);
+            commitData.SaveChanges();
+
+            return "Professional info updated successfully.";
+        }
+
+
+
+
     }
-    }
+}
 
     
 
