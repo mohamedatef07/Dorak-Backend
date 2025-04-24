@@ -446,9 +446,9 @@ namespace Services
                     ShiftDate = currentDate 
                 };
 
-            //    shiftRepository.Add(shift);
-            //    currentDate = currentDate.AddDays(1);
-            //}
+                shiftRepository.Add(shift);
+                currentDate = currentDate.AddDays(1);
+            }
 
             commitData.SaveChanges();
         }
@@ -523,7 +523,7 @@ namespace Services
 
     }
 }
-}
+
 
     
 
