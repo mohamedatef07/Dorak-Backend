@@ -114,7 +114,7 @@ namespace Services
 
 
         //error
-        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user, int centerId, DateTime _startdate, DateTime _enddate, AssignmentType _assignmentType)
+        public async Task<IdentityResult> AddProviderAsync(RegisterationViewModel user, int centerId, DateOnly _startdate, DateOnly _enddate, AssignmentType _assignmentType)
         {
             try
             {

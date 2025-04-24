@@ -12,7 +12,7 @@ namespace Dorak.ViewModels
     {
 
         [Required]
-        public DateTime AppointmentDate { get; set; }
+        public DateOnly AppointmentDate { get; set; }
 
         [Required]
         public AppointmentStatus AppointmentStatus { get; set; }
@@ -22,7 +22,7 @@ namespace Dorak.ViewModels
 
         [Required]
         [StringLength(100, ErrorMessage = "Type cannot exceed 100 characters.")]
-        public string Type { get; set; }
+        public ClientType ClientType { get; set; }
 
         [Range(0, double.MaxValue, ErrorMessage = "Fees must be a positive number.")]
         public decimal Fees { get; set; }

@@ -23,13 +23,17 @@ namespace Repositories
         {
             return Table.Where(a => a.UserId == clientId).ToList();
         }
+        public IQueryable<Appointment> GetAppointmentsByTempClientId(int tempId)
+        {
+            return Table.Where(a => a.TemporaryClientId == tempId);
+        }
         public IEnumerable<Appointment> GetAppointmentsByProviderId(string providerId)
         {
             return Table.Where(a => a.ProviderCenterService.ProviderId == providerId).ToList();
         }
         public IEnumerable<Appointment> GetUpcomingAppointments()
         {
-            return Table.Where(a => a.AppointmentDate >= DateTime.Now).ToList();
+            return Table.Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
         }
 
         public Appointment CreateAppoinment(Appointment appointment)

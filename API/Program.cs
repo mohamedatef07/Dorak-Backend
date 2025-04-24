@@ -85,6 +85,7 @@ namespace API
             builder.Services.AddScoped<ShiftServices>();
             builder.Services.AddScoped(typeof(AppointmentRepository));
             builder.Services.AddScoped(typeof(AppointmentServices));
+            builder.Services.AddScoped(typeof(TemperoryClientRepository));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {

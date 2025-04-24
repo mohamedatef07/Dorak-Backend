@@ -13,7 +13,7 @@ namespace Dorak.ViewModels
         public int appointmentId {  get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public DateTime AppointmentDate { get; set; }
+        public DateOnly AppointmentDate { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
