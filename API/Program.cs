@@ -145,7 +145,7 @@ namespace API
                 recurringJobManager.AddOrUpdate(
                     "RegenerateWeeklyAssignmentsJob",
                     () => providerServices.RegenerateWeeklyAssignments(),
-                    Cron.Daily);
+                    "0 */6 * * *");
             }
 
             app.MapControllerRoute(

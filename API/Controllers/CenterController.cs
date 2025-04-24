@@ -29,7 +29,7 @@ namespace API.Controllers
             {
                 Data = res,
                 Message = "Success",
-                Status=200
+                Status = 200
             });
         }
 

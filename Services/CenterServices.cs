@@ -26,7 +26,7 @@ namespace Services
             CommitData _commitData,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ProviderRepository _providerRepository,
-            AccountServices _accountServices,ProviderServices _providerServices)
+            AccountServices _accountServices, ProviderServices _providerServices)
         {
             centerRepository = _centerRepository;
             commitData = _commitData;
@@ -160,17 +160,17 @@ namespace Services
             return "Provider Deleted Succesfully!";
         }
 
-       
-        public PaginationViewModel<ProviderViewModel> ProviderSearch( int centerId, string searchText = "", int pageNumber = 1,
+
+        public PaginationViewModel<ProviderViewModel> ProviderSearch(int centerId, string searchText = "", int pageNumber = 1,
         int pageSize = 2)
         {
             var builder = PredicateBuilder.New<Provider>(true);
-            builder= builder.And(i=>i.ProviderAssignments.Any(p=>p.CenterId==centerId && p.IsDeleted==false));
+            builder = builder.And(i => i.ProviderAssignments.Any(p => p.CenterId == centerId && p.IsDeleted == false));
             if (!searchText.IsNullOrEmpty())
             {
                 builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) ||
                 i.LastName.ToLower().Contains(searchText.ToLower()) ||
-                i.City.ToLower().Contains(searchText.ToLower()) 
+                i.City.ToLower().Contains(searchText.ToLower())
                 && i.IsDeleted == false));
             }
             else
@@ -191,6 +191,6 @@ namespace Services
             };
         }
 
-        
+
     }
 }

@@ -10,20 +10,21 @@ namespace API.Controllers
     public class WeeklyProviderAssignmentController : Controller
     {
 
-            private readonly ProviderServices providerService;
+        private readonly ProviderServices providerService;
 
-            public WeeklyProviderAssignmentController(ProviderServices _providerService)
-            {
-                providerService = _providerService;
-            }
-
-            [HttpPost("assignweekly")]
-            public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
-            {
-                var result = providerService.AssignProviderToCenterWithWorkingDays(model);
-                return Ok(new { message = result });
-            }
+        public WeeklyProviderAssignmentController(ProviderServices _providerService)
+        {
+            providerService = _providerService;
         }
+
+        [HttpPost("assignweekly")]
+        public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
+        {
+            var result = providerService.AssignProviderToCenterWithWorkingDays(model);
+            return Ok(new { message = result });
+        }
+
     }
+}
 
 
