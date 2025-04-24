@@ -106,9 +106,8 @@ namespace Data.Migrations
                     b.Property<bool>("IsChecked")
                         .HasColumnType("bit");
 
-                    b.Property<string>("OperatorId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("LiveQueueId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ProviderCenterServiceId")
                         .HasColumnType("int");
@@ -124,8 +123,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("AppointmentId");
-
-                    b.HasIndex("OperatorId");
 
                     b.HasIndex("ProviderCenterServiceId");
 
@@ -286,7 +283,8 @@ namespace Data.Migrations
 
                     b.HasKey("LiveQueueId");
 
-                    b.HasIndex("AppointmentId");
+                    b.HasIndex("AppointmentId")
+                        .IsUnique();
 
                     b.HasIndex("OperatorId");
 
@@ -526,8 +524,8 @@ namespace Data.Migrations
                     b.Property<int>("CenterId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -536,8 +534,8 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("StartDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.HasKey("AssignmentId");
 
@@ -669,8 +667,8 @@ namespace Data.Migrations
                     b.Property<int>("ProviderAssignmentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ShiftDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("ShiftDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("ShiftType")
                         .HasColumnType("int");
@@ -952,12 +950,6 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Dorak.Models.Appointment", b =>
                 {
-                    b.HasOne("Dorak.Models.Operator", "Operator")
-                        .WithMany()
-                        .HasForeignKey("OperatorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Dorak.Models.ProviderCenterService", "ProviderCenterService")
                         .WithMany("Appointments")
                         .HasForeignKey("ProviderCenterServiceId")
@@ -974,8 +966,6 @@ namespace Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Operator");
 
                     b.Navigation("ProviderCenterService");
 
@@ -998,15 +988,15 @@ namespace Data.Migrations
             modelBuilder.Entity("Dorak.Models.LiveQueue", b =>
                 {
                     b.HasOne("Dorak.Models.Appointment", "Appointment")
-                        .WithMany()
-                        .HasForeignKey("AppointmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne("LiveQueue")
+                        .HasForeignKey("Dorak.Models.LiveQueue", "AppointmentId")
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Dorak.Models.Operator", "Operator")
-                        .WithMany("LiveQueues")
+                        .WithMany()
                         .HasForeignKey("OperatorId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Appointment");
@@ -1214,6 +1204,9 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Dorak.Models.Appointment", b =>
                 {
+                    b.Navigation("LiveQueue")
+                        .IsRequired();
+
                     b.Navigation("Notifications");
 
                     b.Navigation("Payment")
@@ -1227,11 +1220,6 @@ namespace Data.Migrations
                     b.Navigation("ProviderAssignments");
 
                     b.Navigation("ProviderCenterServices");
-                });
-
-            modelBuilder.Entity("Dorak.Models.Operator", b =>
-                {
-                    b.Navigation("LiveQueues");
                 });
 
             modelBuilder.Entity("Dorak.Models.Payment", b =>

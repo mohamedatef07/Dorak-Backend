@@ -11,8 +11,8 @@ namespace Dorak.ViewModels
     {
         public string ProviderId { get; set; }
         public int CenterId { get; set; }
-        public DateTime StartDate { get; set; }
-        public DateTime EndDate { get; set; }
+        public DateOnly StartDate { get; set; }
+        public DateOnly EndDate { get; set; }
         public AssignmentType AssignmentType { get; set; }
         public List<ShiftViewModel> Shifts { get; set; }
 

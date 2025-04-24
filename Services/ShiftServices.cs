@@ -18,7 +18,7 @@ namespace Services
         AppointmentRepository _appointmentRepository;
         public CommitData commitData;
 
-        public ShiftServices(ShiftRepository _shiftRepository,CenterRepository _centerRepository, AppointmentRepository appointmentRepository, CommitData _commitData)
+        public ShiftServices(ShiftRepository _shiftRepository, CenterRepository _centerRepository, AppointmentRepository appointmentRepository, CommitData _commitData)
         {
             shiftRepository = _shiftRepository;
             centerRepository = _centerRepository;
@@ -28,7 +28,7 @@ namespace Services
 
         public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateTime _shiftDate, int centerId)
         {
-            var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate,centerId);
+            var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
             return shifts.Select(shift => shift.ShiftToShiftVM());
         }
 

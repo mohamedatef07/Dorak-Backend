@@ -17,12 +17,12 @@ namespace Dorak.Models
         public TimeOnly EndTime { get; set; }
         public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
-        //public int LiveQueueId { get; set; }
-        //public virtual LiveQueue LiveQueue { get; set; }
+        public int LiveQueueId { get; set; }
+        public virtual LiveQueue LiveQueue { get; set; }
         public int ProviderCenterServiceId { get; set; }
         public virtual ProviderCenterService ProviderCenterService { get; set; }
-        //public int ShiftId { get; set; }
-        //public virtual Shift Shift { get; set; }
+        public int ShiftId { get; set; }
+        public virtual Shift Shift { get; set; }
         public string UserId { get; set; }
         public virtual User User { get; set; }
         public int? TemporaryClientId { get; set; }
