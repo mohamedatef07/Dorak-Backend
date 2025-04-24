@@ -535,7 +535,7 @@ namespace Data.Migrations
                     b.Property<int>("CenterId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("EndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("IsDeleted")
@@ -545,7 +545,7 @@ namespace Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<DateTime?>("StartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("AssignmentId");
@@ -682,8 +682,8 @@ namespace Data.Migrations
                     b.Property<int>("ProviderAssignmentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("ShiftDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("ShiftDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("ShiftType")
                         .HasColumnType("int");

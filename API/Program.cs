@@ -1,4 +1,4 @@
-using Data;
+﻿using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,6 +12,7 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
 
+
 namespace API
 {
     public class Program
@@ -23,12 +24,17 @@ namespace API
             // Add services to the container
             builder.Services.AddControllersWithViews();
 
+
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
 
+            // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
+
+       
+
 
             // ?? Hangfire Configuration
             builder.Services.AddHangfire(config => config
@@ -72,6 +78,11 @@ namespace API
             builder.Services.AddScoped(typeof(CommitData));
             builder.Services.AddScoped(typeof(CenterServices));
             builder.Services.AddScoped(typeof(ProviderCardService));
+            builder.Services.AddScoped<UserManager<User>>();
+            builder.Services.AddScoped<SignInManager<User>>();
+            builder.Services.AddScoped(typeof(ProviderServices));
+            builder.Services.AddScoped(typeof(ProviderCardService));
+            builder.Services.AddScoped<ShiftServices>();
             builder.Services.AddScoped(typeof(AppointmentRepository));
             builder.Services.AddScoped(typeof(AppointmentServices));
 
@@ -104,7 +115,9 @@ namespace API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
+
             var app = builder.Build();
+
 
             // Configure the HTTP request pipeline
             if (app.Environment.IsDevelopment())
@@ -137,6 +150,7 @@ namespace API
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=index}");
+
 
             app.MapControllers();
             app.Run();

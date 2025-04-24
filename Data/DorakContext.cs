@@ -34,7 +34,7 @@ namespace Data
             builder.ApplyConfiguration(new CenterConfiguration { });
             builder.ApplyConfiguration(new ServiceConfiguration { });
             builder.ApplyConfiguration(new AdminCenterManagementConfiguration { });
-            builder.ApplyConfiguration(new LiveQueueConfiguration { });
+           // builder.ApplyConfiguration(new LiveQueueConfiguration { });
             builder.ApplyConfiguration(new AppointmentConfiguration { });
             builder.ApplyConfiguration(new ShiftConfiguration { });
             builder.ApplyConfiguration(new PaymentConfiguration { });

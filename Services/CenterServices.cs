@@ -135,7 +135,7 @@ namespace Services
                             ProviderId = providerId
                         };
 
-                       providerServices.AssignProviderToCenter(providerAssignmentViewModel);
+                        providerServices.AssignProviderToCenter(providerAssignmentViewModel);
                         commitData.SaveChanges();
                     }
                 }

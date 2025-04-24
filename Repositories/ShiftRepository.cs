@@ -27,26 +27,23 @@ namespace Dorak.Models.Models.Wallet
         {
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).FirstOrDefault();
         }
-        
+
         public IQueryable<Shift> GetShiftsWithDateAndCenterId(DateTime _date, int _centerId)
         {
-            return GetAll().Where(s => s.ShiftDate == _date).Where(s => s.ProviderAssignment.CenterId == _centerId);
+            return GetAll().Where(s => s.ShiftDate == DateOnly.FromDateTime(_date)).Where(s => s.ProviderAssignment.CenterId == _centerId);
         }
-        
+
         public List<Shift> GetAllShiftsByAssignmentId(int ProviderAssignmentId)
         {
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).ToList();
         }
 
-        public IQueryable<Shift> LiveQueueShift()
+        public Shift LiveQueueShift()
         {
-            var now = DateTime.Now;
-            var today = now.Date;
-            var currentTime = TimeOnly.FromDateTime(now);
+            var today = DateTime.Now;
+            var now = TimeOnly.FromDateTime(DateTime.Now);
 
-            return Table.Where(lq => lq.ShiftDate.Date <= today &&
-                                    lq.StartTime <= currentTime &&
-                                    lq.ShiftType != ShiftType.Completed);
+            return Table.Where(lq => lq.ShiftDate == DateOnly.FromDateTime(today)).Where(lq => lq.StartTime <= now).Where(lq => lq.ShiftType != ShiftType.Completed).FirstOrDefault();
         }
     }
 }

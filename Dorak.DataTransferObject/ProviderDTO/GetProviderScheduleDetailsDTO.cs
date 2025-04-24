@@ -14,7 +14,6 @@ namespace Dorak.DataTransferObject
         public ShiftType ShiftType { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
+        public DateOnly ShiftDate { get; set; }
     }
 }
