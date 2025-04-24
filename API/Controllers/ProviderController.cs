@@ -1,9 +1,9 @@
 ﻿using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Dorak.ViewModels.DoctorCardVMs;
-using Dorak.DataTransferObject;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
@@ -127,6 +127,30 @@ namespace API.Controllers
                 Data = result
             });
         }
+
+        [HttpPut("update-professional-info")]
+        public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
+        {
+            var result = providerServices.UpdateProfessionalInfo(model);
+
+            return Ok(new ApiResponse<string>
+            {
+                Message = result,
+                Status = 200,
+                Data = result
+            });
+        }
+
+      
+
+
+
+
+
+
+
+
+
 
 
 

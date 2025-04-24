@@ -33,6 +33,9 @@ namespace API
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
 
+       
+
+
             // ?? Hangfire Configuration
             builder.Services.AddHangfire(config => config
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -73,7 +76,11 @@ namespace API
             builder.Services.AddScoped(typeof(CommitData));
             builder.Services.AddScoped(typeof(CenterServices));
             builder.Services.AddScoped(typeof(ProviderCardService));
-            builder.Services.AddScoped(typeof (ShiftServices));
+            builder.Services.AddScoped<UserManager<User>>();
+            builder.Services.AddScoped<SignInManager<User>>();
+            builder.Services.AddScoped(typeof(ProviderServices));
+            builder.Services.AddScoped(typeof(ProviderCardService));
+            builder.Services.AddScoped<ShiftServices>();
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {

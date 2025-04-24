@@ -12,9 +12,7 @@ using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
 using Dorak.DataTransferObject.ShiftDTO;
-
-
-
+using Dorak.DataTransferObject.ProviderDTO;
 
 
 
@@ -445,12 +443,12 @@ namespace Services
                     MaxPatientsPerDay = model.MaxPatientsPerDay,
                     ShiftDate = DateOnly.FromDateTime(assignment.StartDate),
                     IsDeleted = false,
-                    //ShiftDate = currentDate 
+                    ShiftDate = currentDate 
                 };
 
-                shiftRepository.Add(shift);
-                currentDate = currentDate.AddDays(1);
-            }
+            //    shiftRepository.Add(shift);
+            //    currentDate = currentDate.AddDays(1);
+            //}
 
             commitData.SaveChanges();
         }
@@ -502,8 +500,29 @@ namespace Services
             return "Doctor profile updated successfully.";
 
         }
+
+        public string UpdateProfessionalInfo(UpdateProviderProfessionalInfoDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (provider == null)
+                return "Provider not found.";
+
+            provider.Specialization = model.Specialization;
+            provider.ExperienceYears = model.ExperienceYears;
+            provider.LicenseNumber = model.LicenseNumber;
+            provider.Bio = model.Bio;
+
+            providerRepository.Edit(provider);
+            commitData.SaveChanges();
+
+            return "Professional info updated successfully.";
+        }
+
+
+
+
     }
-    }
+}
 
     
 
