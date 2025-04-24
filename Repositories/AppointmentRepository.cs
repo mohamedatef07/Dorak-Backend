@@ -19,17 +19,21 @@ namespace Repositories
             CommitData = _commitData;
         }
 
-        public async Task<IEnumerable<Appointment>> GetAppointmentsByClientId(string clientId)
+        public IEnumerable<Appointment> GetAppointmentsByClientId(string clientId)
         {
-            return await Table.Where(a => a.UserId == clientId).ToListAsync();
+            return Table.Where(a => a.UserId == clientId).ToList();
         }
-        public async Task<IEnumerable<Appointment>> GetAppointmentsByProviderId(string providerId)
+        public IQueryable<Appointment> GetAppointmentsByTempClientId(int tempId)
         {
-            return await Table.Where(a => a.ProviderCenterService.ProviderId == providerId).ToListAsync();
+            return Table.Where(a => a.TemporaryClientId == tempId);
         }
-        public async Task<IEnumerable<Appointment>> GetUpcomingAppointments()
+        public IEnumerable<Appointment> GetAppointmentsByProviderId(string providerId)
         {
-            return await Table.Where(a => a.AppointmentDate >= DateTime.Now).ToListAsync();
+            return Table.Where(a => a.ProviderCenterService.ProviderId == providerId).ToList();
+        }
+        public IEnumerable<Appointment> GetUpcomingAppointments()
+        {
+            return Table.Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
         }
 
         public Appointment CreateAppoinment(Appointment appointment)

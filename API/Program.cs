@@ -64,6 +64,8 @@ namespace API
             builder.Services.AddScoped(typeof(RoleRepository));
             builder.Services.AddScoped(typeof(ProviderCenterService));
             builder.Services.AddScoped(typeof(ShiftRepository));
+            builder.Services.AddScoped(typeof(ShiftServices));
+            builder.Services.AddScoped(typeof(LiveQueueRepository));
             builder.Services.AddScoped(typeof(ServicesRepository));
             builder.Services.AddScoped(typeof(AccountServices));
             builder.Services.AddScoped(typeof(ClientServices));
@@ -81,6 +83,9 @@ namespace API
             builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(ProviderCardService));
             builder.Services.AddScoped<ShiftServices>();
+            builder.Services.AddScoped(typeof(AppointmentRepository));
+            builder.Services.AddScoped(typeof(AppointmentServices));
+            builder.Services.AddScoped(typeof(TemperoryClientRepository));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {

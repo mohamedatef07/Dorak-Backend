@@ -109,6 +109,14 @@ namespace Repositories
             }
         }
 
+        public int GetCurrentPostion( Appointment appointment)
+        {
+
+            var priority = appointment.ProviderCenterService.Priority;
+            var count = appointment.Shift.Appointments.Count();
+            return count;
+        }
+        
 
 
     }

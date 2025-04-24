@@ -6,7 +6,7 @@ namespace Dorak.Models
     {
         public int AssignmentId { get; set; }
         public DateOnly StartDate { get; set; }
-        public DateOnly EndDate { get; set; }
+        public DateOnly EndDate { get; set; } 
         public AssignmentType AssignmentType { get; set; }
         public bool IsDeleted { get; set; }
         public string ProviderId { get; set; }
