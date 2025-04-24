@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Repositories;
 using Dorak.ViewModels.AccountViewModels;
 using Models.Enums;
+using Dorak.DataTransferObject.ProviderDTO;
+
 
 
 namespace Services
@@ -187,6 +189,29 @@ namespace Services
                 return new List<string>();
             }
             return await userManager.GetRolesAsync(user);
+        }
+
+        //changepassword
+
+        public async Task<string> ChangePasswordAsync(ChangePasswordDTO model)
+        {
+            var user = await userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+                return "User not found.";
+
+            var result = await userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return $"Password change failed: {errors}";
+            }
+
+            if (model.LogoutAllDevices)
+            {
+                await userManager.UpdateSecurityStampAsync(user);
+            }
+
+            return "Password changed successfully.";
         }
     }
 }

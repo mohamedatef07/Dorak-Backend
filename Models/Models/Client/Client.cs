@@ -19,5 +19,7 @@ namespace Dorak.Models
         public string? Image {  get; set; }
         public bool IsDeleted { get; set; } = false;
 
+        public virtual ICollection<Review> Reviews { get; set; }
+
     }
 }

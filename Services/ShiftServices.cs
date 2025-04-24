@@ -38,11 +38,11 @@ namespace Services
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
         }
 
-        public IQueryable<Appointment> LiveShiftAppointments()
-        {
-            var
-            var LiveQueue = shiftRepository.get
-        }
+        //public IQueryable<Appointment> LiveShiftAppointments()
+        //{
+        //    var
+        //    var LiveQueue = shiftRepository.get
+        //}
     }
 
 }

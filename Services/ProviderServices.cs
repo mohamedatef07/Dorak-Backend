@@ -9,6 +9,13 @@ using Repositories;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using Dorak.DataTransferObject;
+using System.Data.Entity.Core.Common;
+using Dorak.DataTransferObject.ShiftDTO;
+using Dorak.DataTransferObject.ProviderDTO;
+
+
+
 
 namespace Services
 {
@@ -18,20 +25,25 @@ namespace Services
         public ProviderAssignmentRepository providerAssignmentRepository;
         public ShiftRepository shiftRepository;
         public ProviderCenterServiceRepository providerCenterServiceRepository;
-
+        public ServicesRepository servicesRepository;
+        public UserManager<User> userManager;
         public CommitData commitData;
         public ProviderServices(
             ProviderRepository _providerRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
-            CommitData _commitData)
+            UserManager<User> _userManager,
+            CommitData _commitData, ServicesRepository _servicesRepository)
+
         {
             providerRepository = _providerRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
             shiftRepository = _shiftRepository;
             providerCenterServiceRepository = _providerCenterServiceRepository;
+            userManager = _userManager;
             commitData = _commitData;
+            servicesRepository = _servicesRepository;
         }
 
         // Creating a New User-Provider 
@@ -62,13 +74,10 @@ namespace Services
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
-
-
         public Provider GetProviderById(string providerId)
         {
             return providerRepository.GetById(p => p.ProviderId == providerId);
         }
-
         public List<Provider> GetAllProviders()
         {
             return providerRepository.GetAll().ToList();
@@ -81,6 +90,7 @@ namespace Services
         public void DeleteProvider(Provider provider)
         {
             providerRepository.Delete(provider);
+            commitData.SaveChanges();
         }
 
         // Assign provider to center manually - for visitor provider
@@ -98,13 +108,12 @@ namespace Services
             };
 
             providerAssignmentRepository.Add(assignment);
-
             commitData.SaveChanges();
 
-            foreach (ShiftViewModel shift in model.Shifts )
+            foreach (ShiftViewModel shift in model.Shifts)
             {
 
-                CreateShift(shift,assignment);
+                CreateShift(shift, assignment);
 
             }
 
@@ -114,7 +123,7 @@ namespace Services
         // Assign provider to center weekly - for permanent provider
         public string AssignProviderToCenterWithWorkingDays(WeeklyProviderAssignmentViewModel model)
         {
-            
+
             if (model.WorkingDays == null || !model.WorkingDays.Any())
                 return "Please select at least one working day.";
 
@@ -127,7 +136,7 @@ namespace Services
 
             List<ProviderAssignment> assignments = new List<ProviderAssignment>();
 
-           
+
             for (int i = 0; i < 28; i++)
             {
                 int dayOfWeek = (int)currentDate.DayOfWeek;
@@ -173,14 +182,14 @@ namespace Services
                 });
             }
 
-            
+
             foreach (var assignment in assignments)
             {
                 providerAssignmentRepository.Add(assignment);
             }
-            commitData.SaveChanges(); 
+            commitData.SaveChanges();
 
-            
+
             foreach (var assignment in assignments)
             {
                 foreach (ShiftViewModel shift in model.Shifts)
@@ -192,8 +201,7 @@ namespace Services
             return "Weekly assignment completed successfully.";
         }
 
-        // background service to rescedule 
-
+        // background service to reassign 
         public string RegenerateWeeklyAssignments()
         {
             var weeklyAssignments = providerAssignmentRepository.GetAll()
@@ -273,6 +281,111 @@ namespace Services
             return "Weekly assignments regenerated successfully.";
         }
 
+        //Get provider main Information 
+        public GetProviderMainInfoDTO GetProviderMainInfo(Provider provider)
+        {
+            return new GetProviderMainInfoDTO
+            {
+                FirstName = provider.FirstName,
+                LastName = provider.LastName,
+                Specialization = provider.Specialization,
+                Bio = provider.Bio,
+                Rate = provider.Rate,
+                Image = provider.Image
+            };
+        }
+        //Get Provider Booking Information
+        public List<GetProviderBookingInfoDTO> GetProviderBookingInfo(Provider provider)
+        {
+            var providerAssignments = provider.ProviderAssignments.Where(pa => pa.StartDate >= DateTime.Now || pa.EndDate >= DateTime.Now);
+            List<GetProviderBookingInfoDTO> bookingInfo = new List<GetProviderBookingInfoDTO>();
+            List<Shift> shifts = new List<Shift>();
+            foreach (var providerAssignment in providerAssignments)
+            {
+                shifts = shiftRepository.GetAllShiftsByAssignmentId(providerAssignment.AssignmentId);
+                foreach (var shift in shifts)
+                {
+                    if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now.AddMonths(1)))
+                    {
+                        break;
+                    }
+                    else if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now))
+                    {
+                        var newShift = new GetProviderBookingInfoDTO()
+                        {
+                            StartTime = shift.StartTime,
+                            EndTime = shift.EndTime,
+                            ShiftType = shift.ShiftType,
+                            CenterId = providerAssignment.CenterId,
+                            Date = shift.ShiftDate
+                        };
+                        bookingInfo.Add(newShift);
+                    }
+                }
+            }
+            return bookingInfo;
+        }
+        // Get schedule setails
+        public List<GetProviderScheduleDetailsDTO> GetScheduleDetails(Provider provider)
+        {
+            var providerAssignments = providerAssignmentRepository.GetCurrentAssignmentsForProvider(provider.ProviderId);
+            List<GetProviderScheduleDetailsDTO> shiftDetails = new List<GetProviderScheduleDetailsDTO>();
+            List<Shift> shifts = new List<Shift>();
+            foreach (var providerAssignment in providerAssignments)
+            {
+                shifts = shiftRepository.GetAllShiftsByAssignmentId(providerAssignment.AssignmentId);
+
+                foreach (var shift in shifts)
+                {
+                    var newShift = new GetProviderScheduleDetailsDTO
+                    {
+                        CenterId = shift.ProviderAssignment.CenterId,
+                        ShiftId = shift.ShiftId,
+                        ShiftType = shift.ShiftType,
+                        StartTime = shift.StartTime,
+                        EndTime = shift.EndTime,
+                        ShiftDate = shift.ShiftDate
+                    };
+                    shiftDetails.Add(newShift);
+                }
+            }
+            return shiftDetails;
+        }
+        // Get shift details
+        public GetShiftDetailsDTO GetShiftDetails(int shiftId)
+        {
+            Shift shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
+            GetShiftDetailsDTO shiftDetails = new GetShiftDetailsDTO
+            {
+                CenterId = shift.ProviderAssignment.CenterId,
+                ShiftId = shift.ShiftId,
+                ShiftType = shift.ShiftType,
+                StartTime = shift.StartTime,
+                EndTime = shift.EndTime,
+                EstimatedDuration = shift.EstimatedDuration,
+                TotalAppointments = shift.Appointments.Count(),
+                ApprovedAppointments = shift.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Confirmed).Count(),
+                PendingAppointments = shift.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Pending).Count()
+            };
+            return shiftDetails;
+        }
+        // Get center Services
+        public List<GetCenterServicesShiftDTO> GetCenterServices(Provider provider)
+        {
+            var providerCenterServices = provider.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId).ToList();
+            List<GetCenterServicesShiftDTO> pcs = new List<GetCenterServicesShiftDTO>();
+
+            foreach (var providerCenterService in providerCenterServices)
+            {
+                GetCenterServicesShiftDTO centerServicesShiftDTO = new GetCenterServicesShiftDTO
+                {
+                    Center = providerCenterService.Center,
+                    Services = providerCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == providerCenterService.Center.CenterId).Select(pcs => pcs.Service).ToList()
+                };
+                pcs.Add(centerServicesShiftDTO);
+            }
+            return pcs;
+        }
 
         // Assign service to center
         public string AssignServiceToCenter(AssignProviderCenterServiceViewModel model)
@@ -328,13 +441,76 @@ namespace Services
 
             commitData.SaveChanges();
         }
-
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
-        
+
+        //////
+
+
+        public async Task<string> UpdateDoctorProfile(UpdateProviderProfileDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (provider == null)
+                return "Provider not found.";
+
+            // Update Provider Info
+            provider.FirstName = model.FirstName;
+            provider.LastName = model.LastName;
+            provider.BirthDate = model.BirthDate;
+            provider.Gender = model.Gender;
+            provider.Image = model.Image;
+
+            providerRepository.Edit(provider);
+
+            // Update Identity User Info
+            var user = await userManager.FindByIdAsync(model.ProviderId);
+            if (user != null)
+            {
+                user.Email = model.Email;
+                user.PhoneNumber = model.Phone;
+
+                var updateResult = await userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    var errorMessages = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                    return $"Failed to update user account: {errorMessages}";
+                }
+            }
+            else
+            {
+                return "User not found in Identity.";
+            }
+
+            commitData.SaveChanges();
+
+            return "Doctor profile updated successfully.";
+
+        }
+
+        public string UpdateProfessionalInfo(UpdateProviderProfessionalInfoDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (provider == null)
+                return "Provider not found.";
+
+            provider.Specialization = model.Specialization;
+            provider.ExperienceYears = model.ExperienceYears;
+            provider.LicenseNumber = model.LicenseNumber;
+            provider.Bio = model.Bio;
+
+            providerRepository.Edit(provider);
+            commitData.SaveChanges();
+
+            return "Professional info updated successfully.";
+        }
+
+
+
 
     }
 }
+
+

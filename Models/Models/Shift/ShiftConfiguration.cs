@@ -17,6 +17,11 @@ namespace Dorak.Models
                    .HasForeignKey(Appointment => Appointment.ShiftId)
                    .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(Shift => Shift.LiveQueues)
+                     .WithOne(LiveQueue => LiveQueue.Shift)
+                     .HasForeignKey(LiveQueue => LiveQueue.ShiftId)
+                     .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 }

@@ -17,6 +17,8 @@ namespace Dorak.Models
                    .HasForeignKey(Notifcation => Notifcation.AppointmentId)
                    .OnDelete(DeleteBehavior.NoAction);
 
+            
+
         }
     }
 }

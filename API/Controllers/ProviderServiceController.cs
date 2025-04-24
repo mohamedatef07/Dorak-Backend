@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Dorak.ViewModels;
 using Services;
+using Data;
+using Repositories;
+using Dorak.DataTransferObject;
 
 namespace API.Controllers
 {
@@ -8,11 +11,14 @@ namespace API.Controllers
     [ApiController]
     public class ProviderCenterServiceController : ControllerBase
     {
+        
+
         private readonly ProviderServices providerServices;
 
         public ProviderCenterServiceController(ProviderServices _providerServices)
         {
             providerServices = _providerServices;
+         
         }
 
         [HttpPost("assign")]
@@ -22,5 +28,13 @@ namespace API.Controllers
             var result = providerServices.AssignServiceToCenter(model);
             return Ok(new { message = result });
         }
+
+       
+
+
+
+
+
+
     }
 }

@@ -16,6 +16,11 @@ namespace Dorak.Models
                 .HasForeignKey<Client>(c => c.ClientId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(c => c.Reviews)
+                .WithOne(r => r.Client)
+                .HasForeignKey(r => r.ClientId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             //Properties
             builder.Property(c => c.FirstName)
                 .HasMaxLength(50)

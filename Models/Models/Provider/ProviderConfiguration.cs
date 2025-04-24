@@ -5,12 +5,12 @@ using Models.Enums;
 
 namespace Dorak.Models
 {
-    public class ProviderConfiguration:IEntityTypeConfiguration<Provider>
+    public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
     {
         public void Configure(EntityTypeBuilder<Provider> builder)
         {
             //PrimaryKey
-            builder.HasKey(provider=>provider.ProviderId);
+            builder.HasKey(provider => provider.ProviderId);
 
             //Relations
             builder.HasOne(p => p.User)
@@ -18,9 +18,9 @@ namespace Dorak.Models
                 .HasForeignKey<Provider>(p => p.ProviderId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasMany(p=>p.Certifications)
-                .WithOne(c=>c.Provider)
-                .HasForeignKey(c=>c.ProviderId)
+            builder.HasMany(p => p.Certifications)
+                .WithOne(c => c.Provider)
+                .HasForeignKey(c => c.ProviderId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasMany(p => p.ProviderAssignments)
@@ -32,6 +32,11 @@ namespace Dorak.Models
                 .WithOne(pcs => pcs.Provider)
                 .HasForeignKey(pcs => pcs.ProviderId)
                  .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasMany(p => p.Reviews)
+                .WithOne(r => r.Provider)
+                .HasForeignKey(r => r.ProviderId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             //Properties
             builder.Property(p => p.FirstName)

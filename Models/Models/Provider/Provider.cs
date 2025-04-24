@@ -12,7 +12,7 @@ namespace Dorak.Models
         public string Specialization { get; set; }
         public string Bio { get; set; }
         public int? ExperienceYears { get; set; }
-        public string LicenseNumber {  get; set; }
+        public string LicenseNumber { get; set; }
         public ProviderTitle providerTitle { get; set; }
         public GenderType Gender { get; set; } = GenderType.none;
         public string? Street { get; set; }
@@ -31,5 +31,6 @@ namespace Dorak.Models
         public virtual ICollection<ProviderCertification> Certifications { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
         public virtual ICollection<ProviderCenterService> ProviderCenterServices { get; set; }
+        public virtual ICollection<Review> Reviews { get; set; }
     }
 }

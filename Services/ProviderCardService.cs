@@ -56,14 +56,30 @@ namespace Services
 
             return query.Select(p => p.ToCardView()).ToList();
         }
-        public List<ProviderCardViewModel> FilterByDay(string day)
+
+        public List<ProviderCardViewModel> FilterByDay(DateOnly date)
         {
-            return context.Providers
-                .Include(p => p.ProviderCenterServices)
-                .Where(p => !p.IsDeleted && p.Availability.ToLower().Contains(day.ToLower()))
+            DateTime dateTime = date.ToDateTime(TimeOnly.MinValue);
+
+            var assignments = context.ProviderAssignments
+                .Include(a => a.Provider)
+                    .ThenInclude(p => p.ProviderCenterServices)
+                .Where(a => !a.IsDeleted
+                            && a.StartDate <= dateTime
+                            && a.EndDate >= dateTime)
+                .ToList();
+
+            var uniqueProviders = assignments
+                .Select(a => a.Provider)
+                .Distinct()
+                .ToList();
+
+            return uniqueProviders
                 .Select(p => p.ToCardView())
                 .ToList();
         }
+
+
 
 
 
