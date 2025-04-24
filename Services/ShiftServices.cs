@@ -15,18 +15,20 @@ namespace Services
     {
         ShiftRepository shiftRepository;
         CenterRepository centerRepository;
-        AppointmentRepository _appointmentRepository;
+        AppointmentRepository appointmentRepository;
+        LiveQueueRepository liveQueueRepository;
         public CommitData commitData;
 
-        public ShiftServices(ShiftRepository _shiftRepository, CenterRepository _centerRepository, AppointmentRepository appointmentRepository, CommitData _commitData)
+        public ShiftServices(ShiftRepository _shiftRepository,CenterRepository _centerRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData)
         {
             shiftRepository = _shiftRepository;
             centerRepository = _centerRepository;
-            _appointmentRepository = appointmentRepository;
+            appointmentRepository = _appointmentRepository;
+            liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
         }
 
-        public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateTime _shiftDate, int centerId)
+        public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateOnly _shiftDate, int centerId)
         {
             var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
             return shifts.Select(shift => shift.ShiftToShiftVM());
@@ -34,15 +36,34 @@ namespace Services
 
         public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
         {
-            var appointments = _appointmentRepository.GetAllAppointmentForShift(ShiftId);
+            var appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId);
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
         }
 
-        //public IQueryable<Appointment> LiveShiftAppointments()
-        //{
-        //    var
-        //    var LiveQueue = shiftRepository.get
-        //}
+        public IQueryable<Appointment> LiveShiftAppointments()
+        {   
+            var shifts = shiftRepository.LiveQueueShift().ToList();
+            foreach (var shift in shifts) {
+                var appointments = appointmentRepository.GetAllAppointmentForShift(shift.ShiftId);
+                foreach (var appointment in appointments) {
+
+                    liveQueueRepository.Add(new LiveQueue
+                    {
+                        ShiftId = appointment.ShiftId,
+                        OperatorId = appointment.OperatorId,
+                        AppointmentId = appointment.AppointmentId,
+                        ArrivalTime = null,
+                        EstimatedTime = appointment.EstimatedTime,
+                        CurrentQueuePosition = liveQueueRepository.GetCurrentPostion(appointment),
+                        EstimatedDuration = appointment.ProviderCenterService.Duration,
+                        //Status = 
+
+                    });
+                }
+
+            }
+            return null;
+        }
     }
 
 }

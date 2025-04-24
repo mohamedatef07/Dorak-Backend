@@ -65,8 +65,8 @@ namespace Services
                 .Include(a => a.Provider)
                     .ThenInclude(p => p.ProviderCenterServices)
                 .Where(a => !a.IsDeleted
-                            && a.StartDate <= dateTime
-                            && a.EndDate >= dateTime)
+                            && a.StartDate <= DateOnly.FromDateTime(dateTime)
+                            && a.EndDate >= DateOnly.FromDateTime(dateTime))
                 .ToList();
 
             var uniqueProviders = assignments

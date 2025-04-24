@@ -15,7 +15,7 @@ namespace Repositories
         }
         public List<ProviderAssignment> GetCurrentAssignmentsForProvider(string providerId)
         {
-            var assignments = GetList(pa => pa.ProviderId == providerId && pa.StartDate <= DateTime.Now && pa.EndDate >= DateTime.Now).ToList();
+            var assignments = GetList(pa => pa.ProviderId == providerId && pa.StartDate <= DateOnly.FromDateTime(DateTime.Now )&& pa.EndDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
             return assignments;
         }
 

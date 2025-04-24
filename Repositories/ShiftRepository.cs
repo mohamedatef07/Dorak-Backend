@@ -28,9 +28,9 @@ namespace Dorak.Models.Models.Wallet
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).FirstOrDefault();
         }
 
-        public IQueryable<Shift> GetShiftsWithDateAndCenterId(DateTime _date, int _centerId)
+        public IQueryable<Shift> GetShiftsWithDateAndCenterId(DateOnly _date, int _centerId)
         {
-            return GetAll().Where(s => s.ShiftDate == DateOnly.FromDateTime(_date)).Where(s => s.ProviderAssignment.CenterId == _centerId);
+            return GetAll().Where(s => s.ShiftDate == _date).Where(s => s.ProviderAssignment.CenterId == _centerId);
         }
 
         public List<Shift> GetAllShiftsByAssignmentId(int ProviderAssignmentId)
@@ -38,12 +38,15 @@ namespace Dorak.Models.Models.Wallet
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).ToList();
         }
 
-        public Shift LiveQueueShift()
+        public IQueryable<Shift> LiveQueueShift()
         {
-            var today = DateTime.Now;
-            var now = TimeOnly.FromDateTime(DateTime.Now);
+            var now = DateTime.Now;
+            var today = DateOnly.FromDateTime(now.Date);
+            var currentTime = TimeOnly.FromDateTime(now);
 
-            return Table.Where(lq => lq.ShiftDate == DateOnly.FromDateTime(today)).Where(lq => lq.StartTime <= now).Where(lq => lq.ShiftType != ShiftType.Completed).FirstOrDefault();
-        }
+            return Table.Where(lq => lq.ShiftDate <= today &&
+                                    lq.StartTime <= currentTime &&
+                                    lq.ShiftType != ShiftType.Completed);
+        }
     }
 }
