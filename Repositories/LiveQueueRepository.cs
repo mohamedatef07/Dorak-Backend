@@ -1,5 +1,6 @@
 ﻿using Data;
 using Dorak.Models;
+using Dorak.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,10 @@ namespace Repositories
         }
 
         // Get queue by status
-        public async Task<List<LiveQueue>> GetByStatusAsync(string status)
+        public async Task<List<LiveQueue>> GetByStatusAsync(QueueAppointmentStatus status)
         {
             return await Table
-                .Where(q => q.Status.ToLower() == status.ToLower())
+                .Where(q => q.AppointmentStatus == status)
                 .ToListAsync();
         }
 
@@ -35,7 +36,7 @@ namespace Repositories
         public async Task<List<LiveQueue>> GetDoneClientsAsync()
         {
             return await Table
-                .Where(q => q.Status.ToLower() == "done")
+                .Where(q => q.AppointmentStatus == QueueAppointmentStatus.Completed)
                 .OrderBy(q => q.CurrentQueuePosition)
                 .ToListAsync();
         }
@@ -44,14 +45,14 @@ namespace Repositories
         public async Task<int> CountDoneClientsAsync()
         {
             return await Table
-                .CountAsync(q => q.Status.ToLower() == "done");
+                .CountAsync(q => q.AppointmentStatus == QueueAppointmentStatus.Completed);
         }
 
         // get all waiting clients
         public async Task<List<LiveQueue>> GetWaitingClientsAsync()
         {
             return await Table
-                .Where(q => q.Status.ToLower() == "waiting")
+                .Where(q => q.AppointmentStatus == QueueAppointmentStatus.Waiting)
                 .OrderBy(q => q.CurrentQueuePosition)
                 .ToListAsync();
         }
@@ -60,14 +61,14 @@ namespace Repositories
         public async Task<int> CountWaitingClientsAsync()
         {
             return await Table
-                .CountAsync(q => q.Status.ToLower() == "waiting");
+                .CountAsync(q => q.AppointmentStatus == QueueAppointmentStatus.Waiting);
         }
 
         // get all not checked clients
         public async Task<List<LiveQueue>> GetNotCheckedClientsAsync()
         {
             return await Table
-                .Where(q => q.Status.ToLower() == "not checked")
+                .Where(q => q.AppointmentStatus == QueueAppointmentStatus.NotChecked)
                 .OrderBy(q => q.ArrivalTime)
                 .ToListAsync();
         }
@@ -76,14 +77,14 @@ namespace Repositories
         public async Task<int> CountNotCheckedClientsAsync()
         {
             return await Table
-                .CountAsync(q => q.Status.ToLower() == "not checked");
+                .CountAsync(q => q.AppointmentStatus == QueueAppointmentStatus.NotChecked);
         }
 
         // get next client in queue
         public async Task<LiveQueue?> GetNextClientAsync()
         {
             return await Table
-                .Where(q => q.Status.ToLower() == "waiting")
+                .Where(q => q.AppointmentStatus == QueueAppointmentStatus.Waiting)
                 .OrderBy(q => q.CurrentQueuePosition)
                 .FirstOrDefaultAsync();
         }
@@ -99,12 +100,12 @@ namespace Repositories
 
         // update status
 
-        public void UpdateStatus(int liveQueueId, string newStatus)
+        public void UpdateStatus(int liveQueueId, QueueAppointmentStatus newStatus)
         {
             var queueEntry = Table.Find(liveQueueId);
             if (queueEntry != null)
             {
-                queueEntry.Status = newStatus;
+                queueEntry.AppointmentStatus = newStatus;
                 commitData.SaveChanges();
             }
         }

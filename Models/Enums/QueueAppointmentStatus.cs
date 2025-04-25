@@ -8,6 +8,7 @@ namespace Dorak.Models.Enums
 {
     public enum QueueAppointmentStatus
     {
+        none,
         NotChecked,
         Waiting,
         OnProgress,
