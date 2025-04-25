@@ -1,5 +1,5 @@
 ﻿using Dorak.DataTransferObject;
-using Dorak.DataTransferObject.ShiftDTO;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -71,24 +71,25 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("CenterServices")]
-        public IActionResult CenterServices([FromQuery] string providerId)
+
+        [HttpGet("ProviderCenterServices")]
+        public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetCenterServicesShiftDTO> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<GetProviderCenterServicesDTO> { Message = "Provider id is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<GetCenterServicesShiftDTO> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<GetProviderCenterServicesDTO> { Message = "Provider not found", Status = 404 });
             }
-            List<GetCenterServicesShiftDTO> centerServices = providerServices.GetCenterServices(provider);
+            List<GetProviderCenterServicesDTO> centerServices = providerServices.GetCenterServices(provider);
             if (centerServices == null || !centerServices.Any())
             {
-                return NotFound(new ApiResponse<GetCenterServicesShiftDTO> { Message = "Provider center services not found", Status = 404 });
+                return NotFound(new ApiResponse<GetProviderCenterServicesDTO> { Message = "Provider center services not found", Status = 404 });
             }
-            return Ok(new ApiResponse<List<GetCenterServicesShiftDTO>>
+            return Ok(new ApiResponse<List<GetProviderCenterServicesDTO>>
             {
                 Message = "Get provider center services Successfully",
                 Status = 200,

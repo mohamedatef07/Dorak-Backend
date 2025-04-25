@@ -11,7 +11,6 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dorak.DataTransferObject;
 using System.Data.Entity.Core.Common;
-using Dorak.DataTransferObject.ShiftDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 
 
@@ -371,19 +370,27 @@ namespace Services
             return shiftDetails;
         }
         // Get center Services
-        public List<GetCenterServicesShiftDTO> GetCenterServices(Provider provider)
+        public List<GetProviderCenterServicesDTO> GetCenterServices(Provider provider)
         {
-            var providerCenterServices = provider.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId).ToList();
-            List< GetCenterServicesShiftDTO >  pcs = new List< GetCenterServicesShiftDTO >();
-            
-            foreach (var providerCenterService in providerCenterServices)
+            var uniqueProviderCenterServices = provider.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId).DistinctBy(pcs => pcs.CenterId).ToList();
+            List<GetProviderCenterServicesDTO> pcs = new List<GetProviderCenterServicesDTO>();
+            foreach (var providerCenterService in uniqueProviderCenterServices)
             {
-                GetCenterServicesShiftDTO centerServicesShiftDTO = new GetCenterServicesShiftDTO
+                Center center = providerCenterService.Center;
+                List<Service> services = center.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == center.CenterId).Select(pcs => pcs.Service).ToList();
+                GetProviderCenterServicesDTO providerCenterServicesDTO;
+                List<GetProviderSrvicesDTO> providerSrvicesDTO = new List<GetProviderSrvicesDTO>();
+                providerSrvicesDTO = services.Select(service => new GetProviderSrvicesDTO
                 {
-                    Center = providerCenterService.Center,
-                    Services = providerCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == providerCenterService.Center.CenterId).Select(pcs => pcs.Service).ToList()
+                    ServiceId = service.ServiceId,
+                    ServiceName = service.ServiceName,
+                }).ToList();
+                providerCenterServicesDTO = new GetProviderCenterServicesDTO
+                {
+                    CenterId = center.CenterId,
+                    Services = providerSrvicesDTO
                 };
-                pcs.Add(centerServicesShiftDTO);
+                pcs.Add(providerCenterServicesDTO);
             }
             return pcs;
         }
