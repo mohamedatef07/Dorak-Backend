@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Services
 {
@@ -35,7 +36,8 @@ namespace Services
             if (appointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
 
-            var app = appointmentDTO.AppointmentDTOToAppointment();
+             var app = appointmentDTO.AppointmentDTOToAppointment();
+
             var pcs = providerCenterServiceRepository
                 .GetAll()
                 .FirstOrDefault(p =>
@@ -48,12 +50,24 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
 
-            var createdAppointment = appointmentRepository.CreateAppoinment(app);
-            commitData.SaveChanges();
+            Appointment createdAppointment;
 
+            using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+            {
+                try
+                {
+                    createdAppointment = appointmentRepository.CreateAppoinment(app);
+                    commitData.SaveChanges();
+                    await paymentServices.ProcessPayment(stripeToken, amount, clientId, createdAppointment.AppointmentId);
 
+                    transaction.Complete();
+                }
+                catch (Exception) {
 
-            await paymentServices.ProcessPayment(stripeToken, amount, clientId,createdAppointment.AppointmentId);
+                    throw;
+                }
+            }
+
             return createdAppointment;
         }
 
