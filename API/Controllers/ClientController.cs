@@ -2,9 +2,12 @@
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace API.Controllers
 {
@@ -97,19 +100,27 @@ namespace API.Controllers
             });
         }
 
-
+        
         [HttpPost("ReserveAppointment")]
-        public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
+        public async Task<IActionResult> ReserveAppointment([FromBody] ReserveAppointmentRequest reserveAppointmentRequest)
         {
-            if (!ModelState.IsValid)
+            try
+            {
+                if (!ModelState.IsValid)
+                    return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
 
-                return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
 
-            var appointment = _appointmentServices.ReserveAppointment(appointmentDTO);
+                var appointment = await _appointmentServices.ReserveAppointment(reserveAppointmentRequest.AppointmentDTO, reserveAppointmentRequest.StripeToken, reserveAppointmentRequest.Amount, reserveAppointmentRequest.AppointmentDTO.UserId);
 
-            return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
-
+                return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
+
+
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
         {
