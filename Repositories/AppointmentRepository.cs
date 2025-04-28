@@ -39,7 +39,7 @@ namespace Repositories
         public Appointment CreateAppoinment(Appointment appointment)
         {
             Table.Add(appointment);
-            CommitData.SaveChanges();
+            
             return appointment;
         }
 
