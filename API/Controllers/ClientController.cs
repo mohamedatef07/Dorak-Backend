@@ -19,13 +19,17 @@ namespace API.Controllers
         public ProviderCardService providerCardService;
         public ShiftServices shiftServices;
         private readonly AppointmentServices _appointmentServices;
+        public ReviewService reviewService;
 
-        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices)
+
+        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices , ReviewService _reviewService)
         {
             providerServices = _providerServices;
             this.providerCardService = providerCardService;
             shiftServices = _shiftServices;
             _appointmentServices = appointmentServices;
+            reviewService = _reviewService;
+
 
         }
         [HttpGet("MainInfo")]
@@ -142,6 +146,35 @@ namespace API.Controllers
             return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Last Appointment retrived.", Data = upcomings });
 
         }
+
+        // Add new review
+        [HttpPost("add-review")]
+        public IActionResult CreateReview([FromBody] ReviewDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var review = new Review
+                {
+                    Rating = model.Rating,
+                    Description = model.Description,
+                    ProviderId = model.Providerid,
+                    ClientId = model.ClientId
+                };
+
+                var result = reviewService.CreateReview(review);
+                return Ok(new ApiResponse<string>
+                {
+                    Message = result,
+                    Status = 200,
+                    Data = result
+                });
+            }
+            return BadRequest(ModelState);
+        }
+
+
+
+
 
 
     }
