@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dorak.ViewModels.DoctorCardVMs;
+using Dorak.ViewModels;
 using Data;
 using Repositories;
 using Microsoft.EntityFrameworkCore;
+
+
 
 namespace Services
 {
@@ -22,62 +24,83 @@ namespace Services
         public List<ProviderCardViewModel> GetDoctorCards()
         {
             var providers = context.Providers
-            .Include(p => p.ProviderCenterServices)
-             .Where(p => !p.IsDeleted)
-             .Select(p => p.ToCardView())
-             .ToList();
+                .Where(p => !p.IsDeleted)
+                .Select(p => new ProviderCardViewModel
+                {
+                    FullName = p.FirstName + " " + p.LastName,
+                    Specialization = p.Specialization,
+                    City = p.City,
+                    Rate = p.Rate,
+                    EstimatedDuration = p.EstimatedDuration,
+                    Price = p.ProviderCenterServices.Any()
+                        ? p.ProviderCenterServices.Min(s => s.Price)
+                        : 0
+                })
+                .ToList();
 
             return providers;
         }
+
         public List<ProviderCardViewModel> SearchDoctors(string? searchText, string? city, string? specialization)
         {
             var query = context.Providers
-                .Include(p => p.ProviderCenterServices)
-                .Where(p => !p.IsDeleted)
-                .AsQueryable();
+                .Where(p => !p.IsDeleted);
 
             if (!string.IsNullOrWhiteSpace(searchText))
             {
-                searchText = searchText.ToLower();
-                query = query.Where(p => (p.FirstName + " " + p.LastName).ToLower().Contains(searchText));
+                query = query.Where(p => (p.FirstName + " " + p.LastName).ToLower().Contains(searchText.ToLower()));
             }
 
             if (!string.IsNullOrWhiteSpace(city))
             {
-                city = city.ToLower();
-                query = query.Where(p => p.City.ToLower() == city);
+                query = query.Where(p => p.City.ToLower() == city.ToLower());
             }
 
             if (!string.IsNullOrWhiteSpace(specialization))
             {
-                specialization = specialization.ToLower();
-                query = query.Where(p => p.Specialization.ToLower() == specialization);
+                query = query.Where(p => p.Specialization.ToLower() == specialization.ToLower());
             }
 
-            return query.Select(p => p.ToCardView()).ToList();
+            return query.Select(p => new ProviderCardViewModel
+            {
+                FullName = p.FirstName + " " + p.LastName,
+                Specialization = p.Specialization,
+                City = p.City,
+                Rate = p.Rate,
+                EstimatedDuration = p.EstimatedDuration,
+                Price = p.ProviderCenterServices.Any()
+                    ? p.ProviderCenterServices.Min(s => s.Price)
+                    : 0
+            }).ToList();
         }
+
 
         public List<ProviderCardViewModel> FilterByDay(DateOnly date)
         {
             DateTime dateTime = date.ToDateTime(TimeOnly.MinValue);
 
-            var assignments = context.ProviderAssignments
-                .Include(a => a.Provider)
-                    .ThenInclude(p => p.ProviderCenterServices)
+            var providers = context.ProviderAssignments
                 .Where(a => !a.IsDeleted
                             && a.StartDate <= DateOnly.FromDateTime(dateTime)
                             && a.EndDate >= DateOnly.FromDateTime(dateTime))
-                .ToList();
-
-            var uniqueProviders = assignments
                 .Select(a => a.Provider)
                 .Distinct()
+                .Select(p => new ProviderCardViewModel
+                {
+                    FullName = p.FirstName + " " + p.LastName,
+                    Specialization = p.Specialization,
+                    City = p.City,
+                    Rate = p.Rate,
+                    EstimatedDuration = p.EstimatedDuration,
+                    Price = p.ProviderCenterServices.Any()
+                        ? p.ProviderCenterServices.Min(s => s.Price)
+                        : 0
+                })
                 .ToList();
 
-            return uniqueProviders
-                .Select(p => p.ToCardView())
-                .ToList();
+            return providers;
         }
+
 
 
 

@@ -3,7 +3,6 @@ using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
-using Dorak.ViewModels.DoctorCardVMs;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
@@ -19,7 +18,7 @@ namespace API.Controllers
         public ProviderController(ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices)
         {
             providerServices = _providerServices;
-            this.providerCardService = providerCardService;
+            providerCardService = providerCardService; 
             shiftServices = _shiftServices;
         }
         [HttpGet("ScheduleDetails")]
@@ -140,17 +139,8 @@ namespace API.Controllers
                 Data = result
             });
         }
+
        
-
-
-
-
-
-
-
-
-
-
 
 
 

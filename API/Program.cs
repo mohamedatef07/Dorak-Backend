@@ -86,6 +86,13 @@ namespace API
             builder.Services.AddScoped(typeof(AppointmentRepository));
             builder.Services.AddScoped(typeof(AppointmentServices));
             builder.Services.AddScoped(typeof(TemperoryClientRepository));
+            builder.Services.AddScoped(typeof(ReviewRepository));
+            builder.Services.AddScoped<ReviewService>();
+
+
+
+
+
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
