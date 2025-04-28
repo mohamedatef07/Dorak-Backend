@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -19,10 +20,10 @@ namespace API.Controllers
         public ProviderCardService providerCardService;
         public ShiftServices shiftServices;
         private readonly AppointmentServices _appointmentServices;
-        public ReviewService reviewService;
+        public Review_Service reviewService;
 
 
-        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices , ReviewService _reviewService)
+        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices , Review_Service _reviewService)
         {
             providerServices = _providerServices;
             this.providerCardService = providerCardService;

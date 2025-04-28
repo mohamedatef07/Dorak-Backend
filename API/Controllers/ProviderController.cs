@@ -71,55 +71,55 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("cards")]
-        public IActionResult GetDoctorCards()
-        {
-            var doctors = providerCardService.GetDoctorCards();
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = "Cards are displayed.",
-                Status = 200,
-                Data = doctors
-            });
-        }
+        //[HttpGet("cards")]
+        //public IActionResult GetDoctorCards()
+        //{
+        //    var doctors = providerCardService.GetDoctorCards();
+        //    return Ok(new ApiResponse<List<ProviderCardViewModel>>
+        //    {
+        //        Message = "Cards are displayed.",
+        //        Status = 200,
+        //        Data = doctors
+        //    });
+        //}
 
-        [HttpGet("search")]
-        public IActionResult SearchDoctors(
-           [FromQuery] string? searchText,
-           [FromQuery] string? city,
-           [FromQuery] string? specialization)
-        {
-            var doctors = providerCardService.SearchDoctors(searchText, city, specialization);
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = "Search Done Successfully",
-                Status = 200,
-                Data = doctors
-            });
-        }
+        //[HttpGet("search")]
+        //public IActionResult SearchDoctors(
+        //   [FromQuery] string? searchText,
+        //   [FromQuery] string? city,
+        //   [FromQuery] string? specialization)
+        //{
+        //    var doctors = providerCardService.SearchDoctors(searchText, city, specialization);
+        //    return Ok(new ApiResponse<List<ProviderCardViewModel>>
+        //    {
+        //        Message = "Search Done Successfully",
+        //        Status = 200,
+        //        Data = doctors
+        //    });
+        //}
 
-        [HttpGet("filter-by-day")]
-        public IActionResult FilterByDay([FromQuery] DateOnly date)
-        {
-            var doctors = providerCardService.FilterByDay(date);
+        //[HttpGet("filter-by-day")]
+        //public IActionResult FilterByDay([FromQuery] DateOnly date)
+        //{
+        //    var doctors = providerCardService.FilterByDay(date);
 
-            if (!doctors.Any())
-            {
-                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
-                {
-                    Message = "Day is required",
-                    Status = 400,
-                    Data = new List<ProviderCardViewModel>()
-                });
-            }
+        //    if (!doctors.Any())
+        //    {
+        //        return NotFound(new ApiResponse<List<ProviderCardViewModel>>
+        //        {
+        //            Message = "Day is required",
+        //            Status = 400,
+        //            Data = new List<ProviderCardViewModel>()
+        //        });
+        //    }
 
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = $"Doctors available on {date} retrieved successfully.",
-                Status = 200,
-                Data = doctors
-            });
-        }
+        //    return Ok(new ApiResponse<List<ProviderCardViewModel>>
+        //    {
+        //        Message = $"Doctors available on {date} retrieved successfully.",
+        //        Status = 200,
+        //        Data = doctors
+        //    });
+        //}
 
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
