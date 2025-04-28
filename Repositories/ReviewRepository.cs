@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Data;
 using Dorak.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Repositories
 {
@@ -12,4 +13,6 @@ namespace Repositories
     {
         public ReviewRepository(DorakContext dbContext) : base(dbContext) { }
     }
+
+
 }
