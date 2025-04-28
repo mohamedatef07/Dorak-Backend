@@ -12,12 +12,15 @@ namespace Repositories
 {
     public class OperatorRepository : BaseRepository<Operator>
     {
-        CommitData commitData;
-        private readonly ApiResponse<Operator> apiResponse;
+        private readonly CommitData commitData;
 
         public OperatorRepository(DorakContext _dbContext, CommitData _commitData) : base(_dbContext)
         {
             commitData = _commitData;
+        }
+        public Operator GetOperatorById(string operatorId)
+        {
+            return GetById(op => op.OperatorId == operatorId);
         }
 
     }

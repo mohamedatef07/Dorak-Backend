@@ -16,11 +16,13 @@ namespace API.Controllers
         public ProviderServices providerServices;
         public ProviderCardService providerCardService;
         public ShiftServices shiftServices;
-        public ProviderController(ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices)
+        public LiveQueueServices liveQueueServices;
+        public ProviderController(ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices)
         {
             providerServices = _providerServices;
             this.providerCardService = providerCardService;
             shiftServices = _shiftServices;
+            liveQueueServices = _liveQueueServices;
         }
         [HttpGet("ScheduleDetails")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
@@ -49,6 +51,14 @@ namespace API.Controllers
         [HttpGet("ShiftDetails")]
         public IActionResult ShiftDetails([FromQuery] int shiftId)
         {
+            if (shiftId <= 0)
+            {
+                return BadRequest(new ApiResponse<GetShiftDetailsDTO>
+                {
+                    Message = "Invalid shift id",
+                    Status = 400
+                });
+            }
             GetShiftDetailsDTO shiftDetails = providerServices.GetShiftDetails(shiftId);
             if (shiftDetails == null)
             {
@@ -140,9 +150,31 @@ namespace API.Controllers
                 Data = result
             });
         }
-       
+        [HttpGet("queue-entries")]
+        public IActionResult QueueEntries(string providerId)
+        {
+            if (string.IsNullOrEmpty(providerId))
+            {
+                return BadRequest(new ApiResponse<GetQueueEntriesDTO> { Message = "Provider Id is required", Status = 400 });
+            }
+            Provider provider = providerServices.GetProviderById(providerId);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<List<GetQueueEntriesDTO>> { Message = "Provider not found", Status = 404 });
+            }
+            List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
+            if (queueEntries == null || !queueEntries.Any())
+            {
+                return NotFound(new ApiResponse<List<GetQueueEntriesDTO>> { Message = "Queue entries not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
+            {
+                Message = "Get queue entries successfully",
+                Status = 200,
+                Data = queueEntries
+            });
 
-
+        }
 
 
 
