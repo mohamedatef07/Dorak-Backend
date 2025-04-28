@@ -97,7 +97,7 @@ namespace API
             builder.Services.AddScoped(typeof(PaymentServices));
 
             builder.Services.AddScoped(typeof(ReviewRepository));
-            builder.Services.AddScoped<ReviewService>();
+            builder.Services.AddScoped<Review_Service>();
 
 
 

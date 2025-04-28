@@ -10,12 +10,12 @@ using System.Linq;
 namespace Services
 {
 
-    public class ReviewService
+    public class Review_Service
     {
         private readonly ReviewRepository reviewRepository;
         private readonly CommitData commitData;
 
-        public ReviewService(ReviewRepository _reviewRepository, CommitData _commitData)
+        public Review_Service(ReviewRepository _reviewRepository, CommitData _commitData)
         {
             reviewRepository = _reviewRepository;
             commitData = _commitData;
