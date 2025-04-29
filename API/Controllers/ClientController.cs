@@ -1,4 +1,5 @@
-﻿using Dorak.DataTransferObject;
+﻿using Data;
+using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
@@ -6,9 +7,12 @@ using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Models.Enums;
+using Repositories;
 using Services;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace API.Controllers
 {
@@ -103,9 +107,9 @@ namespace API.Controllers
             });
         }
 
-        
+
         [HttpPost("ReserveAppointment")]
-        public async Task<IActionResult> ReserveAppointment([FromBody] ReserveAppointmentRequest reserveAppointmentRequest)
+        public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
         {
             try
             {
@@ -113,15 +117,59 @@ namespace API.Controllers
                     return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
 
 
-                var appointment = await _appointmentServices.ReserveAppointment(reserveAppointmentRequest.AppointmentDTO, reserveAppointmentRequest.StripeToken, reserveAppointmentRequest.Amount, reserveAppointmentRequest.AppointmentDTO.UserId);
+                var appointment = _appointmentServices.ReserveAppointment(appointmentDTO);
 
                 return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
             }
             catch (Exception ex)
             {
+                Console.WriteLine("asdasdasd");
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [HttpPost("Checkout")]
+        public async Task<IActionResult> Checkout([FromBody] CheckoutRequest checkoutRequest)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string> { Status = 400, Message = "Invalid checkout request." });
+
+            try
+            {
+                // Retrieve the appointment
+                var appointment = _appointmentServices.GetAppointmentById(checkoutRequest.AppointmentId);
+                if (appointment == null)
+                    return NotFound(new ApiResponse<string> { Status = 404, Message = "Appointment not found." });
+
+                // Check if the appointment is already paid
+                if (appointment.AppointmentStatus == AppointmentStatus.Confirmed)
+                    return BadRequest(new ApiResponse<string> { Status = 400, Message = "Appointment is already paid." });
+
+                // Validate the client
+                if (appointment.UserId != checkoutRequest.ClientId)
+                    return BadRequest(new ApiResponse<string> { Status = 400, Message = "Client ID does not match the appointment." });
+
+                // Validate amount
+                if (checkoutRequest.Amount <= 0)
+                    return BadRequest(new ApiResponse<string> { Status = 400, Message = "Amount must be greater than 0." });
+
+               
+                    // Process the payment
+                    await _appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
+
+                   
+
+
+                return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<string> { Status = 400, Message = $"Payment failed: {ex.Message}" });
+            }
+        }
+
+
 
 
         [HttpGet("last-appointment/{userId}")]
