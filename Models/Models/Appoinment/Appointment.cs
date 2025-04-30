@@ -8,11 +8,12 @@ namespace Dorak.Models
         public DateOnly AppointmentDate { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; }
         public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public ClientType ClientType { get; set; }
+        public DateTime UpdatedAt { get; set; } 
+        public ClientType ClientType { get; set; } 
         public decimal Fees { get; set; }
         public decimal AdditionalFees { get; set; }
-        public TimeOnly EstimatedTime { get; set; }
+        public TimeOnly? ArrivalTime { get; set; }
+        public TimeOnly EstimatedTime { get; set; } 
         public TimeOnly ExactTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public string? OperatorId { get; set; }

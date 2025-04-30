@@ -13,7 +13,7 @@ namespace Dorak.Models
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public int EstimatedDuration { get; set; }
-        public int MaxPatientsPerDay { get; set; }
+        public int? MaxPatientsPerDay { get; set; }
         public bool IsDeleted { get; set; }
         public virtual ProviderAssignment ProviderAssignment { get; set; }
         public string? OperatorId { get; set; }

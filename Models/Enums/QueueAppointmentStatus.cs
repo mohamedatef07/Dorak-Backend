@@ -11,7 +11,7 @@ namespace Dorak.Models.Enums
         none,
         NotChecked,
         Waiting,
-        OnProgress,
+        InProgress,
         Completed
     }
 }
