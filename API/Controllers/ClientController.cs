@@ -5,7 +5,6 @@ using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
 using Repositories;
@@ -16,24 +15,21 @@ using System.Transactions;
 
 namespace API.Controllers
 {
+    [Authorize(Roles ="Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
     {
-        public ProviderServices providerServices;
-        public ShiftServices shiftServices;
-        private readonly AppointmentServices _appointmentServices;
-        public Review_Service reviewService;
-
-
-        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
+        private readonly ProviderServices providerServices;
+        private readonly ShiftServices shiftServices;
+        private readonly AppointmentServices appointmentServices;
+        private readonly Review_Service reviewService;
+        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
-            _appointmentServices = appointmentServices;
+            appointmentServices = _appointmentServices;
             reviewService = _reviewService;
-
-
         }
         [HttpGet("MainInfo")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -80,8 +76,6 @@ namespace API.Controllers
                 Data = providerBookingInfo
             });
         }
-
-
         [HttpGet("ProviderCenterServices")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
@@ -268,12 +262,5 @@ namespace API.Controllers
                 Data = doctors
             });
         }
-
-
-
-
-
-
-
     }
 }

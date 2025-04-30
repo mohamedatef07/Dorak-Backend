@@ -8,7 +8,6 @@
 @section styles {
     <link rel="stylesheet" href="~/css/TableLayout.css" />
 }
-
 <div class="col-7 mb-4">
     <form asp-controller="Center" asp-action="Index" method="get" class="g-3 d-flex gap-4" id="searchForm">
         <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
@@ -40,15 +39,13 @@
                 <td>@center.CenterStatus</td>
                 <td>
                     <form asp-controller="Center" asp-action="ToggleStatus" method="post" class="d-flex justify-content-center align-items-center">
-                        <input type="hidden" name="centerId" value="@center.CenterId" />
                         <div class="form-check form-switch">
                             <input class="form-check-input"
                                    type="checkbox"
                                    role="switch"
-                                   id="switchCheck@center.CenterId"
-                                   name="status"
-                                   onchange="this.form.submit()"
-                            @((center.CenterStatus == CenterStatus.Active) ? "checked" : "")>
+                                   data-center-id="@center.CenterId"
+                                   onchange="toggleCenterStatus(this)"
+                            @(center.CenterStatus == CenterStatus.Active ? "checked=\"checked\"" : "") />
                         </div>
                     </form>
                 </td>
@@ -71,7 +68,7 @@
     }
     <button class="btn text-white main-bg-color" onclick="page('next')" disabled="@canNext">Next</button>
 </div>
-
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 @section scripts {
     <script>
         let form = document.getElementById("searchForm");
@@ -88,6 +85,16 @@
         function pagenum(a) {
             form.PageNumber.value = a;
             form.submit();
+        }
+        function toggleCenterStatus(checkbox) {
+            const centerId = checkbox.getAttribute("data-center-id");
+            const status = checkbox.checked;
+            $.ajax({
+                url: '/center/ToggleStatus',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ centerId: parseInt(centerId), status })
+            });
         }
     </script>
 }
