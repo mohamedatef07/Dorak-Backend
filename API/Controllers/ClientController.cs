@@ -1,29 +1,35 @@
-﻿using Dorak.DataTransferObject;
+﻿using Data;
+using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.Enums;
+using Repositories;
 using Services;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Transactions;
 
 namespace API.Controllers
 {
+    [Authorize(Roles ="Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
     {
-        public ProviderServices providerServices;
-        public ProviderCardService providerCardService;
-        public ShiftServices shiftServices;
-        private readonly AppointmentServices _appointmentServices;
-
-        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices)
+        private readonly ProviderServices providerServices;
+        private readonly ShiftServices shiftServices;
+        private readonly AppointmentServices appointmentServices;
+        private readonly Review_Service reviewService;
+        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
         {
             providerServices = _providerServices;
-            this.providerCardService = providerCardService;
             shiftServices = _shiftServices;
-            _appointmentServices = appointmentServices;
-
+            appointmentServices = _appointmentServices;
+            reviewService = _reviewService;
         }
         [HttpGet("MainInfo")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -70,8 +76,6 @@ namespace API.Controllers
                 Data = providerBookingInfo
             });
         }
-
-
         [HttpGet("ProviderCenterServices")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
@@ -101,15 +105,67 @@ namespace API.Controllers
         [HttpPost("ReserveAppointment")]
         public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
         {
-            if (!ModelState.IsValid)
+            try
+            {
+                if (!ModelState.IsValid)
+                    return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
 
-                return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
 
-            var appointment = _appointmentServices.ReserveAppointment(appointmentDTO);
+                var appointment = _appointmentServices.ReserveAppointment(appointmentDTO);
 
-            return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
-
+                return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("asdasdasd");
+                return BadRequest(ex.Message);
+            }
         }
+
+
+        [HttpPost("Checkout")]
+        public async Task<IActionResult> Checkout([FromBody] CheckoutRequest checkoutRequest)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(new ApiResponse<string> { Status = 400, Message = "Invalid checkout request." });
+
+            try
+            {
+                // Retrieve the appointment
+                var appointment = _appointmentServices.GetAppointmentById(checkoutRequest.AppointmentId);
+                if (appointment == null)
+                    return NotFound(new ApiResponse<string> { Status = 404, Message = "Appointment not found." });
+
+                // Check if the appointment is already paid
+                if (appointment.AppointmentStatus == AppointmentStatus.Confirmed)
+                    return BadRequest(new ApiResponse<string> { Status = 400, Message = "Appointment is already paid." });
+
+                // Validate the client
+                if (appointment.UserId != checkoutRequest.ClientId)
+                    return BadRequest(new ApiResponse<string> { Status = 400, Message = "Client ID does not match the appointment." });
+
+                // Validate amount
+                if (checkoutRequest.Amount <= 0)
+                    return BadRequest(new ApiResponse<string> { Status = 400, Message = "Amount must be greater than 0." });
+
+               
+                    // Process the payment
+                    await _appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
+
+                   
+
+
+                return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new ApiResponse<string> { Status = 400, Message = $"Payment failed: {ex.Message}" });
+            }
+        }
+
+
+
+
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
         {
@@ -132,6 +188,79 @@ namespace API.Controllers
 
         }
 
+        // Add new review
+        [HttpPost("add-review")]
+        public IActionResult CreateReview([FromBody] ReviewDTO model)
+        {
+            if (ModelState.IsValid)
+            {
+                var review = new Review
+                {
+                    Rating = model.Rating,
+                    Description = model.Description,
+                    ProviderId = model.Providerid,
+                    ClientId = model.ClientId
+                };
 
+                var result = reviewService.CreateReview(review);
+                return Ok(new ApiResponse<string>
+                {
+                    Message = result,
+                    Status = 200,
+                    Data = result
+                });
+            }
+            return BadRequest(ModelState);
+        }
+
+        [HttpGet("cards")]
+        public IActionResult GetDoctorCards()
+        {
+            var doctors = providerServices.GetDoctorCards();
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = "Cards are displayed.",
+                Status = 200,
+                Data = doctors
+            });
+        }
+
+        [HttpGet("search")]
+        public IActionResult SearchDoctors(
+           [FromQuery] string? searchText,
+           [FromQuery] string? city,
+           [FromQuery] string? specialization)
+        {
+            var doctors = providerServices.SearchDoctors(searchText, city, specialization);
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = "Search Done Successfully",
+                Status = 200,
+                Data = doctors
+            });
+        }
+
+        [HttpGet("filter-by-day")]
+        public IActionResult FilterByDay([FromQuery] DateOnly date)
+        {
+            var doctors = providerServices.FilterByDay(date);
+
+            if (!doctors.Any())
+            {
+                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
+                {
+                    Message = "Day is required",
+                    Status = 400,
+                    Data = new List<ProviderCardViewModel>()
+                });
+            }
+
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = $"Doctors available on {date} retrieved successfully.",
+                Status = 200,
+                Data = doctors
+            });
+        }
     }
 }

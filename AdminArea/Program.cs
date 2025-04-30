@@ -42,6 +42,7 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(OperatorRepository));
             builder.Services.AddScoped(typeof(AdminCenterRepository));
             builder.Services.AddScoped(typeof(ClientServices));
+            builder.Services.AddScoped(typeof(TemperoryClientRepository));
             builder.Services.AddScoped(typeof(OperatorServices));
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(AppointmentRepository));

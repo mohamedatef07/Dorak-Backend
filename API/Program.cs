@@ -11,6 +11,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
+using Stripe;
 
 
 namespace API
@@ -24,7 +25,7 @@ namespace API
             // Add services to the container
             builder.Services.AddControllersWithViews();
 
-
+            
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
@@ -33,7 +34,13 @@ namespace API
             builder.Services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<DorakContext>();
 
-       
+
+            var stripeSecretKey = builder.Configuration.GetSection("Stripe:SecretKey").Value;
+            if (string.IsNullOrEmpty(stripeSecretKey))
+            {
+                throw new InvalidOperationException("Stripe SecretKey is not configured in appsettings.json.");
+            }
+            StripeConfiguration.ApiKey = stripeSecretKey; 
 
 
             // ?? Hangfire Configuration
@@ -66,6 +73,7 @@ namespace API
             builder.Services.AddScoped(typeof(ShiftRepository));
             builder.Services.AddScoped(typeof(ShiftServices));
             builder.Services.AddScoped(typeof(LiveQueueRepository));
+            builder.Services.AddScoped(typeof(LiveQueueServices));
             builder.Services.AddScoped(typeof(ServicesRepository));
             builder.Services.AddScoped(typeof(AccountServices));
             builder.Services.AddScoped(typeof(ClientServices));
@@ -77,15 +85,19 @@ namespace API
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(CommitData));
             builder.Services.AddScoped(typeof(CenterServices));
-            builder.Services.AddScoped(typeof(ProviderCardService));
             builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<SignInManager<User>>();
             builder.Services.AddScoped(typeof(ProviderServices));
-            builder.Services.AddScoped(typeof(ProviderCardService));
             builder.Services.AddScoped<ShiftServices>();
             builder.Services.AddScoped(typeof(AppointmentRepository));
             builder.Services.AddScoped(typeof(AppointmentServices));
             builder.Services.AddScoped(typeof(TemperoryClientRepository));
+            builder.Services.AddScoped(typeof(PaymentRepository));
+            builder.Services.AddScoped(typeof(PaymentServices));
+            builder.Services.AddScoped(typeof(ReviewRepository));
+            builder.Services.AddScoped<Review_Service>();
+
+
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
@@ -141,11 +153,15 @@ namespace API
             {
                 var providerServices = scope.ServiceProvider.GetRequiredService<ProviderServices>();
                 var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-
+                var paymentServices = scope.ServiceProvider.GetRequiredService<PaymentServices>();
                 recurringJobManager.AddOrUpdate(
                     "RegenerateWeeklyAssignmentsJob",
                     () => providerServices.RegenerateWeeklyAssignments(),
                     "0 */6 * * *");
+                recurringJobManager.AddOrUpdate(
+                    "UpdatePendingPaymentsJob",
+                    () => paymentServices.UpdatePendingPayments(),
+                    "0 */10 * * *");
             }
 
             app.MapControllerRoute(
