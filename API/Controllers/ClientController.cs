@@ -1,4 +1,5 @@
 ﻿using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
@@ -17,16 +18,15 @@ namespace API.Controllers
     public class ClientController : ControllerBase
     {
         public ProviderServices providerServices;
-        public ProviderCardService providerCardService;
         public ShiftServices shiftServices;
         private readonly AppointmentServices _appointmentServices;
         public Review_Service reviewService;
+        public Review_Service reviewService;
 
 
-        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices , Review_Service _reviewService)
+        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
         {
             providerServices = _providerServices;
-            this.providerCardService = providerCardService;
             shiftServices = _shiftServices;
             _appointmentServices = appointmentServices;
             reviewService = _reviewService;
@@ -172,6 +172,57 @@ namespace API.Controllers
             }
             return BadRequest(ModelState);
         }
+
+        [HttpGet("cards")]
+        public IActionResult GetDoctorCards()
+        {
+            var doctors = providerServices.GetDoctorCards();
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = "Cards are displayed.",
+                Status = 200,
+                Data = doctors
+            });
+        }
+
+        [HttpGet("search")]
+        public IActionResult SearchDoctors(
+           [FromQuery] string? searchText,
+           [FromQuery] string? city,
+           [FromQuery] string? specialization)
+        {
+            var doctors = providerServices.SearchDoctors(searchText, city, specialization);
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = "Search Done Successfully",
+                Status = 200,
+                Data = doctors
+            });
+        }
+
+        [HttpGet("filter-by-day")]
+        public IActionResult FilterByDay([FromQuery] DateOnly date)
+        {
+            var doctors = providerServices.FilterByDay(date);
+
+            if (!doctors.Any())
+            {
+                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
+                {
+                    Message = "Day is required",
+                    Status = 400,
+                    Data = new List<ProviderCardViewModel>()
+                });
+            }
+
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = $"Doctors available on {date} retrieved successfully.",
+                Status = 200,
+                Data = doctors
+            });
+        }
+
 
 
 

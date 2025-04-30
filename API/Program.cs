@@ -85,11 +85,9 @@ namespace API
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(CommitData));
             builder.Services.AddScoped(typeof(CenterServices));
-            builder.Services.AddScoped(typeof(ProviderCardService));
             builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<SignInManager<User>>();
             builder.Services.AddScoped(typeof(ProviderServices));
-            builder.Services.AddScoped(typeof(ProviderCardService));
             builder.Services.AddScoped<ShiftServices>();
             builder.Services.AddScoped(typeof(AppointmentRepository));
             builder.Services.AddScoped(typeof(AppointmentServices));
@@ -99,9 +97,6 @@ namespace API
 
             builder.Services.AddScoped(typeof(ReviewRepository));
             builder.Services.AddScoped<Review_Service>();
-
-
-
 
 
 
