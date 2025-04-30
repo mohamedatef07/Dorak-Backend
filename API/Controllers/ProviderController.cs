@@ -3,19 +3,21 @@ using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
 namespace API.Controllers
 {
+    [Authorize(Roles = "Provider")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
     {
-        public ProviderServices providerServices;
-        public ShiftServices shiftServices;
-        public LiveQueueServices liveQueueServices;
-        public ProviderController(ProviderServices _providerServices, ProviderCardService providerCardService, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices)
+        private readonly ProviderServices providerServices;
+        private readonly ShiftServices shiftServices;
+        private readonly LiveQueueServices liveQueueServices;
+        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
@@ -68,57 +70,6 @@ namespace API.Controllers
                 Data = shiftDetails
             });
         }
-
-        [HttpGet("cards")]
-        public IActionResult GetDoctorCards()
-        {
-            var doctors = providerCardService.GetDoctorCards();
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = "Cards are displayed.",
-                Status = 200,
-                Data = doctors
-            });
-        }
-
-        [HttpGet("search")]
-        public IActionResult SearchDoctors(
-           [FromQuery] string? searchText,
-           [FromQuery] string? city,
-           [FromQuery] string? specialization)
-        {
-            var doctors = providerCardService.SearchDoctors(searchText, city, specialization);
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = "Search Done Successfully",
-                Status = 200,
-                Data = doctors
-            });
-        }
-
-        [HttpGet("filter-by-day")]
-        public IActionResult FilterByDay([FromQuery] DateOnly date)
-        {
-            var doctors = providerCardService.FilterByDay(date);
-
-            if (!doctors.Any())
-            {
-                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
-                {
-                    Message = "Day is required",
-                    Status = 400,
-                    Data = new List<ProviderCardViewModel>()
-                });
-            }
-
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = $"Doctors available on {date} retrieved successfully.",
-                Status = 200,
-                Data = doctors
-            });
-        }
-
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
         {
@@ -134,7 +85,6 @@ namespace API.Controllers
                 Data = result
             });
         }
-
         [HttpPut("update-professional-info")]
         public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
         {
@@ -147,7 +97,7 @@ namespace API.Controllers
                 Data = result
             });
         }
-        [HttpGet("queue-entries")]
+        [HttpGet("Queue-Entries")]
         public IActionResult QueueEntries(string providerId)
         {
             if (string.IsNullOrEmpty(providerId))

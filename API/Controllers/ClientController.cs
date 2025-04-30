@@ -4,34 +4,26 @@ using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
-using System.Security.Claims;
-using System.Threading.Tasks;
-
 namespace API.Controllers
 {
+    [Authorize(Roles ="Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
     {
-        public ProviderServices providerServices;
-        public ShiftServices shiftServices;
-        private readonly AppointmentServices _appointmentServices;
-        public Review_Service reviewService;
-        public Review_Service reviewService;
-
-
-        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
+        private readonly ProviderServices providerServices;
+        private readonly ShiftServices shiftServices;
+        private readonly AppointmentServices appointmentServices;
+        private readonly Review_Service reviewService;
+        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
-            _appointmentServices = appointmentServices;
+            appointmentServices = _appointmentServices;
             reviewService = _reviewService;
-
-
         }
         [HttpGet("MainInfo")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -78,8 +70,6 @@ namespace API.Controllers
                 Data = providerBookingInfo
             });
         }
-
-
         [HttpGet("ProviderCenterServices")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
@@ -105,7 +95,6 @@ namespace API.Controllers
             });
         }
 
-        
         [HttpPost("ReserveAppointment")]
         public async Task<IActionResult> ReserveAppointment([FromBody] ReserveAppointmentRequest reserveAppointmentRequest)
         {
@@ -124,7 +113,6 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
@@ -222,12 +210,5 @@ namespace API.Controllers
                 Data = doctors
             });
         }
-
-
-
-
-
-
-
     }
 }

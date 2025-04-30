@@ -6,6 +6,7 @@ using Repositories;
 using Data;
 using Services;
 using Models.Enums;
+using Dorak.ViewModels;
 
 namespace AdminArea.Controllers
 {
@@ -14,10 +15,10 @@ namespace AdminArea.Controllers
     {
         public CenterServices centerServices;
         public CommitData commitData;
-        public CenterController(CenterServices _centerServices, CommitData commitData)
+        public CenterController(CenterServices _centerServices, CommitData _commitData)
         {
             centerServices = _centerServices;
-            this.commitData = commitData;
+            commitData = _commitData;
         }
         [HttpGet]
         public IActionResult Index(string searchText = "", string centerName = "",
@@ -65,18 +66,17 @@ namespace AdminArea.Controllers
             return NotFound();
         }
         [HttpPost]
-        public IActionResult ToggleStatus(int centerId, bool status)
+        public IActionResult ToggleStatus([FromBody] ToggleStatusViewModel model)
         {
-            var center = centerServices.GetById(centerId);
+            var center = centerServices.GetById(model.CenterId);
             if (center == null)
             {
                 return RedirectToAction("Index");
             }
-            center.CenterStatus = status ? CenterStatus.Active : CenterStatus.Inactive;
+            center.CenterStatus = model.Status ? CenterStatus.Active : CenterStatus.Inactive;
             centerServices.Edit(center);
             commitData.SaveChanges();
             return RedirectToAction("Index");
         }
-
     }
 }

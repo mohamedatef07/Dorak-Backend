@@ -27,3 +27,13 @@ div form .search-btn {
 .main-bg-color {
     background-color: #2a6f96;
 }
+
+.form-switch .form-check-input {
+    width: 3rem;
+    height: 1.5rem;
+}
+
+.form-switch .form-check-input:checked {
+    background-color: #2a6f96;
+    border:none;
+}
