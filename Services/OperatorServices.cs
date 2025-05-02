@@ -1,6 +1,13 @@
-﻿using Data;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
+using System.Threading.Tasks;
+using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
+using Dorak.Models.Enums;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
@@ -15,8 +22,10 @@ namespace Services
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
         LiveQueueRepository liveQueueRepository;
+        private readonly LiveQueueRepository liveQueueRepository;
         public CommitData commitData;
         public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository , LiveQueueRepository _liveQueueRepository)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -24,6 +33,7 @@ namespace Services
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
+            liveQueueRepository = _liveQueueRepository;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -181,6 +191,79 @@ namespace Services
             commitData.SaveChanges();
 
             return true;
+        }
+
+        public string UpdateQueueStatus(UpdateQueueStatusViewModel model)
+        {
+            
+            if (string.IsNullOrWhiteSpace(model.SelectedStatus))
+                return "Selected status cannot be null or empty.";
+
+            Expression<Func<LiveQueue, bool>> predicate = lq => lq.LiveQueueId == model.LiveQueueId;
+
+            var liveQueue = liveQueueRepository.GetById(predicate);
+            if (liveQueue == null) return "Queue entry not found";
+
+            var appointment = liveQueue.Appointment;
+            var now = DateTime.Now;
+            var today = DateOnly.FromDateTime(now);
+
+            
+            switch (model.SelectedStatus)
+            {
+                case "NotChecked":
+                    
+                    if (liveQueue.AppointmentStatus != QueueAppointmentStatus.Waiting &&
+                        liveQueue.AppointmentStatus != QueueAppointmentStatus.NotChecked)
+                        return "Cannot transition to NotChecked from current status.";
+                    liveQueue.AppointmentStatus = QueueAppointmentStatus.NotChecked;
+                    appointment.IsChecked = false;
+                    liveQueue.ArrivalTime = null;
+                    appointment.ArrivalTime = null;
+                    break;
+
+                case "Waiting":
+                    
+                    if (liveQueue.AppointmentStatus != QueueAppointmentStatus.NotChecked)
+                        return "Can only transition to Waiting from NotChecked status.";
+                    liveQueue.AppointmentStatus = QueueAppointmentStatus.Waiting;
+                    appointment.IsChecked = true;
+                    liveQueue.ArrivalTime = TimeOnly.FromDateTime(now);
+                    appointment.ArrivalTime = TimeOnly.FromDateTime(now);
+                    break;
+
+                case "InProgress":
+                    
+                    if (liveQueue.AppointmentStatus != QueueAppointmentStatus.Waiting)
+                        return "Can only transition to InProgress from Waiting status.";
+                    
+                    if (!liveQueue.ArrivalTime.HasValue)
+                        return "Arrival time must be set before transitioning to InProgress.";
+                    liveQueue.AppointmentStatus = QueueAppointmentStatus.InProgress;
+                    appointment.IsChecked = true;
+                    appointment.ExactTime = TimeOnly.FromDateTime(now);
+                    break;
+
+                case "Completed":
+                    
+                    if (liveQueue.AppointmentStatus != QueueAppointmentStatus.InProgress)
+                        return "Can only transition to Completed from InProgress status.";
+                    
+                    if (appointment.ExactTime == TimeOnly.MinValue)
+                        return "Exact time must be set before transitioning to Completed.";
+                    liveQueue.AppointmentStatus = QueueAppointmentStatus.Completed;
+                    appointment.IsChecked = true;
+                    appointment.EndTime = TimeOnly.FromDateTime(now);
+                    break;
+
+                default:
+                    return "Invalid status selected";
+            }
+
+            appointment.UpdatedAt = now;
+            commitData.SaveChanges();
+
+            return "Queue status updated successfully";
         }
     }
 }

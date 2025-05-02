@@ -24,6 +24,8 @@ namespace Data
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
+        public virtual DbSet<Review> Review { get; set; }
+
 
         //Connect With database
         public DorakContext(DbContextOptions<DorakContext> options) : base(options) { }
@@ -47,6 +49,7 @@ namespace Data
             builder.ApplyConfiguration(new ClientConfiguration { });
             builder.ApplyConfiguration(new TemporaryClientConfiguration { });
             builder.ApplyConfiguration(new OperatorConfiguration { });
+            builder.ApplyConfiguration(new ReviewConfiguration { });
 
             base.OnModelCreating(builder);
         }

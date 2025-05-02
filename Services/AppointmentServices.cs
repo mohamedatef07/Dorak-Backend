@@ -1,12 +1,15 @@
 ﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Models.Enums;
 using Repositories;
+using Stripe;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Transactions;
 
 namespace Services
 {
@@ -28,7 +31,7 @@ namespace Services
         }
 
 
-        public async Task<Appointment> ReserveAppointment(AppointmentDTO appointmentDTO, string stripeToken, decimal amount, string clientId)
+        public Appointment ReserveAppointment(AppointmentDTO appointmentDTO)
         {
 
             // Validate appointment details
@@ -36,6 +39,7 @@ namespace Services
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
 
             var app = appointmentDTO.AppointmentDTOToAppointment();
+
             var pcs = providerCenterServiceRepository
                 .GetAll()
                 .FirstOrDefault(p =>
@@ -47,14 +51,46 @@ namespace Services
                 throw new Exception("Invalid provider, center, or service combination.");
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
-
-            var createdAppointment = appointmentRepository.CreateAppoinment(app);
+           
+            Appointment createdAppointment;
+            createdAppointment = appointmentRepository.CreateAppoinment(app);
             commitData.SaveChanges();
 
 
 
-            await paymentServices.ProcessPayment(stripeToken, amount, clientId,createdAppointment.AppointmentId);
             return createdAppointment;
+        }
+
+        public async Task<Charge> ProcessPayment(string stripeToken, decimal amount, string clientId, int appointmentId)
+        {
+            try
+            {
+                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
+                {
+
+                    var res = await paymentServices.ProcessPayment(stripeToken, amount, clientId, appointmentId);
+                    var app = appointmentRepository.GetById(a=>a.AppointmentId==appointmentId);
+                    app.AppointmentStatus = AppointmentStatus.Confirmed;
+                    
+                    commitData.SaveChanges();
+
+
+
+                    transaction.Complete();
+                    return res;
+
+                }
+
+            }
+            catch (StripeException ex)
+            {
+                throw new Exception($"Payment failed: {ex.Message}");
+            }
+            catch(Exception ex) {
+                throw new Exception($"{ex.Message}");
+
+            }
+
         }
 
         public async Task CancelAppointment(int appointmentId)
@@ -95,6 +131,11 @@ namespace Services
             var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
                            .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentDTO());
             return upcoming.ToList();
+        }
+
+        public Appointment GetAppointmentById(int AppointmentId)
+        {
+            return appointmentRepository.GetById(a=>a.AppointmentId==AppointmentId);
         }
 
     }
