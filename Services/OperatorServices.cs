@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data;
-using Dorak.Models;
+﻿using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
@@ -20,13 +14,15 @@ namespace Services
         public ClientRepository clientRepository;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
+        LiveQueueRepository liveQueueRepository;
         public CommitData commitData;
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
             clientRepository = _clientRepository;
             appointmentRepository = _appointmentRepository;
+            liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
@@ -109,7 +105,11 @@ namespace Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            return appointmentRepository.CreateAppoinment(appointment);
+            appointmentRepository.CreateAppoinment(appointment);
+
+            //Call Queueing function 
+
+            return 
         }     //NOT DONE>>>>>>>>
         public bool StartShift(int ShiftId, string operatorId)
         {
@@ -132,6 +132,53 @@ namespace Services
             }
             IQueryable<Appointment> appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId);
 
+            foreach (var appointment in appointments)
+            {
+                appointment.OperatorId = operatorId;
+                var livequeue = new LiveQueue
+                {
+                    ArrivalTime = null,
+                    EstimatedTime = appointment.EstimatedTime,
+                    EstimatedDuration = appointment.ProviderCenterService.Duration,
+                    AppointmentStatus = QueueAppointmentStatus.NotChecked,
+                    Capacity = appointment.Shift.MaxPatientsPerDay,
+                    OperatorId = appointment.OperatorId,
+                    AppointmentId = appointment.AppointmentId,
+                    ShiftId = appointment.ShiftId
+                };
+
+                liveQueueRepository.Add(livequeue);
+            }
+            commitData.SaveChanges();
+
+            return true;
+        }
+
+        public bool EndShift(int ShiftId, string operatorId)
+        {
+            DateTime currentTime = DateTime.Now;
+            TimeOnly timeNow = TimeOnly.FromDateTime(currentTime);
+
+            Shift shift = shiftRepository.GetById(s => s.ShiftId == ShiftId);
+
+            if (shift != null)
+            {
+                shift.ExactEndTime = timeNow;
+                shift.ShiftType = ShiftType.Completed;
+                shiftRepository.Edit(shift);
+                commitData.SaveChanges();
+            }
+            else
+            {
+                return false;
+            }
+            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllLiveQueueForShift(ShiftId);
+
+            foreach (var liveQueue in liveQueues)
+            {
+                liveQueueRepository.Delete(liveQueue);
+            }
+            commitData.SaveChanges();
 
             return true;
         }

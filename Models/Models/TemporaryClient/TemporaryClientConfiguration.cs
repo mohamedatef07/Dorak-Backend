@@ -10,6 +10,7 @@ namespace Dorak.Models
             //Primary Key
             builder.HasKey(tempclient => tempclient.TempClientId);
 
+
             //Relations Many To one
             builder.HasMany(tempclient => tempclient.Appointments)
                 .WithOne(Appointment => Appointment.TemporaryClient)
@@ -17,6 +18,19 @@ namespace Dorak.Models
                 .OnDelete(DeleteBehavior.NoAction);
 
             //Properties
+            builder.Property(tempclient => tempclient.FirstName)
+                .HasMaxLength(50)
+                .HasColumnName("First Name")
+                .HasColumnType("NVARCHAR")
+                .IsRequired(true);
+
+
+            builder.Property(tempclient => tempclient.LastName)
+                .HasMaxLength(50)
+                .HasColumnName("Last Name")
+                .HasColumnType("NVARCHAR")
+                .IsRequired(true);
+
             builder.Property(tempclient => tempclient.ContactInfo)
                 .IsRequired(true);
 
