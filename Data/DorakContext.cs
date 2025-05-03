@@ -24,7 +24,7 @@ namespace Data
         public virtual DbSet<ProviderCertification> ProviderCertifications { get; set; }
         public virtual DbSet<TemporaryClient> TemporaryClients { get; set; }
         public virtual DbSet<Operator> Operators { get; set; }
-        public virtual DbSet<Review> Review { get; set; }
+        public virtual DbSet<Review> Reviews { get; set; }
 
 
         //Connect With database
@@ -36,7 +36,7 @@ namespace Data
             builder.ApplyConfiguration(new CenterConfiguration { });
             builder.ApplyConfiguration(new ServiceConfiguration { });
             builder.ApplyConfiguration(new AdminCenterManagementConfiguration { });
-           // builder.ApplyConfiguration(new LiveQueueConfiguration { });
+            builder.ApplyConfiguration(new LiveQueueConfiguration { });
             builder.ApplyConfiguration(new AppointmentConfiguration { });
             builder.ApplyConfiguration(new ShiftConfiguration { });
             builder.ApplyConfiguration(new PaymentConfiguration { });
