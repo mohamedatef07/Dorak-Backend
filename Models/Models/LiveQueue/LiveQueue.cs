@@ -10,7 +10,7 @@ namespace Dorak.Models
         public TimeOnly EstimatedTime { get; set; }
         public int EstimatedDuration { get; set; }
         public QueueAppointmentStatus AppointmentStatus { get; set; }
-        public int Capacity { get; set; }
+        public int? Capacity { get; set; }
         public string OperatorId { get; set; }
         public virtual Operator Operator { get; set; }
         public int AppointmentId { get; set; }

@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
-using Dorak.Models.Enums;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
@@ -21,11 +20,9 @@ namespace Services
         public ClientRepository clientRepository;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
-        LiveQueueRepository liveQueueRepository;
         private readonly LiveQueueRepository liveQueueRepository;
         public CommitData commitData;
         public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository)
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository , LiveQueueRepository _liveQueueRepository)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -115,11 +112,10 @@ namespace Services
                 UpdatedAt = DateTime.UtcNow
             };
 
-            appointmentRepository.CreateAppoinment(appointment);
+            return appointmentRepository.CreateAppoinment(appointment);
 
-            //Call Queueing function 
+            //>>>>>>>>>>>>>>>>>>>>>Call Queueing function 
 
-            return 
         }     //NOT DONE>>>>>>>>
         public bool StartShift(int ShiftId, string operatorId)
         {
@@ -151,7 +147,7 @@ namespace Services
                     EstimatedTime = appointment.EstimatedTime,
                     EstimatedDuration = appointment.ProviderCenterService.Duration,
                     AppointmentStatus = QueueAppointmentStatus.NotChecked,
-                    Capacity = appointment.Shift.MaxPatientsPerDay,
+                    Capacity =  appointment.Shift.MaxPatientsPerDay,
                     OperatorId = appointment.OperatorId,
                     AppointmentId = appointment.AppointmentId,
                     ShiftId = appointment.ShiftId
