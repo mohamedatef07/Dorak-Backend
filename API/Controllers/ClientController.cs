@@ -7,11 +7,8 @@ using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
-using Repositories;
 using Services;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Transactions;
+
 
 namespace API.Controllers
 {
@@ -20,15 +17,16 @@ namespace API.Controllers
     [ApiController]
     public class ClientController : ControllerBase
     {
-        private readonly ProviderServices providerServices;
-        private readonly ShiftServices shiftServices;
-        private readonly AppointmentServices appointmentServices;
-        private readonly Review_Service reviewService;
-        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
+        public ProviderServices providerServices;
+        public ShiftServices shiftServices;
+        private readonly AppointmentServices _appointmentServices;
+        public Review_Service reviewService;
+
+        public ClientController(AppointmentServices appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, Review_Service _reviewService)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
-            appointmentServices = _appointmentServices;
+            _appointmentServices = appointmentServices;
             reviewService = _reviewService;
         }
         [HttpGet("MainInfo")]
@@ -76,6 +74,7 @@ namespace API.Controllers
                 Data = providerBookingInfo
             });
         }
+
         [HttpGet("ProviderCenterServices")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
@@ -101,7 +100,6 @@ namespace API.Controllers
             });
         }
 
-
         [HttpPost("ReserveAppointment")]
         public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
         {
@@ -121,7 +119,6 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
         [HttpPost("Checkout")]
         public async Task<IActionResult> Checkout([FromBody] CheckoutRequest checkoutRequest)
@@ -162,8 +159,6 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<string> { Status = 400, Message = $"Payment failed: {ex.Message}" });
             }
         }
-
-
 
 
         [HttpGet("last-appointment/{userId}")]
