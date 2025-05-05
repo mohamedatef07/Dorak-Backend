@@ -7,11 +7,8 @@ using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
-using Repositories;
 using Services;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Transactions;
+
 
 namespace API.Controllers
 {
@@ -28,7 +25,7 @@ namespace API.Controllers
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
-            appointmentServices = _appointmentServices;
+            _appointmentServices = appointmentServices;
             reviewService = _reviewService;
         }
         [HttpGet("MainInfo")]
@@ -76,6 +73,7 @@ namespace API.Controllers
                 Data = providerBookingInfo
             });
         }
+
         [HttpGet("ProviderCenterServices")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
@@ -101,7 +99,6 @@ namespace API.Controllers
             });
         }
 
-
         [HttpPost("ReserveAppointment")]
         public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
         {
@@ -121,7 +118,6 @@ namespace API.Controllers
                 return BadRequest(ex.Message);
             }
         }
-
 
         [HttpPost("Checkout")]
         public async Task<IActionResult> Checkout([FromBody] CheckoutRequest checkoutRequest)
@@ -162,8 +158,6 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<string> { Status = 400, Message = $"Payment failed: {ex.Message}" });
             }
         }
-
-
 
 
         [HttpGet("last-appointment/{userId}")]
