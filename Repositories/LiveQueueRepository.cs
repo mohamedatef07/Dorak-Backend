@@ -1,6 +1,6 @@
 ﻿using Data;
 using Dorak.Models;
-using Dorak.Models.Enums;
+using Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,8 +117,11 @@ namespace Repositories
             var count = appointment.Shift.Appointments.Count();
             return count;
         }
-        
 
+        public IQueryable<LiveQueue> GetAllLiveQueueForShift(int ShiftId)
+        {
+            return GetAll().Where(a => a.ShiftId == ShiftId);
+        }
 
     }
 

@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dorak.Models.Enums
+namespace Models.Enums
 {
     public enum QueueAppointmentStatus
     {
         none,
         NotChecked,
         Waiting,
-        OnProgress,
+        InProgress,
         Completed
     }
 }
