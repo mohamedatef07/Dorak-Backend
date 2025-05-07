@@ -10,8 +10,7 @@ namespace Dorak.DataTransferObject
 {
     public class GetQueueEntriesDTO
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string FullName { get; set; }
         public string PhoneNumber { get; set; }
         public int? CurrentQueuePosition { get; set; }
         public TimeOnly? ArrivalTime { get; set; }

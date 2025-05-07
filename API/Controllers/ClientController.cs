@@ -25,7 +25,7 @@ namespace API.Controllers
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
-            _appointmentServices = appointmentServices;
+            appointmentServices = _appointmentServices;
             reviewService = _reviewService;
         }
         [HttpGet("MainInfo")]
