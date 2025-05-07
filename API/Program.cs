@@ -169,6 +169,21 @@ namespace API
                 pattern: "{controller=Home}/{action=index}");
 
 
+            RecurringJob.AddOrUpdate<Review_Service>(
+             "update-provider-ratings",
+              service => service.UpdateAllProvidersAverageRating(),
+               Cron.Monthly);
+
+
+
+
+
+
+
+
+
+
+
             app.MapControllers();
             app.Run();
         }
