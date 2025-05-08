@@ -5,6 +5,8 @@ namespace Dorak.Models
     public class TemporaryClient
     {
         public int TempClientId {  get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
         public string? ContactInfo { get; set; }
         public string TempCode { get; set; }
         public bool IsDeleted { get; set; }

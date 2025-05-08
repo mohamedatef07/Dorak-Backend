@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
 using Services;
+using System.Data.Entity.Core.Common;
 using System.Threading.Tasks;
 
 namespace API.Controllers
@@ -14,11 +15,15 @@ namespace API.Controllers
     public class CenterController : ControllerBase
     {
         private readonly CenterServices centerServices;
-
-        public CenterController(CenterServices _centerServices)
+        private readonly OperatorServices operatorServices;
+        private readonly ProviderServices providerServices;
+        public CenterController(CenterServices _centerServices, OperatorServices _operatorServices, ProviderServices _providerServices)
         {
             centerServices = _centerServices;
+            operatorServices = _operatorServices;
+            providerServices = _providerServices;
         }
+
         [HttpGet]
         [Route("AllProviders")]
         public IActionResult AllProvider(int CenterId)
@@ -75,6 +80,75 @@ namespace API.Controllers
         {
             var res = centerServices.ProviderSearch(centerId, searchText, pageNumber, pageSize);
             return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
+        }
+
+        [HttpPost]
+        [Route("UpdateQueueStatus")]
+        public IActionResult UpdateQueueStatus([FromBody] UpdateQueueStatusViewModel model)
+        {
+            var res = operatorServices.UpdateQueueStatus(model);
+            return Ok(new ApiResponse<string>
+            {
+                Data = res,
+                Message = "Success",
+                Status = 200
+            });
+        }
+
+        [HttpPost]
+        [Route("AssignProviderToCenterManually")]
+        public IActionResult AssignProvider([FromBody] ProviderAssignmentViewModel model)
+        {
+
+            var res = providerServices.AssignProviderToCenter(model);
+
+            return Ok(new ApiResponse<string>
+            {
+                Data = res,
+                Message = "Success",
+                Status = 200
+            });
+        }
+
+        [HttpPost]
+        [Route("AssignProviderToCenterWeekly")]
+        public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
+        {
+            var res = providerServices.AssignProviderToCenterWithWorkingDays(model);
+            return Ok(new ApiResponse<string>
+            {
+                Data = res,
+                Message = "Success",
+                Status = 200
+            });
+        }
+
+        [HttpPost]
+        [Route("RescheduleAssignment")]
+        public IActionResult RescheduleAssignment([FromBody] RescheduleAssignmentViewModel model)
+        {
+            var res = providerServices.RescheduleAssignment(model);
+            return Ok(new ApiResponse<string>
+            {
+                Data = res,
+                Message = "Success",
+                Status = 200
+            });
+        }
+
+
+        [HttpPost]
+        [Route("AssignServiceToCenter")]
+        public IActionResult AssignServiceToCenter([FromBody] AssignProviderCenterServiceViewModel model)
+        {
+
+            var res = providerServices.AssignServiceToCenter(model);
+            return Ok(new ApiResponse<string>
+            {
+                Data = res,
+                Message = "Success",
+                Status = 200
+            });
         }
 
     }
