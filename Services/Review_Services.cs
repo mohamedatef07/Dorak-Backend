@@ -24,7 +24,7 @@ namespace Services
 
         public string CreateReview(Review review)
         {
-            context.Review.Add(review);
+            context.Reviews.Add(review);
             commitData.SaveChanges();
 
             return "Review added successfully.";
@@ -36,7 +36,7 @@ namespace Services
 
             foreach (var provider in providers)
             {
-                var reviews = context.Review
+                var reviews = context.Reviews
                     .Where(r => r.ProviderId == provider.ProviderId)
                     .ToList();
 
@@ -56,7 +56,7 @@ namespace Services
 
         public List<ReviewByProviderDTO> GetReviewsForProvider(string providerId)
         {
-            return context.Review
+            return context.Reviews
                 .Where(r => r.ProviderId == providerId)
                 .Select(r => new ReviewByProviderDTO
                 {
@@ -69,7 +69,7 @@ namespace Services
 
         public List<ReviewbyclientDTO> GetReviewsForClient(string ClientId)
         {
-            return context.Review
+            return context.Reviews
                 .Where(r => r.ClientId == ClientId)
                 .Select(r => new ReviewbyclientDTO
                 {
