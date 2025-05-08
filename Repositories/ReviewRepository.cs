@@ -12,7 +12,10 @@ namespace Repositories
     public class ReviewRepository : BaseRepository<Review>
     {
         public ReviewRepository(DorakContext dbContext) : base(dbContext) { }
+
     }
+
+
 
 
 }

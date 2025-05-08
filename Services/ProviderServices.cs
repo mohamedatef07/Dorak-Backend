@@ -520,7 +520,7 @@ namespace Services
         }
 
 
-        public List<ProviderCardViewModel> GetDoctorCards()
+        public List<ProviderCardViewModel> GetProviderCards()
         {
             var providers = context.Providers
                 .Where(p => !p.IsDeleted)
@@ -541,7 +541,8 @@ namespace Services
         }
 
 
-        public List<ProviderCardViewModel> SearchDoctors(string? searchText, string? city, string? specialization)
+
+        public List<ProviderCardViewModel> SearchProviders(string? searchText, string? city, string? specialization)
         {
             var query = context.Providers
                 .Where(p => !p.IsDeleted);

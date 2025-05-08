@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Dorak.DataTransferObject.ClientDTO
 {
-    public class reviewbyProviderDTO
+    public class ReviewByProviderDTO
     {
      
             public string ClientName { get; set; }   

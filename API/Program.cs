@@ -93,7 +93,6 @@ namespace API
             builder.Services.AddScoped(typeof(TemperoryClientRepository));
             builder.Services.AddScoped(typeof(PaymentRepository));
             builder.Services.AddScoped(typeof(PaymentServices));
-
             builder.Services.AddScoped(typeof(ReviewRepository));
             builder.Services.AddScoped<Review_Service>();
 
@@ -167,6 +166,21 @@ namespace API
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=index}");
+
+
+            RecurringJob.AddOrUpdate<Review_Service>(
+             "update-provider-ratings",
+              service => service.UpdateAllProvidersAverageRating(),
+               Cron.Monthly);
+
+
+
+
+
+
+
+
+
 
 
             app.MapControllers();

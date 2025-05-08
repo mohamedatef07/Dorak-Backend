@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace Dorak.DataTransferObject.ClientDTO
 {
-    internal class ReviewByClientDTO
+    public class ReviewbyclientDTO
     {
+
+            public string Providerid { get; set; }
+            public string ProviderName { get; set; }
+            public string Review { get; set; }
+            public decimal Rate { get; set; }
+
     }
 }
+
+
