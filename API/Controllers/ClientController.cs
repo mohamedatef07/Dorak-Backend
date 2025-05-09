@@ -182,6 +182,59 @@ namespace API.Controllers
 
         }
 
+      
+
+        [HttpGet("cards")]
+        public IActionResult GetProviderCards()
+        {
+            var providers = providerServices.GetProviderCards();
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = "Cards are displayed.",
+                Status = 200,
+                Data = providers
+            });
+        }
+
+        [HttpGet("search")]
+        public IActionResult SearchProviders(
+           [FromQuery] string? searchText,
+           [FromQuery] string? city,
+           [FromQuery] string? specialization)
+        {
+            var providers = providerServices.SearchProviders(searchText, city, specialization);
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = "Search Done Successfully",
+                Status = 200,
+                Data = providers
+            });
+        }
+
+
+        [HttpGet("filter-by-day")]
+        public IActionResult FilterByDay([FromQuery] DateOnly date)
+        {
+            var providers = providerServices.FilterByDay(date);
+
+            if (!providers.Any())
+            {
+                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
+                {
+                    Message = "Day is required",
+                    Status = 400,
+                    Data = new List<ProviderCardViewModel>()
+                });
+            }
+
+            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            {
+                Message = $"providers available on {date} retrieved successfully.",
+                Status = 200,
+                Data = providers
+            });
+        }
+
         // Add new review
         [HttpPost("add-review")]
         public IActionResult CreateReview([FromBody] ReviewDTO model)
@@ -207,54 +260,54 @@ namespace API.Controllers
             return BadRequest(ModelState);
         }
 
-        [HttpGet("cards")]
-        public IActionResult GetDoctorCards()
+        [HttpGet("provider-reviews")]
+        public IActionResult GetReviewsForProvider([FromQuery] string providerId)
         {
-            var doctors = providerServices.GetDoctorCards();
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            var reviews = reviewService.GetReviewsForProvider(providerId);
+            if (!reviews.Any())
             {
-                Message = "Cards are displayed.",
-                Status = 200,
-                Data = doctors
-            });
-        }
-
-        [HttpGet("search")]
-        public IActionResult SearchDoctors(
-           [FromQuery] string? searchText,
-           [FromQuery] string? city,
-           [FromQuery] string? specialization)
-        {
-            var doctors = providerServices.SearchDoctors(searchText, city, specialization);
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = "Search Done Successfully",
-                Status = 200,
-                Data = doctors
-            });
-        }
-
-        [HttpGet("filter-by-day")]
-        public IActionResult FilterByDay([FromQuery] DateOnly date)
-        {
-            var doctors = providerServices.FilterByDay(date);
-
-            if (!doctors.Any())
-            {
-                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
+                return NotFound(new ApiResponse<List<ReviewByProviderDTO>>
                 {
-                    Message = "Day is required",
-                    Status = 400,
-                    Data = new List<ProviderCardViewModel>()
+                    Message = "No reviews found",
+                    Status = 404,
+                    Data = new List<ReviewByProviderDTO>()
                 });
             }
 
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            return Ok(new ApiResponse<List<ReviewByProviderDTO>>
             {
-                Message = $"Doctors available on {date} retrieved successfully.",
+                Message = "Reviews retrieved successfully.",
                 Status = 200,
-                Data = doctors
+                Data = reviews
             });
         }
+
+        [HttpGet("reviews-by-client")]
+        public IActionResult GetReviewsByClient([FromQuery] string clientId)
+        {
+            if (string.IsNullOrWhiteSpace(clientId))
+                return BadRequest(new ApiResponse<string> { Message = "Client ID is required", Status = 400 });
+
+            var reviews = reviewService.GetReviewsForClient(clientId);
+
+            if (!reviews.Any())
+                return NotFound(new ApiResponse<string> { Message = "No reviews found for this client", Status = 404 });
+
+            return Ok(new ApiResponse<List<ReviewbyclientDTO>>
+            {
+                Message = "Client reviews retrieved successfully",
+                Status = 200,
+                Data = reviews
+            });
+        }
+
+
+
+
+
+
+
+
+
     }
 }
