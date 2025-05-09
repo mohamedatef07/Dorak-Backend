@@ -105,6 +105,7 @@ namespace API
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
             builder.Services.AddAuthentication(option =>
