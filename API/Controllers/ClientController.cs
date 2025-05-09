@@ -7,6 +7,7 @@ using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
+using Repositories;
 using Services;
 
 
@@ -293,7 +294,7 @@ namespace API.Controllers
             if (!reviews.Any())
                 return NotFound(new ApiResponse<string> { Message = "No reviews found for this client", Status = 404 });
 
-            return Ok(new ApiResponse<List<ReviewbyclientDTO>>
+            return Ok(new ApiResponse<List<ReviewByClientDTO>>
             {
                 Message = "Client reviews retrieved successfully",
                 Status = 200,

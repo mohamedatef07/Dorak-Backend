@@ -67,11 +67,11 @@ namespace Services
                 }).ToList();
         }
 
-        public List<ReviewbyclientDTO> GetReviewsForClient(string ClientId)
+        public List<ReviewByClientDTO> GetReviewsForClient(string ClientId)
         {
             return context.Reviews
                 .Where(r => r.ClientId == ClientId)
-                .Select(r => new ReviewbyclientDTO
+                .Select(r => new ReviewByClientDTO
                 {
                     ProviderName = r.Provider.FirstName + " " + r.Provider.LastName,
                     Review = r.Description,
