@@ -166,6 +166,13 @@ namespace API
                     "UpdatePendingPaymentsJob",
                     () => paymentServices.UpdatePendingPayments(),
                     "0 */10 * * *");
+                var appointmentServices = scope.ServiceProvider.GetRequiredService<AppointmentServices>();
+
+                
+                recurringJobManager.AddOrUpdate(
+                    "CancelUnpaidAppointmentsJob",
+                    () => appointmentServices.CancelUnpaidAppointments(),
+                    "0 0 * * *");  //daily 
             }
 
             app.MapControllerRoute(
