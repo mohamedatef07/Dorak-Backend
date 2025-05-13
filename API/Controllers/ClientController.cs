@@ -13,7 +13,7 @@ using Services;
 
 namespace API.Controllers
 {
-    [Authorize(Roles ="Client")]
+    //[Authorize(Roles ="Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
