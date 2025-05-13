@@ -150,7 +150,7 @@ namespace Services
             {
                 var payment = paymentRepository.GetById(p => p.AppointmentId == appointment.AppointmentId);
 
-                if (payment == null || payment.PaymentStatus != "Paid")  // Check if payment is not made
+                if (payment == null || payment.PaymentStatus != "succeeded") 
                 {
                     try
                     {
