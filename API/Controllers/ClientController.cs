@@ -149,7 +149,7 @@ namespace API.Controllers
                     // Process the payment
                     await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
 
-                   
+
 
 
                 return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
