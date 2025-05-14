@@ -15,7 +15,7 @@ using System.Transactions;
 
 namespace API.Controllers
 {
-    [Authorize(Roles ="Client")]
+    [Authorize(Roles = "Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -24,7 +24,7 @@ namespace API.Controllers
         private readonly ShiftServices shiftServices;
         private readonly AppointmentServices appointmentServices;
         private readonly Review_Service reviewService;
-        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices , Review_Service _reviewService)
+        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, Review_Service _reviewService)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
@@ -111,7 +111,7 @@ namespace API.Controllers
                     return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
 
 
-                var appointment = _appointmentServices.ReserveAppointment(appointmentDTO);
+                var appointment = appointmentServices.ReserveAppointment(appointmentDTO);
 
                 return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
             }
@@ -132,7 +132,7 @@ namespace API.Controllers
             try
             {
                 // Retrieve the appointment
-                var appointment = _appointmentServices.GetAppointmentById(checkoutRequest.AppointmentId);
+                var appointment = appointmentServices.GetAppointmentById(checkoutRequest.AppointmentId);
                 if (appointment == null)
                     return NotFound(new ApiResponse<string> { Status = 404, Message = "Appointment not found." });
 
@@ -148,11 +148,11 @@ namespace API.Controllers
                 if (checkoutRequest.Amount <= 0)
                     return BadRequest(new ApiResponse<string> { Status = 400, Message = "Amount must be greater than 0." });
 
-               
-                    // Process the payment
-                    await _appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
 
-                   
+                // Process the payment
+                await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
+
+
 
 
                 return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
@@ -169,7 +169,7 @@ namespace API.Controllers
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
         {
-            var lastAppointment = _appointmentServices.GetLastAppointment(userId);
+            var lastAppointment = appointmentServices.GetLastAppointment(userId);
 
             if (lastAppointment == null)
                 return Ok(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found." });
@@ -182,7 +182,7 @@ namespace API.Controllers
         [HttpGet("upcoming-appointments/{userId}")]
         public IActionResult GetUpcomingAppointments(string userId)
         {
-            var upcomings = _appointmentServices.GetUpcomingAppointments(userId);
+            var upcomings = appointmentServices.GetUpcomingAppointments(userId);
 
             return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Last Appointment retrived.", Data = upcomings });
 

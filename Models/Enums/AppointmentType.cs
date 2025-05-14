@@ -6,12 +6,10 @@ using System.Threading.Tasks;
 
 namespace Models.Enums
 {
-    public enum AppointmentStatus
+    public enum AppointmentType
     {
         none,
-        Confirmed,
-        Pending,
-        Cancelled,
-        Urgent
+        Urgent,
+        Normal
     }
 }

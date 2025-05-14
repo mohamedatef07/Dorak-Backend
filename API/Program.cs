@@ -13,12 +13,11 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Stripe;
 
-
 namespace API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -125,11 +124,34 @@ namespace API
                 i => i.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()
             ));
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularApp", builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+            });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                string[] roles = { "SuperAdmin", "Admin", "Operator", "Provider", "Client" };
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                    }
+                }
+            }
 
 
             // Configure the HTTP request pipeline
