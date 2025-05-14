@@ -12,6 +12,9 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
 using Stripe;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Dorak.DataTransferObject;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace API
 {
@@ -94,13 +97,14 @@ namespace API
             builder.Services.AddScoped(typeof(PaymentRepository));
             builder.Services.AddScoped(typeof(PaymentServices));
             builder.Services.AddScoped(typeof(ReviewRepository));
-            builder.Services.AddScoped<Review_Service>();
-
-
+            builder.Services.AddScoped(typeof(Review_Service));
+            builder.Services.AddTransient<MailKitEmailSender>();
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
             builder.Services.AddAuthentication(option =>
@@ -184,11 +188,33 @@ namespace API
                     "UpdatePendingPaymentsJob",
                     () => paymentServices.UpdatePendingPayments(),
                     "0 */10 * * *");
+                var appointmentServices = scope.ServiceProvider.GetRequiredService<AppointmentServices>();
+
+                
+                recurringJobManager.AddOrUpdate(
+                    "CancelUnpaidAppointmentsJob",
+                    () => appointmentServices.CancelUnpaidAppointments(),
+                    "0 0 * * *");  //daily 
             }
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=index}");
+
+
+            RecurringJob.AddOrUpdate<Review_Service>(
+             "update-provider-ratings",
+              service => service.UpdateAllProvidersAverageRating(),
+               Cron.Monthly);
+
+
+
+
+
+
+
+
+
 
 
             app.MapControllers();

@@ -1,8 +1,13 @@
-﻿using Dorak.DataTransferObject.ProviderDTO;
+﻿using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.AccountDTO;
+using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.Models;
 using Dorak.ViewModels;
 using Dorak.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Web;
 
 namespace API.Controllers
 {
@@ -15,18 +20,24 @@ namespace API.Controllers
         private readonly ProviderServices _providerService;
         private readonly OperatorServices _operatorServices;
         private readonly AdminCenterServices _adminCenterServices;
+        private readonly UserManager<User> _userManager;
+        private readonly MailKitEmailSender _emailSender;
 
         public AccountController(AccountServices accountServices,
                                 ClientServices clientServices,
                                 ProviderServices providerServices,
                                 OperatorServices operatorServices,
-                                AdminCenterServices adminCenterServices)
+                                AdminCenterServices adminCenterServices,
+                                UserManager<User> userManager,
+                                MailKitEmailSender emailSender)
         {
             _accountServices = accountServices;
             _clientServices = clientServices;
             _providerService = providerServices;
             _operatorServices = operatorServices;
             _adminCenterServices = adminCenterServices;
+            _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         [HttpPost("Register")]
@@ -36,16 +47,16 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var result = await _accountServices.CreateAccount(user);
             if (result.Succeeded)
             {
-                return Ok(new { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
+                return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
             }
 
-            return BadRequest(new { Message = "Account creation failed", Status = 400 });
+            return BadRequest(new ApiResponse<object> { Message = "Account creation failed", Status = 400 });
         }
 
         #region Creating Users
@@ -56,16 +67,16 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var result = await _clientServices.CreateClient(id, client);
             if (result.Succeeded)
             {
-                return Ok(new { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
+                return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
             }
 
-            return BadRequest(new { Message = "Client creation failed", Status = 400 });
+            return BadRequest(new ApiResponse<object> { Message = "Client creation failed", Status = 400 });
         }
 
         [HttpPost("CreateProvider")]
@@ -75,16 +86,16 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var result = await _providerService.CreateProvider(id, provider);
             if (result.Succeeded)
             {
-                return Ok(new { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
+                return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
             }
 
-            return BadRequest(new { Message = "Client creation failed", Status = 400 });
+            return BadRequest(new ApiResponse<object> { Message = "Client creation failed", Status = 400 });
         }
 
         [HttpPost("CreateOperator")]
@@ -94,16 +105,16 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var result = await _operatorServices.CreateOperator(id, _operator);
             if (result.Succeeded)
             {
-                return Ok(new { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
+                return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
             }
 
-            return BadRequest(new { Message = "Client creation failed", Status = 400 });
+            return BadRequest(new ApiResponse<object> { Message = "Client creation failed", Status = 400 });
         }
 
         [HttpPost("CreateAdminCenter")]
@@ -113,16 +124,16 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var result = await _adminCenterServices.CreateAdminCenter(id, adminCenter);
             if (result.Succeeded)
             {
-                return Ok(new { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
+                return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
             }
 
-            return BadRequest(new { Message = "Client creation failed", Status = 400 });
+            return BadRequest(new ApiResponse<object> { Message = "Client creation failed", Status = 400 });
         }
 
         #endregion
@@ -134,24 +145,33 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var token = await _accountServices.LoginWithGenerateJWTToken(user);
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized(new { Message = "Invalid Email, Username, or Password", Status = 400 });
+                return Unauthorized(new ApiResponse<object> { Message = "Invalid Email, Username, or Password", Status = 400 });
             }
 
             var roles = await _accountServices.GetUserRolesAsync(user.UserName);
-            return Ok(new { Message = "Logged In Successfully", Status = 200, Token = token, Roles = roles });
+            return Ok(new ApiResponse<AuthResponseDTO>
+            {
+                Message = "Logged In Successfully",
+                Status = 200,
+                Data = new AuthResponseDTO
+                {
+                    Token = token,
+                    Roles = roles
+                }
+            });
         }
 
         [HttpPost("SignOut")]
         public async Task<IActionResult> SignOut()
         {
             await _accountServices.Signout();
-            return Ok(new { Message = "Sign out Successfully", Status = 200 });
+            return Ok(new ApiResponse<object> { Message = "Sign out Successfully", Status = 200 });
         }
 
         //change password
@@ -160,12 +180,56 @@ namespace API.Controllers
         {
             var result = await _accountServices.ChangePasswordAsync(model);
 
-            return Ok(new ApiResponse<string>
+            return Ok(new ApiResponse<object>
             {
                 Message = result,
                 Status = 200,
                 Data = result
             });
         }
+        //Forgot Password
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Email", Status = 400 });
+            }
+            User? user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                return Ok(new ApiResponse<object> { Message = "If that email exists, a reset link has been sent", Status = 200 });
+            }
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = HttpUtility.UrlEncode(token);
+
+            var resetLink = $"{model.ClientAppUrl}/reset-password?email={user.Email}&token={encodedToken}";
+
+            await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+                $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>");
+            return Ok(new ApiResponse<string> { Message = "If that email exists, a reset link has been sent", Status = 200 });
+        }
+        //Reset Password
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Data", Status = 400 });
+            }
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "User not found", Status = 404 });
+            }
+            var result = await _userManager.ResetPasswordAsync(user, model.Token, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(" | ", result.Errors.Select(e => e.Description));
+                return BadRequest(new ApiResponse<object> { Message = errors, Status = 400 });
+            }
+            return Ok(new ApiResponse<object> { Message = "Password has been reset successfully", Status = 200 });
+        }
+
     }
 }

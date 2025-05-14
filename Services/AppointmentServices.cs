@@ -145,6 +145,34 @@ namespace Services
             return appointmentRepository.GetById(a=>a.AppointmentId==AppointmentId);
         }
 
+
+        public async Task CancelUnpaidAppointments()
+        {
+            // Get all appointments scheduled for two days from now
+            var upcomingAppointments = appointmentRepository.GetUpcomingAppointments()
+                .Where(a => a.AppointmentDate == DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
+                .ToList();
+
+            foreach (var appointment in upcomingAppointments)
+            {
+                var payment = paymentRepository.GetById(p => p.AppointmentId == appointment.AppointmentId);
+
+                if (payment == null || payment.PaymentStatus != "succeeded") 
+                {
+                    try
+                    {
+                        // Proceed to cancel the appointment
+                        await CancelAppointment(appointment.AppointmentId);
+                        Console.WriteLine($"Appointment {appointment.AppointmentId} canceled due to non-payment.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error canceling appointment {appointment.AppointmentId}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
         public List<Appointment> AssignToQueue(int providerCenterServiceId, DateOnly shiftDate, int? newAppointmentId)
         {
             var confirmedAppointments = appointmentRepository.GetAll()

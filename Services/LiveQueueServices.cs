@@ -18,6 +18,8 @@ namespace Services
         {
             providerAssignmentRepository = _providerAssignmentRepository;
         }
+
+        //Get Queue Entries for a provider
         public List<GetQueueEntriesDTO> GetQueueEntries(Provider provider)
         {
             List<ProviderAssignment> providerAssignments = providerAssignmentRepository.GetCurrentAssignmentsForProvider(provider.ProviderId);
@@ -31,12 +33,11 @@ namespace Services
                 {
                     result.Add(new GetQueueEntriesDTO
                     {
+                        FullName = $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
                         ArrivalTime = liveQueue.ArrivalTime,
                         AppointmentDate = appointment.AppointmentDate,
                         Type = appointment.ClientType,
                         Status = liveQueue.AppointmentStatus,
-                        FirstName = "Temp",//appointment.TemporaryClient.FirstName,
-                        LastName = "Temp", //appointment.TemporaryClient.LastName,
                         PhoneNumber = appointment.TemporaryClient.ContactInfo,
                         CurrentQueuePosition = liveQueue.CurrentQueuePosition
 
@@ -46,12 +47,11 @@ namespace Services
                 {
                     result.Add(new GetQueueEntriesDTO
                     {
+                        FullName = $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}",
                         ArrivalTime = liveQueue.ArrivalTime,
                         AppointmentDate = appointment.AppointmentDate,
                         Type = appointment.ClientType,
                         Status = liveQueue.AppointmentStatus,
-                        FirstName = appointment.User.Client.FirstName,
-                        LastName = appointment.User.Client.LastName,
                         PhoneNumber = appointment.User.PhoneNumber,
                         CurrentQueuePosition = liveQueue.CurrentQueuePosition
                     });
