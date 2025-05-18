@@ -56,7 +56,14 @@ namespace Services
             createdAppointment = appointmentRepository.CreateAppoinment(app);
             commitData.SaveChanges();
 
+            var queue = AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
+            
+            var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
+            if (queuedAppointment != null)
+            {
+                createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
+            }
 
             return createdAppointment;
         }
@@ -150,7 +157,7 @@ namespace Services
             {
                 var payment = paymentRepository.GetById(p => p.AppointmentId == appointment.AppointmentId);
 
-                if (payment == null || payment.PaymentStatus != "Paid")  // Check if payment is not made
+                if (payment == null || payment.PaymentStatus != "succeeded") 
                 {
                     try
                     {
@@ -164,6 +171,100 @@ namespace Services
                     }
                 }
             }
+        }
+
+        public List<Appointment> AssignToQueue(int providerCenterServiceId, DateOnly shiftDate, int? newAppointmentId)
+        {
+            var confirmedAppointments = appointmentRepository.GetAll()
+                .Where(a => (a.AppointmentStatus == AppointmentStatus.Confirmed ||
+                             a.AppointmentId == newAppointmentId) &&
+                            a.AppointmentDate == shiftDate &&
+                            a.ProviderCenterServiceId == providerCenterServiceId)
+                .ToList();
+
+            var queue = new List<Appointment>();
+            int insertIndex = 0;
+
+
+            var newUrgent = confirmedAppointments
+                .FirstOrDefault(a => a.AppointmentId == newAppointmentId && a.ClientType == ClientType.Urgent && a.AppointmentType == AppointmentType.Urgent);
+
+            if (newUrgent != null)
+            {
+
+                TimeOnly insertTime;
+                var existingAppointments = confirmedAppointments
+                    .Where(a => a.AppointmentId != newAppointmentId)
+                    .ToList();
+
+                if (existingAppointments.Any())
+                {
+                    insertTime = existingAppointments.Min(a => a.EstimatedTime);
+                }
+                else
+                {
+                    var now = DateTime.Now;
+                    insertTime = new TimeOnly(now.Hour, now.Minute);
+                }
+
+                newUrgent.EstimatedTime = insertTime;
+                queue.Insert(insertIndex, newUrgent);
+                insertIndex++;
+
+
+                var remainingAppointments = confirmedAppointments
+                    .Where(a => a.AppointmentId != newAppointmentId &&
+                                (a.ClientType == ClientType.Normal ||
+                                 a.ClientType == ClientType.Consultation)
+                                )
+                    .OrderBy(a => a.EstimatedTime)
+                    .ToList();
+
+                foreach (var app in remainingAppointments)
+                {
+                    var previousAppointment = queue[insertIndex - 1];
+                    insertTime = previousAppointment.EstimatedTime.Add(TimeSpan.FromMinutes(previousAppointment.EstimatedDuration));
+                    app.EstimatedTime = insertTime;
+                    queue.Insert(insertIndex, app);
+                    insertIndex++;
+                }
+            }
+            else
+            {
+
+                var regularAppointments = confirmedAppointments
+                    .Where(a => a.ClientType == ClientType.Normal ||
+                                a.ClientType == ClientType.Consultation
+                                )
+                    .OrderBy(a => a.EstimatedTime)
+                    .ToList();
+
+                TimeOnly insertTime = regularAppointments.Any() ? regularAppointments.Min(a => a.EstimatedTime) : new TimeOnly(DateTime.Now.Hour, DateTime.Now.Minute);
+                foreach (var app in regularAppointments)
+                {
+                    if (app.AppointmentId == newAppointmentId || app.EstimatedTime == TimeOnly.MinValue)
+                    {
+                        app.EstimatedTime = insertTime;
+                    }
+                    queue.Add(app);
+                    insertTime = app.EstimatedTime.Add(TimeSpan.FromMinutes(app.EstimatedDuration));
+                }
+            }
+
+
+            foreach (var app in queue)
+            {
+                var dbApp = appointmentRepository.GetById(a => a.AppointmentId == app.AppointmentId);
+                if (dbApp != null && dbApp.EstimatedTime != app.EstimatedTime)
+                {
+                    dbApp.EstimatedTime = app.EstimatedTime;
+                    appointmentRepository.Edit(dbApp);
+                }
+            }
+
+            commitData.SaveChanges();
+
+            return queue;
         }
 
     }
