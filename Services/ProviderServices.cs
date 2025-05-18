@@ -459,8 +459,7 @@ namespace Services
         {
             return new GetProviderMainInfoDTO
             {
-                FirstName = provider.FirstName,
-                LastName = provider.LastName,
+                FullName = $"{provider.FirstName} {provider.LastName}",
                 Specialization = provider.Specialization,
                 Bio = provider.Bio,
                 Rate = provider.Rate,
@@ -550,17 +549,22 @@ namespace Services
             foreach (var providerCenterService in uniqueProviderCenterServices)
             {
                 Center center = providerCenterService.Center;
-                List<Service> services = center.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == center.CenterId).Select(pcs => pcs.Service).ToList();
+                List<ProviderCenterService> centerServices = center.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == center.CenterId).ToList();
                 GetProviderCenterServicesDTO providerCenterServicesDTO;
                 List<GetProviderSrvicesDTO> providerSrvicesDTO = new List<GetProviderSrvicesDTO>();
-                providerSrvicesDTO = services.Select(service => new GetProviderSrvicesDTO
+                providerSrvicesDTO = centerServices.Select(service => new GetProviderSrvicesDTO
                 {
                     ServiceId = service.ServiceId,
-                    ServiceName = service.ServiceName,
+                    ServiceName = service.Service.ServiceName,
+                    Price = service.Price,
+                    Duration= service.Duration,
                 }).ToList();
                 providerCenterServicesDTO = new GetProviderCenterServicesDTO
                 {
                     CenterId = center.CenterId,
+                    CenterName = center.CenterName,
+                    Latitude = center.Latitude,
+                    Longitude = center.Longitude,
                     Services = providerSrvicesDTO
                 };
                 pcs.Add(providerCenterServicesDTO);

@@ -60,10 +60,12 @@ namespace Services
                 .Where(r => r.ProviderId == providerId)
                 .Select(r => new ReviewByProviderDTO
                 {
-                    ProviderName = r.Provider.FirstName + " " + r.Provider.LastName,
-                    ClientName = r.Client.FirstName + " " + r.Client.LastName,
+                    ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
+                    ClientName = $"{r.Client.FirstName} {r.Client.LastName}",
                     Review = r.Description,
-                    ClientId = r.ClientId
+                    ClientId = r.ClientId ,
+                    Rate=r.Rating,
+                    Date = r.Date
                 }).ToList();
         }
 
@@ -73,9 +75,9 @@ namespace Services
                 .Where(r => r.ClientId == ClientId)
                 .Select(r => new ReviewByClientDTO
                 {
-                    ProviderName = r.Provider.FirstName + " " + r.Provider.LastName,
+                    ProviderName =$"{r.Provider.FirstName} {r.Provider.LastName}",
                     Review = r.Description,
-                    Providerid = r.ProviderId,
+                    ProviderId = r.ProviderId,
                     Rate=r.Rating
                 }).ToList();
         }

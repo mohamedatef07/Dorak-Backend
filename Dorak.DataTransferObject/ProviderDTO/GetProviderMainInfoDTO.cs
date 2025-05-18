@@ -8,8 +8,7 @@ namespace Dorak.DataTransferObject
 {
     public class GetProviderMainInfoDTO
     {
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
+        public string FullName { get; set; }
         public string Specialization { get; set; }
         public string Bio { get; set; }
         public decimal Rate { get; set; }

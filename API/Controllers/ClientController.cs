@@ -29,7 +29,7 @@ namespace API.Controllers
             appointmentServices = _appointmentServices;
             reviewService = _reviewService;
         }
-        [HttpGet("MainInfo")]
+        [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -50,7 +50,7 @@ namespace API.Controllers
                 Data = mainInfo
             });
         }
-        [HttpGet("BookingInfo")]
+        [HttpGet("booking-info")]
         public IActionResult ProviderBookingInfo([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -75,7 +75,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("ProviderCenterServices")]
+        [HttpGet("provider-center-services")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -149,9 +149,6 @@ namespace API.Controllers
                     // Process the payment
                     await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
 
-                   
-
-
                 return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
             }
             catch (Exception ex)
@@ -159,7 +156,6 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<string> { Status = 400, Message = $"Payment failed: {ex.Message}" });
             }
         }
-
 
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
@@ -178,17 +174,21 @@ namespace API.Controllers
         public IActionResult GetUpcomingAppointments(string userId)
         {
             var upcomings = appointmentServices.GetUpcomingAppointments(userId);
-
+            if (upcomings == null || !upcomings.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
+            }
             return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Last Appointment retrived.", Data = upcomings });
-
         }
-
-      
 
         [HttpGet("cards")]
         public IActionResult GetProviderCards()
         {
             var providers = providerServices.GetProviderCards();
+            if (providers == null || !providers.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+            }
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
                 Message = "Cards are displayed.",
@@ -204,6 +204,10 @@ namespace API.Controllers
            [FromQuery] string? specialization)
         {
             var providers = providerServices.SearchProviders(searchText, city, specialization);
+            if(providers == null || !providers.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message= "No found providers" });
+            }
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
                 Message = "Search Done Successfully",
@@ -267,14 +271,12 @@ namespace API.Controllers
             var reviews = reviewService.GetReviewsForProvider(providerId);
             if (!reviews.Any())
             {
-                return NotFound(new ApiResponse<List<ReviewByProviderDTO>>
+                return NotFound(new ApiResponse<object>
                 {
                     Message = "No reviews found",
-                    Status = 404,
-                    Data = new List<ReviewByProviderDTO>()
+                    Status = 404
                 });
             }
-
             return Ok(new ApiResponse<List<ReviewByProviderDTO>>
             {
                 Message = "Reviews retrieved successfully.",
@@ -301,14 +303,5 @@ namespace API.Controllers
                 Data = reviews
             });
         }
-
-
-
-
-
-
-
-
-
     }
 }
