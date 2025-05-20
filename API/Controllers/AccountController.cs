@@ -145,27 +145,83 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
+
+                return BadRequest(new ApiResponse<object>
+                {
+                    Message = string.Join(" ", errors),
+                    Status = 400,
+                    Data = null
+                });
             }
 
-            var token = await _accountServices.LoginWithGenerateJWTToken(user);
+            var (token, refreshToken) = await _accountServices.LoginWithGenerateJWTToken(user);
+
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized(new ApiResponse<object> { Message = "Invalid Email, Username, or Password", Status = 400 });
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Message = "Invalid Email, Username, or Password",
+                    Status = 401,
+                    Data = null
+                });
             }
 
             var roles = await _accountServices.GetUserRolesAsync(user.UserName);
-            return Ok(new ApiResponse<AuthResponseDTO>
+
+            var responseData = new
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                Roles = roles
+            };
+
+            return Ok(new ApiResponse<object>
             {
                 Message = "Logged In Successfully",
                 Status = 200,
-                Data = new AuthResponseDTO
+                Data = responseData
+            });
+        }
+
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new ApiResponse<string>
                 {
-                    Token = token,
-                    Roles = roles
+                    Message = string.Join(" ", errors),
+                    Status = 400,
+                    Data = null
+                });
+            }
+
+            var result = await _accountServices.RefreshTokenAsync(request);
+            if (result.NewAccessToken == null)
+            {
+                return Unauthorized(new ApiResponse<string>
+                {
+                    Message = "Invalid or expired refresh token.",
+                    Status = 401,
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<object>
+            {
+                Message = "Token refreshed successfully.",
+                Status = 200,
+                Data = new
+                {
+                    AccessToken = result.NewAccessToken,
+                    RefreshToken = result.NewRefreshToken
+
                 }
             });
         }
+
 
         [HttpPost("SignOut")]
         public async Task<IActionResult> SignOut()

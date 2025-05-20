@@ -123,7 +123,6 @@ namespace Services
             return appointments;
         }
 
-
         public AppointmentDTO GetLastAppointment(string userId)
         {
             var appointments = appointmentRepository.GetAppointmentsByClientId(userId)
