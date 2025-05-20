@@ -69,8 +69,6 @@ namespace Repositories
             await signInManager.SignOutAsync();
         }
 
-
-
     }
 
 }
