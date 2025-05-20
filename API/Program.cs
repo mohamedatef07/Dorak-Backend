@@ -194,7 +194,7 @@ namespace API
                 recurringJobManager.AddOrUpdate(
                     "CancelUnpaidAppointmentsJob",
                     () => appointmentServices.CancelUnpaidAppointments(),
-                    "0 0 * * *");  //daily 
+                    "0 0 * * *");  //daily //fire every hour ###
             }
 
             app.MapControllerRoute(
