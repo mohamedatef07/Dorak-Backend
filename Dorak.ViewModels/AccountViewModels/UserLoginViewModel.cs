@@ -11,13 +11,11 @@ namespace Dorak.ViewModels
     {
 
         [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Invalid UserName ")]
+        [StringLength(20, MinimumLength = 8, ErrorMessage = "Invalid UserName ")]
         public string UserName { get; set; }
 
-
-
         [Required(ErrorMessage = "This Field is Required")]
-        [StringLength(100, MinimumLength = 8, ErrorMessage = "Invalid Password")]
+        [StringLength(40, MinimumLength = 8, ErrorMessage = "Invalid Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
     }

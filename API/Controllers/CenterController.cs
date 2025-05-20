@@ -1,5 +1,6 @@
 ﻿using Dorak.ViewModels;
 using Dorak.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -82,6 +83,7 @@ namespace API.Controllers
             return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
         }
 
+        [Authorize(Roles = "Operator")]
         [HttpPost]
         [Route("UpdateQueueStatus")]
         public IActionResult UpdateQueueStatus([FromBody] UpdateQueueStatusViewModel model)
@@ -95,6 +97,7 @@ namespace API.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("AssignProviderToCenterManually")]
         public IActionResult AssignProvider([FromBody] ProviderAssignmentViewModel model)
@@ -110,6 +113,7 @@ namespace API.Controllers
             });
         }
 
+        [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("AssignProviderToCenterWeekly")]
         public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
@@ -123,6 +127,7 @@ namespace API.Controllers
             });
         }
 
+        [Authorize(Roles = "Operator")]
         [HttpPost]
         [Route("RescheduleAssignment")]
         public IActionResult RescheduleAssignment([FromBody] RescheduleAssignmentViewModel model)
@@ -136,7 +141,7 @@ namespace API.Controllers
             });
         }
 
-
+        [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("AssignServiceToCenter")]
         public IActionResult AssignServiceToCenter([FromBody] AssignProviderCenterServiceViewModel model)

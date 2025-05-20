@@ -2,7 +2,10 @@ using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Repositories;
 using Services;
 
@@ -46,7 +49,6 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(OperatorServices));
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(AppointmentRepository));
-
 
             var app = builder.Build();
 

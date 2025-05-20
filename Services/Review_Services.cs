@@ -1,35 +1,85 @@
 ﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
 using Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data.Entity;
+using Dorak.DataTransferObject.ClientDTO;
 
 namespace Services
 {
-
     public class Review_Service
     {
-        private readonly ReviewRepository reviewRepository;
         private readonly CommitData commitData;
+        private readonly DorakContext context;
 
-        public Review_Service(ReviewRepository _reviewRepository, CommitData _commitData)
+        public Review_Service(CommitData _commitData, DorakContext _context)
         {
-            reviewRepository = _reviewRepository;
             commitData = _commitData;
+            context = _context;
         }
 
         public string CreateReview(Review review)
         {
-            reviewRepository.Add(review);
+            context.Reviews.Add(review);
             commitData.SaveChanges();
+
             return "Review added successfully.";
         }
 
+        public void UpdateAllProvidersAverageRating()
+        {
+            var providers = context.Providers.ToList();
 
+            foreach (var provider in providers)
+            {
+                var reviews = context.Reviews
+                    .Where(r => r.ProviderId == provider.ProviderId)
+                    .ToList();
+
+                if (reviews.Any())
+                {
+                    provider.Rate = reviews.Average(r => r.Rating);
+                }
+                else
+                {
+                    provider.Rate = 0;
+                }
+            }
+
+            commitData.SaveChanges();
+        }
+
+
+        public List<ReviewByProviderDTO> GetReviewsForProvider(string providerId)
+        {
+            return context.Reviews
+                .Where(r => r.ProviderId == providerId)
+                .Select(r => new ReviewByProviderDTO
+                {
+                    ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
+                    ClientName = $"{r.Client.FirstName} {r.Client.LastName}",
+                    Review = r.Description,
+                    ClientId = r.ClientId ,
+                    Rate=r.Rating,
+                    Date = r.Date
+                }).ToList();
+        }
+
+        public List<ReviewByClientDTO> GetReviewsForClient(string ClientId)
+        {
+            return context.Reviews
+                .Where(r => r.ClientId == ClientId)
+                .Select(r => new ReviewByClientDTO
+                {
+                    ProviderName =$"{r.Provider.FirstName} {r.Provider.LastName}",
+                    Review = r.Description,
+                    ProviderId = r.ProviderId,
+                    Rate=r.Rating
+                }).ToList();
+        }
     }
-
-
 }

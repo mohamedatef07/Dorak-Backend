@@ -12,13 +12,15 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
 using Stripe;
-
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Dorak.DataTransferObject;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace API
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -95,13 +97,14 @@ namespace API
             builder.Services.AddScoped(typeof(PaymentRepository));
             builder.Services.AddScoped(typeof(PaymentServices));
             builder.Services.AddScoped(typeof(ReviewRepository));
-            builder.Services.AddScoped<Review_Service>();
-
-
+            builder.Services.AddScoped(typeof(Review_Service));
+            builder.Services.AddTransient<MailKitEmailSender>();
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
             builder.Services.AddAuthentication(option =>
@@ -125,11 +128,34 @@ namespace API
                 i => i.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin()
             ));
 
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularApp", builder =>
+                {
+                    builder.WithOrigins("http://localhost:4200")
+                           .AllowAnyHeader()
+                           .AllowAnyMethod();
+                });
+            });
+
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+                string[] roles = { "SuperAdmin", "Admin", "Operator", "Provider", "Client" };
+                foreach (var role in roles)
+                {
+                    if (!await roleManager.RoleExistsAsync(role))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole(role));
+                    }
+                }
+            }
 
 
             // Configure the HTTP request pipeline
@@ -162,12 +188,24 @@ namespace API
                     "UpdatePendingPaymentsJob",
                     () => paymentServices.UpdatePendingPayments(),
                     "0 */10 * * *");
+                var appointmentServices = scope.ServiceProvider.GetRequiredService<AppointmentServices>();
+
+                
+                recurringJobManager.AddOrUpdate(
+                    "CancelUnpaidAppointmentsJob",
+                    () => appointmentServices.CancelUnpaidAppointments(),
+                    "0 0 * * *");  //daily //fire every hour ###
             }
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=index}");
 
+
+            RecurringJob.AddOrUpdate<Review_Service>(
+             "update-provider-ratings",
+              service => service.UpdateAllProvidersAverageRating(),
+               Cron.Monthly);
 
             app.MapControllers();
             app.Run();
