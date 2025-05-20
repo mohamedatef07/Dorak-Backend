@@ -21,8 +21,9 @@ namespace Services
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
         private readonly LiveQueueRepository liveQueueRepository;
+        private readonly AppointmentServices appointmentServices;
         public CommitData commitData;
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -31,6 +32,7 @@ namespace Services
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
             liveQueueRepository = _liveQueueRepository;
+            appointmentServices = _appointmentServices;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -100,7 +102,7 @@ namespace Services
                 ClientType = model.ClientType,
                 Fees = model.Fees,
                 AdditionalFees = model.AdditionalFees,
-                EstimatedTime = model.EstimatedTime,
+                EstimatedTime = appointmentServices.CalculateEstimatedTime(model.ShiftId),
                 ExactTime = model.ExactTime,
                 EndTime = model.EndTime,
                 OperatorId = model.OperatorId,
