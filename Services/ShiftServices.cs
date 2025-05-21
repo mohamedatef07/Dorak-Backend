@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Data;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;

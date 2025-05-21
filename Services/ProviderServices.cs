@@ -487,7 +487,7 @@ namespace Services
                         {
                             StartTime = shift.StartTime,
                             EndTime = shift.EndTime,
-                            ShiftType = shift.ShiftType,
+                            ShiftId = shift.ShiftId,
                             CenterId = providerAssignment.CenterId,
                             Date = shift.ShiftDate
                         };

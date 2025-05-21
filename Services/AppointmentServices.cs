@@ -36,21 +36,22 @@ namespace Services
         }
 
 
-        public Appointment ReserveAppointment(AppointmentDTO appointmentDTO)
+        public Appointment ReserveAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
-
             // Validate appointment details
-            if (appointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
+            if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
 
-            var app = appointmentDTO.AppointmentDTOToAppointment();
+            var app = reserveApointmentDTO.reserveApointmentDTOToAppointment();
 
             var pcs = providerCenterServiceRepository
                 .GetAll()
-                .FirstOrDefault(p =>
-                    p.ProviderId == appointmentDTO.ProviderId &&
-                    p.CenterId == appointmentDTO.CenterId &&
-                    p.ServiceId == appointmentDTO.ServiceId);
+                .FirstOrDefault
+                (   p =>
+                    p.ProviderId == reserveApointmentDTO.ProviderId &&
+                    p.CenterId == reserveApointmentDTO.CenterId &&
+                    p.ServiceId == reserveApointmentDTO.ServiceId
+                );
 
             if (pcs == null)
                 throw new Exception("Invalid provider, center, or service combination.");
@@ -65,7 +66,6 @@ namespace Services
 
             var queue = AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
-            
             var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
             if (queuedAppointment != null)
             {

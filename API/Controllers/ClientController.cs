@@ -100,24 +100,19 @@ namespace API.Controllers
             });
         }
 
-        [HttpPost("ReserveAppointment")]
-        public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
+        [HttpPost("reserve-appointment")]
+        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
-
-
-                var appointment = appointmentServices.ReserveAppointment(appointmentDTO);
-
-                return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment data" });
             }
-            catch (Exception ex)
+            var appointment = appointmentServices.ReserveAppointment(reserveApointmentDTO);
+            if (appointment == null)
             {
-                Console.WriteLine("asdasdasd");
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
+            return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully", Data = appointment });
         }
 
         [HttpPost("Checkout")]
@@ -125,7 +120,6 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<string> { Status = 400, Message = "Invalid checkout request." });
-
             try
             {
                 // Retrieve the appointment
@@ -145,9 +139,9 @@ namespace API.Controllers
                 if (checkoutRequest.Amount <= 0)
                     return BadRequest(new ApiResponse<string> { Status = 400, Message = "Amount must be greater than 0." });
 
-               
-                    // Process the payment
-                    await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
+
+                // Process the payment
+                await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
 
                 return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
             }
@@ -204,9 +198,9 @@ namespace API.Controllers
            [FromQuery] string? specialization)
         {
             var providers = providerServices.SearchProviders(searchText, city, specialization);
-            if(providers == null || !providers.Any())
+            if (providers == null || !providers.Any())
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message= "No found providers" });
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found providers" });
             }
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {

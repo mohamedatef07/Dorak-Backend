@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Dorak.DataTransferObject.ProviderDTO
 {
-       public class GetProviderCenterServicesDTO
+    public class GetProviderCenterServicesDTO
     {
         public int CenterId {  get; set; }
         public string CenterName { get; set; }

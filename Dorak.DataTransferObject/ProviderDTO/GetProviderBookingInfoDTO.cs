@@ -11,10 +11,9 @@ namespace Dorak.DataTransferObject
     public class GetProviderBookingInfoDTO
     {
         public int CenterId { get; set; }
-        public ShiftType ShiftType { get; set; }
+        public int ShiftId { get; set; }
         public DateOnly? Date {  get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
-
     }
 }
