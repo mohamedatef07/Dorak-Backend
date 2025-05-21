@@ -41,8 +41,8 @@ namespace Dorak.ViewModels
         // Duplicated in ClientRegisterViewModel, ProviderRegisterViewModel, and AdminCenterViewModel
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public string? Gender { get; set; }
-        public DateOnly? BirthDate { get; set; }
+        public GenderType Gender { get; set; }
+        public DateOnly BirthDate { get; set; }
 
 
         // From ClientRegisterViewModel
@@ -57,10 +57,8 @@ namespace Dorak.ViewModels
         public string? Specialization { get; set; }
         public string? Bio { get; set; }
         public int? ExperienceYears { get; set; }
-        public string? ProviderType { get; set; }
+        public ProviderType ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
-        public DateOnly? ProviderBirthDate { get; set; }
-        public string? PicName { get; set; }
         public string? Availability { get; set; }
         public int? EstimatedDuration { get; set; }
         public decimal? Rate { get; set; }
