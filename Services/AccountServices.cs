@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Repositories;
-using Dorak.ViewModels.AccountViewModels;
 using Models.Enums;
 using Dorak.DataTransferObject.ProviderDTO;
 

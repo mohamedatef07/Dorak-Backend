@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
 
 namespace Repositories
 {
