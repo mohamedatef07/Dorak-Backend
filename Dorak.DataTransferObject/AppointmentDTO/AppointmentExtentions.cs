@@ -79,9 +79,7 @@ namespace Dorak.ViewModels
                 TemporaryClientId = reserveApointmentDTO.TemporaryClientId ?? null
             };
         }
-
-
-
+        
         public static AppointmentForClientProfileDTO AppointmentToAppointmentForClientProfileDTO(this Appointment appointment)
         {
 
