@@ -310,9 +310,9 @@ namespace API.Controllers
             var AllAppointments = appointmentServices.GetAppointmentsByUserId(userId);
             if (AllAppointments == null || !AllAppointments.Any())
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = AllAppointments });
+            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "All Appointments retrived.", Data = AllAppointments });
         }
     }
 }
