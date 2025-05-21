@@ -19,9 +19,9 @@ namespace Repositories
             CommitData = _commitData;
         }
 
-        public IEnumerable<Appointment> GetAppointmentsByClientId(string clientId)
+        public IQueryable<Appointment> GetAppointmentsByClientId(string clientId)
         {
-            return Table.Where(a => a.UserId == clientId).ToList();
+            return Table.Where(a => a.UserId == clientId);
         }
         public IQueryable<Appointment> GetAppointmentsByTempClientId(int tempId)
         {
