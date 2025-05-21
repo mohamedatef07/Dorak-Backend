@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Services;
-using Models.Enums;
 using Dorak.ViewModels;
-using Dorak.Models;
+using Dorak.DataTransferObject;
 
 namespace API.Controllers
 {

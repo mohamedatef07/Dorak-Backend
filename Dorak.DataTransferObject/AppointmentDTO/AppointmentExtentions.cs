@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 
 namespace Dorak.ViewModels
@@ -59,6 +60,22 @@ namespace Dorak.ViewModels
                 ShiftId = appointmentDTO.ShiftId,
                 UserId = appointmentDTO.UserId,
                 TemporaryClientId = appointmentDTO.TemporaryClientId ?? null
+            };
+        }
+        public static Appointment reserveApointmentDTOToAppointment(this ReserveApointmentDTO reserveApointmentDTO)
+        {
+            return new Appointment
+            {
+                AppointmentDate = reserveApointmentDTO.AppointmentDate,
+                AppointmentStatus = reserveApointmentDTO.AppointmentStatus,
+                CreatedAt = reserveApointmentDTO.CreatedAt,
+                UpdatedAt = reserveApointmentDTO.UpdatedAt,
+                ClientType = reserveApointmentDTO.clientType,
+                Fees = reserveApointmentDTO.Fees,
+                OperatorId = reserveApointmentDTO.OperatorId,
+                ShiftId = reserveApointmentDTO.ShiftId,
+                UserId = reserveApointmentDTO.UserId,
+                TemporaryClientId = reserveApointmentDTO.TemporaryClientId ?? null
             };
         }
     }
