@@ -1,4 +1,5 @@
 ﻿using Data;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
@@ -123,10 +124,10 @@ namespace Services
             commitData.SaveChanges();
         }
 
-        public List<Appointment> GetAppointmentsByUserId(string userId)
+        public List<AppointmentForClientProfileDTO> GetAppointmentsByUserId(string userId)
         {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).ToList();
-            return appointments;
+            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p=>p.AppointmentToAppointmentForClientProfileDTO());
+            return appointments.ToList();
         }
 
 
