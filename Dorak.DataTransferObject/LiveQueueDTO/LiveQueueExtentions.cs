@@ -17,10 +17,7 @@ namespace Dorak.DataTransferObject
                 OperatorId = appointmentDTO.OperatorId,
                 AppointmentId = appointmentDTO.appointmentId,
                 ArrivalTime = null,
-                EstimatedTime = appointmentDTO.EstimatedTime,
                 CurrentQueuePosition = null,
-                //EstimatedDuration = ,
-                //Status = appointmentDTO.
 
 
 

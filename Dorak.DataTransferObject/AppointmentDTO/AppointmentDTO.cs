@@ -20,7 +20,6 @@ namespace Dorak.ViewModels
         public ClientType clientType { get; set; }
         public decimal Fees { get; set; }
         public decimal AdditionalFees { get; set; }
-        public TimeOnly EstimatedTime { get; set; }
         public TimeOnly ExactTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public bool? IsChecked { get; set; }
