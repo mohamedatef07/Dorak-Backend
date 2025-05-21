@@ -1,7 +1,9 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
+using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models.Enums;
 using Repositories;
 using Stripe;
@@ -19,15 +21,17 @@ namespace Services
         private readonly CommitData commitData;
         private readonly PaymentServices paymentServices;
         private readonly AppointmentRepository appointmentRepository;
+        private readonly ShiftRepository shiftRepository;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly PaymentRepository paymentRepository;
 
-        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository)
+        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository)
         {
             commitData = _commitData;
             paymentRepository = _paymentRepository;
             paymentServices = _paymentServices;
             appointmentRepository = _appointmentRepository;
+            shiftRepository = _shiftRepository;
             providerCenterServiceRepository = _providerCenterServiceRepository;
         }
 
@@ -56,6 +60,8 @@ namespace Services
            
             Appointment createdAppointment;
             createdAppointment = appointmentRepository.CreateAppoinment(app);
+
+            createdAppointment.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
             commitData.SaveChanges();
 
             var queue = AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
@@ -118,10 +124,10 @@ namespace Services
             commitData.SaveChanges();
         }
 
-        public List<Appointment> GetAppointmentsByUserId(string userId)
+        public List<AppointmentForClientProfileDTO> GetAppointmentsByUserId(string userId)
         {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).ToList();
-            return appointments;
+            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p=>p.AppointmentToAppointmentForClientProfileDTO());
+            return appointments.ToList();
         }
 
 
@@ -268,5 +274,16 @@ namespace Services
             return queue;
         }
 
+        public TimeOnly CalculateEstimatedTime(int shiftId)
+        {
+            var appointments = appointmentRepository.GetAll().Where(a=>a.ShiftId==shiftId);
+            int TotalDuration = 0;
+            foreach (var appointment in appointments)
+            {
+                TotalDuration += appointment.ProviderCenterService.Duration;
+            }
+            var shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
+            return shift.StartTime.AddMinutes(TotalDuration);
+        }
     }
 }

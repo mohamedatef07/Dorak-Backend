@@ -172,7 +172,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Last Appointment retrived.", Data = upcomings });
+            return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
         }
 
         [HttpGet("cards")]
@@ -296,6 +296,17 @@ namespace API.Controllers
                 Status = 200,
                 Data = reviews
             });
+        }
+
+        [HttpGet("get-all-appointment/{userId}")]
+        public IActionResult GetAllAppointments(string userId)
+        {
+            var AllAppointments = appointmentServices.GetAppointmentsByUserId(userId);
+            if (AllAppointments == null || !AllAppointments.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
+            }
+            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "All Appointments retrived.", Data = AllAppointments });
         }
     }
 }
