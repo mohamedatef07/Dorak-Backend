@@ -10,7 +10,5 @@ namespace Dorak.ViewModels
         public TimeOnly EndTime { get; set; }
         public int? MaxPatientsPerDay { get; set; }
         public string OperatorId { get; set; }
-
-
     }
 }

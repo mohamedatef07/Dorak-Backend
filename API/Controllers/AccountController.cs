@@ -3,7 +3,6 @@ using Dorak.DataTransferObject.AccountDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;

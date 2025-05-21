@@ -1,6 +1,6 @@
 ﻿using Dorak.Models;
 
-namespace Dorak.ViewModels.DoctorCardVMs
+namespace Dorak.ViewModels
 {
     public static class ProviderCardMapper
     {

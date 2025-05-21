@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using Repositories;
 

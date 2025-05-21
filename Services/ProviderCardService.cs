@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dorak.ViewModels.DoctorCardVMs;
+using Dorak.ViewModels;
 using Data;
 using Repositories;
 using Microsoft.EntityFrameworkCore;

@@ -2,7 +2,6 @@
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
 using Repositories;
