@@ -59,7 +59,6 @@ namespace Dorak.ViewModels.AccountViewModels
         public int? ExperienceYears { get; set; }
         public string? ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
-        public DateOnly? ProviderBirthDate { get; set; }
         public string? PicName { get; set; }
         public string? Availability { get; set; }
         public int? EstimatedDuration { get; set; }
