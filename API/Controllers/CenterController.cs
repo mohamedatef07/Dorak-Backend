@@ -1,4 +1,5 @@
-﻿using Dorak.ViewModels;
+using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -24,38 +25,52 @@ namespace API.Controllers
             providerServices = _providerServices;
         }
 
-        [HttpGet]
-        [Route("AllProviders")]
-        public IActionResult AllProvider(int CenterId)
+        [HttpPost]
+        [Route("AddProviderAndAssignIt")]
+        public async Task<IActionResult> AddProviderAndAssignIt(ProviderAssignmentDTO providerDto)
         {
 
-            var res = centerServices.GetProvidersOfCenter(CenterId);
-            return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>>
+            var res = await centerServices.GetProviderID(providerDto);
+            return Ok(new ApiResponse<string>
+
             {
                 Data = res,
                 Message = "Success",
                 Status = 200
             });
+
+
         }
 
 
-        [HttpPost]  //provider or assignment !!!!!!!! Type
-        [Route("addProviderAndAssignIt")]
+        //[HttpGet]
+        //[Route("AllProviders")]
+        //public IActionResult AllProvider(int CenterId)
+        //{
 
-        public async Task<IActionResult> AddProvider(RegisterationViewModel user, int centerId, DateOnly startdate, DateOnly enddate, AssignmentType assignmentType)
+        //    var res = centerServices.GetProvidersOfCenter(CenterId);
+        //    return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>>
+        //    {
+        //        Data = res,
+        //        Message = "Success",
+        //        Status = 200
+        //    });
+        //}
+
+        [HttpGet]
+        [Route("AllProviders")]
+        public IActionResult AllProviders(int centerId, int pageNumber = 1, int pageSize = 9, string specializationFilter = "")
         {
-            var res = await centerServices.AddProviderAsync(user, centerId, startdate, enddate, assignmentType);
-
-            if (res.Succeeded)
+            try
             {
-                return Ok("Provider created and assigned to center successfully!");
+                var res = centerServices.GetProvidersOfCenter(centerId, pageNumber, pageSize, "StartDate", specializationFilter);
+                return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(res.Errors);
+                return StatusCode(500, new ApiResponse<string> { Message = $"Internal Server Error: {ex.Message}", Status = 500 });
             }
         }
-
 
 
 
@@ -73,30 +88,24 @@ namespace API.Controllers
         }
 
 
+
         [HttpGet]
         [Route("SearchProvider")]
-        public IActionResult SearchProvider(int centerId, string searchText = "", int pageNumber = 1,
-                                                            int pageSize = 2)
+        public IActionResult SearchProvider(string searchText = "", int pageNumber = 1, int pageSize = 9, string sortBy = "", string specializationFilter = "")
         {
-            var res = centerServices.ProviderSearch(centerId, searchText, pageNumber, pageSize);
-            return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
-        }
-
-        [Authorize(Roles = "Operator")]
-        [HttpPost]
-        [Route("UpdateQueueStatus")]
-        public IActionResult UpdateQueueStatus([FromBody] UpdateQueueStatusViewModel model)
-        {
-            var res = operatorServices.UpdateQueueStatus(model);
-            return Ok(new ApiResponse<string>
+            try
             {
-                Data = res,
-                Message = "Success",
-                Status = 200
-            });
+                var res = centerServices.ProviderSearch(searchText, pageNumber, pageSize, specializationFilter);
+                return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in SearchProvider: {ex.Message}");
+                return StatusCode(500, new ApiResponse<string> { Data = null, Message = "Internal Server Error", Status = 500 });
+            }
         }
 
-        [Authorize(Roles = "Admin, Operator")]
+        // [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("AssignProviderToCenterManually")]
         public IActionResult AssignProvider([FromBody] ProviderAssignmentViewModel model)

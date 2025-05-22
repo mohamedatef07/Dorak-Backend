@@ -33,12 +33,12 @@ namespace Dorak.ViewModels
         public GenderType Gender { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
-        public DateOnly BirthDate { get; set; }
+        public DateOnly? BirthDate { get; set; }
         public string Street { get; set; }
         public string City { get; set; }
         public string Governorate { get; set; }
         public string Country { get; set; }
-        public string Image { get; set; }
+        public string? Image { get; set; }
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
         public decimal Rate { get; set; }
