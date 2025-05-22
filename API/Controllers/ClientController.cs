@@ -29,7 +29,7 @@ namespace API.Controllers
             appointmentServices = _appointmentServices;
             reviewService = _reviewService;
         }
-        [HttpGet("MainInfo")]
+        [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -50,7 +50,7 @@ namespace API.Controllers
                 Data = mainInfo
             });
         }
-        [HttpGet("BookingInfo")]
+        [HttpGet("booking-info")]
         public IActionResult ProviderBookingInfo([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -75,7 +75,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("ProviderCenterServices")]
+        [HttpGet("provider-center-services")]
         public IActionResult ProviderCenterServices([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -100,24 +100,19 @@ namespace API.Controllers
             });
         }
 
-        [HttpPost("ReserveAppointment")]
-        public IActionResult ReserveAppointment([FromBody] AppointmentDTO appointmentDTO)
+        [HttpPost("reserve-appointment")]
+        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                if (!ModelState.IsValid)
-                    return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on reserving Appointment" });
-
-
-                var appointment = appointmentServices.ReserveAppointment(appointmentDTO);
-
-                return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully.", Data = appointment });
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment data" });
             }
-            catch (Exception ex)
+            var appointment = appointmentServices.ReserveAppointment(reserveApointmentDTO);
+            if (appointment == null)
             {
-                Console.WriteLine("asdasdasd");
-                return BadRequest(ex.Message);
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
+            return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully", Data = appointment });
         }
 
         [HttpPost("Checkout")]
@@ -125,7 +120,6 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(new ApiResponse<string> { Status = 400, Message = "Invalid checkout request." });
-
             try
             {
                 // Retrieve the appointment
@@ -145,12 +139,9 @@ namespace API.Controllers
                 if (checkoutRequest.Amount <= 0)
                     return BadRequest(new ApiResponse<string> { Status = 400, Message = "Amount must be greater than 0." });
 
-               
-                    // Process the payment
-                    await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
 
-
-
+                // Process the payment
+                await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
 
                 return Ok(new ApiResponse<string> { Status = 200, Message = "Payment successful. Appointment confirmed." });
             }
@@ -159,7 +150,6 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<string> { Status = 400, Message = $"Payment failed: {ex.Message}" });
             }
         }
-
 
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
@@ -178,17 +168,21 @@ namespace API.Controllers
         public IActionResult GetUpcomingAppointments(string userId)
         {
             var upcomings = appointmentServices.GetUpcomingAppointments(userId);
-
-            return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Last Appointment retrived.", Data = upcomings });
-
+            if (upcomings == null || !upcomings.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
+            }
+            return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
         }
-
-      
 
         [HttpGet("cards")]
         public IActionResult GetProviderCards()
         {
             var providers = providerServices.GetProviderCards();
+            if (providers == null || !providers.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+            }
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
                 Message = "Cards are displayed.",
@@ -204,6 +198,10 @@ namespace API.Controllers
            [FromQuery] string? specialization)
         {
             var providers = providerServices.SearchProviders(searchText, city, specialization);
+            if (providers == null || !providers.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+            }
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
                 Message = "Search Done Successfully",
@@ -267,14 +265,12 @@ namespace API.Controllers
             var reviews = reviewService.GetReviewsForProvider(providerId);
             if (!reviews.Any())
             {
-                return NotFound(new ApiResponse<List<ReviewByProviderDTO>>
+                return NotFound(new ApiResponse<object>
                 {
                     Message = "No reviews found",
-                    Status = 404,
-                    Data = new List<ReviewByProviderDTO>()
+                    Status = 404
                 });
             }
-
             return Ok(new ApiResponse<List<ReviewByProviderDTO>>
             {
                 Message = "Reviews retrieved successfully.",
@@ -302,13 +298,15 @@ namespace API.Controllers
             });
         }
 
-
-
-
-
-
-
-
-
+        [HttpGet("get-all-appointment/{userId}")]
+        public IActionResult GetAllAppointments(string userId)
+        {
+            var AllAppointments = appointmentServices.GetAppointmentsByUserId(userId);
+            if (AllAppointments == null || !AllAppointments.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
+            }
+            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "All Appointments retrived.", Data = AllAppointments });
+        }
     }
 }

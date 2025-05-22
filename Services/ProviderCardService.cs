@@ -1,0 +1,72 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Dorak.ViewModels;
+using Data;
+using Repositories;
+using Microsoft.EntityFrameworkCore;
+
+namespace Services
+{
+    public class ProviderCardService
+    {
+        private readonly DorakContext context;
+
+        public ProviderCardService(DorakContext _context)
+        {
+            context = _context;
+        }
+
+        public List<ProviderCardViewModel> GetDoctorCards()
+        {
+            var providers = context.Providers
+            .Include(p => p.ProviderCenterServices)
+             .Where(p => !p.IsDeleted)
+             .Select(p => p.ToCardView())
+             .ToList();
+
+            return providers;
+        }
+        public List<ProviderCardViewModel> SearchDoctors(string? searchText, string? city, string? specialization)
+        {
+            var query = context.Providers
+                .Include(p => p.ProviderCenterServices)
+                .Where(p => !p.IsDeleted)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchText))
+            {
+                searchText = searchText.ToLower();
+                query = query.Where(p => (p.FirstName + " " + p.LastName).ToLower().Contains(searchText));
+            }
+
+            if (!string.IsNullOrWhiteSpace(city))
+            {
+                city = city.ToLower();
+                query = query.Where(p => p.City.ToLower() == city);
+            }
+
+            if (!string.IsNullOrWhiteSpace(specialization))
+            {
+                specialization = specialization.ToLower();
+                query = query.Where(p => p.Specialization.ToLower() == specialization);
+            }
+
+            return query.Select(p => p.ToCardView()).ToList();
+        }
+        public List<ProviderCardViewModel> FilterByDay(string day)
+        {
+            return context.Providers
+                .Include(p => p.ProviderCenterServices)
+                .Where(p => !p.IsDeleted && p.Availability.ToLower().Contains(day.ToLower()))
+                .Select(p => p.ToCardView())
+                .ToList();
+        }
+
+
+
+
+    }
+}

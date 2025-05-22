@@ -10,8 +10,7 @@ namespace Models.Enums
     {
         Unknown,
         Normal,
-        Consultation,
         Urgent,
-        MedicalRep
+        Consultation
     }
 }

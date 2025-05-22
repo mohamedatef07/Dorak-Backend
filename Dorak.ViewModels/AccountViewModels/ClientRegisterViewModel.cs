@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Models.Enums;
 
-namespace Dorak.ViewModels.AccountViewModels
+namespace Dorak.ViewModels
 {
     public class ClientRegisterViewModel
     {

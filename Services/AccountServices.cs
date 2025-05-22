@@ -8,10 +8,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Repositories;
-using Dorak.ViewModels.AccountViewModels;
 using Models.Enums;
 using Dorak.DataTransferObject.ProviderDTO;
-
 
 
 namespace Services
@@ -56,11 +54,6 @@ namespace Services
         {
             var userRes = await accountRepository.Register(user);
 
-            //Converting the Enums into Lists:
-            List<GenderType> Genders = Enum.GetValues(typeof(GenderType)).Cast<GenderType>().ToList();
-            List<UserStatus> statuses = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().ToList();
-            List<ProviderType> ProviderTypes = Enum.GetValues(typeof(ProviderType)).Cast<ProviderType>().ToList();
-
             if (userRes.Succeeded)
             {
                 // Our Roles:
@@ -76,7 +69,7 @@ namespace Services
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
+                        Gender = user.Gender,
                         Image = user.Image
                     });
                     if (operarorres.Succeeded)
@@ -94,10 +87,10 @@ namespace Services
                         Specialization = user.Specialization,
                         Bio = user.Bio,
                         ExperienceYears = user.ExperienceYears,
-                        ProviderType = ProviderTypes.FirstOrDefault(p => p.ToString().Equals(user.ProviderType, StringComparison.OrdinalIgnoreCase)),
+                        ProviderType = user.ProviderType,
                         LicenseNumber = user.LicenseNumber,
-                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
-                        BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
+                        Gender = user.Gender,
+                        BirthDate = user.BirthDate,
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,
@@ -118,8 +111,8 @@ namespace Services
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        BirthDate = user.BirthDate ?? DateOnly.FromDateTime(DateTime.MinValue),
-                        Gender = Genders.FirstOrDefault(e => e.ToString().Equals(user.Gender, StringComparison.OrdinalIgnoreCase)),
+                        BirthDate = user.BirthDate,
+                        Gender = user.Gender,
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,

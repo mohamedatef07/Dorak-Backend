@@ -1,6 +1,5 @@
-﻿using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.ViewModels;
-using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;

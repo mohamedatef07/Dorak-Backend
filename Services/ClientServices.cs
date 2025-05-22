@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Data;
 using Dorak.Models;
-using Dorak.ViewModels.AccountViewModels;
+using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Repositories;
 

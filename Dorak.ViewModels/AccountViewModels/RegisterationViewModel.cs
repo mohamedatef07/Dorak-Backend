@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Models.Enums;
 
-namespace Dorak.ViewModels.AccountViewModels
+namespace Dorak.ViewModels
 {
     public class RegisterationViewModel
     {
@@ -41,8 +41,8 @@ namespace Dorak.ViewModels.AccountViewModels
         // Duplicated in ClientRegisterViewModel, ProviderRegisterViewModel, and AdminCenterViewModel
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public string? Gender { get; set; }
-        public DateOnly? BirthDate { get; set; }
+        public GenderType Gender { get; set; }
+        public DateOnly BirthDate { get; set; }
 
 
         // From ClientRegisterViewModel
@@ -57,9 +57,8 @@ namespace Dorak.ViewModels.AccountViewModels
         public string? Specialization { get; set; }
         public string? Bio { get; set; }
         public int? ExperienceYears { get; set; }
-        public string? ProviderType { get; set; }
+        public ProviderType ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
-        public string? PicName { get; set; }
         public string? Availability { get; set; }
         public int? EstimatedDuration { get; set; }
         public decimal? Rate { get; set; }

@@ -103,7 +103,7 @@ namespace API
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 options.JsonSerializerOptions.PropertyNamingPolicy = null;
             });
 
@@ -206,16 +206,6 @@ namespace API
              "update-provider-ratings",
               service => service.UpdateAllProvidersAverageRating(),
                Cron.Monthly);
-
-
-
-
-
-
-
-
-
-
 
             app.MapControllers();
             app.Run();
