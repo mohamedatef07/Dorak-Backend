@@ -9,7 +9,7 @@ using Services;
 
 namespace API.Controllers
 {
-    [Authorize(Roles = "Provider")]
+    // [Authorize(Roles = "Provider")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
@@ -23,6 +23,37 @@ namespace API.Controllers
             shiftServices = _shiftServices;
             liveQueueServices = _liveQueueServices;
         }
+
+        [HttpGet("GetProviderById/{providerId}")]
+        public async Task<IActionResult> GetProviderById(string providerId)
+        {
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return BadRequest(new ApiResponse<ProviderViewModel> { Message = "Provider ID is required", Status = 400 });
+            }
+
+            try
+            {
+                var provider = await providerServices.GetProviderDetailsById(providerId);
+                if (provider == null)
+                {
+                    return NotFound(new ApiResponse<ProviderViewModel> { Message = "Provider not found", Status = 404 });
+                }
+
+                return Ok(new ApiResponse<ProviderViewModel>
+                {
+                    Message = "Provider details retrieved successfully",
+                    Status = 200,
+                    Data = provider
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetProviderById: {ex.Message} - StackTrace: {ex.StackTrace}");
+                return StatusCode(500, new ApiResponse<ProviderViewModel> { Message = "Internal server error", Status = 500 });
+            }
+        }
+
         [HttpGet("ScheduleDetails")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
         {

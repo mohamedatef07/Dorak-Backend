@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dorak.DataTransferObject;
-using Dorak.DataTransferObject;
+
 using Dorak.Models;
 
 namespace Dorak.ViewModels

@@ -10,7 +10,7 @@ namespace Dorak.ViewModels
     {
         public string ProviderId { get; set; }
         public int CenterId { get; set; }
-        public DateOnly StartDate { get; set; }
+        public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public List<int>? WorkingDays { get; set; } 
         public List<ShiftViewModel>? Shifts { get; set; }

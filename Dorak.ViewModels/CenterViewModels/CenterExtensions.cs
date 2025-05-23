@@ -2,7 +2,7 @@
 
 using Dorak.Models;
 
-namespace Dorak.ViewModels.CenterViewModel
+namespace Dorak.ViewModels
 {
     public static class CenterExtensions
     {

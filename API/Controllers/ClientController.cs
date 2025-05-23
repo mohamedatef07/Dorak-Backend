@@ -22,12 +22,15 @@ namespace API.Controllers
         private readonly ShiftServices shiftServices;
         private readonly AppointmentServices appointmentServices;
         private readonly Review_Service reviewService;
-        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, Review_Service _reviewService)
+        private readonly ClientServices clientServices;
+
+        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, Review_Service _reviewService,ClientServices _clientServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
             appointmentServices = _appointmentServices;
             reviewService = _reviewService;
+            clientServices = _clientServices;
         }
         [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -298,15 +301,16 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("get-all-appointment/{userId}")]
-        public IActionResult GetAllAppointments(string userId)
+        [HttpGet("Profile-all-appointment/{userId}")]
+        public IActionResult ProfileAndAllAppointments(string userId)
         {
-            var AllAppointments = appointmentServices.GetAppointmentsByUserId(userId);
-            if (AllAppointments == null || !AllAppointments.Any())
+            var profile = clientServices.GetProfile(userId);
+            if (profile == null)
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "All Appointments retrived.", Data = AllAppointments });
+            return Ok(new ApiResponse<ClientProfileDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
         }
+
     }
 }
