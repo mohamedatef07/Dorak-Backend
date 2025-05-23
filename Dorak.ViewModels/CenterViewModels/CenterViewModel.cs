@@ -2,7 +2,7 @@
 using Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace Dorak.ViewModels.CenterViewModel
+namespace Dorak.ViewModels
 {
     public class CenterViewModel
     {
