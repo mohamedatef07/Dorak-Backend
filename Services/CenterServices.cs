@@ -2,7 +2,6 @@
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Dorak.ViewModels.CenterViewModel;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -286,7 +285,7 @@ namespace Services
                     FirstName = providerDto.FirstName,
                     LastName = providerDto.LastName,
                     Gender = providerDto.Gender,
-                    BirthDate = providerDto.BirthDate,
+                    BirthDate = (DateOnly)providerDto.BirthDate,
                     Street = providerDto.Street,
                     City = providerDto.City,
                     Governorate = providerDto.Governorate,
@@ -352,7 +351,7 @@ namespace Services
                     FirstName = providerDto.FirstName,
                     LastName = providerDto.LastName,
                     Gender = providerDto.Gender,
-                    BirthDate = providerDto.BirthDate,
+                    BirthDate = (DateOnly)providerDto.BirthDate,
                     Street = providerDto.Street,
                     City = providerDto.City,
                     Governorate = providerDto.Governorate,
