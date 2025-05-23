@@ -77,6 +77,7 @@ namespace Services
                 Image = Client.Image,
                 Name = $"{Client.FirstName} {Client.LastName}",
                 Phone = Client.User.PhoneNumber,
+                Email = Client.User.Email,
                 Appointments = appointmentServices.GetAppointmentsByUserId(userId)
             };
             return clientProfile;
