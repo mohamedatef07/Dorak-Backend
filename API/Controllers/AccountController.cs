@@ -44,8 +44,7 @@ namespace API.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
-                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Please provide all required data in the correct format", Status = 400 });
             }
 
             var result = await _accountServices.CreateAccount(user);

@@ -68,7 +68,6 @@ namespace Services
                 LicenseNumber = model.LicenseNumber,
                 Bio = model.Bio,
                 EstimatedDuration = model.EstimatedDuration,
-                Availability = model.Availability,
                 //RATE
                 Specialization = model.Specialization,
                 Image = model.Image,

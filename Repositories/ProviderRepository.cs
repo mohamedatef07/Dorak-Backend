@@ -48,7 +48,6 @@ namespace Repositories
             selected.EstimatedDuration = provider.EstimatedDuration;
             selected.Specialization = provider.Specialization;
             selected.LicenseNumber = provider.LicenseNumber;
-            selected.Availability = provider.Availability;
             selected.ExperienceYears = provider.ExperienceYears;
             base.Edit(selected);
         }

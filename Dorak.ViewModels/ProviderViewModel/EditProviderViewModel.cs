@@ -13,7 +13,6 @@ namespace Dorak.ViewModels
         public string lastName { get; set; }
         public string Specialization { get; set; }
         public int? ExperienceYears { get; set; }
-        public string Availability { get; set; }
         public string LicenseNumber { get; set; }
         public int EstimatedDuration { get; set; }
 

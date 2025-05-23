@@ -97,7 +97,6 @@ namespace Services
                         Country = user.Country,
                         Image = user.Image,
                         EstimatedDuration = user.EstimatedDuration ?? 0,
-                        Availability = user.Availability
 
                     });
                     if (providerres.Succeeded)
