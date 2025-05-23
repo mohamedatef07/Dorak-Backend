@@ -1,13 +1,9 @@
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Models.Enums;
 using Services;
-using System.Data.Entity.Core.Common;
-using System.Threading.Tasks;
+
 
 namespace API.Controllers
 {

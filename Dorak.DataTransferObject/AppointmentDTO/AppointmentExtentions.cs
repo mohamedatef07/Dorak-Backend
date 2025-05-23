@@ -69,6 +69,7 @@ namespace Dorak.ViewModels
             {
                 AppointmentDate = reserveApointmentDTO.AppointmentDate,
                 AppointmentStatus = reserveApointmentDTO.AppointmentStatus,
+                AppointmentType = reserveApointmentDTO.AppointmentType,
                 CreatedAt = reserveApointmentDTO.CreatedAt,
                 UpdatedAt = reserveApointmentDTO.UpdatedAt,
                 ClientType = reserveApointmentDTO.clientType,

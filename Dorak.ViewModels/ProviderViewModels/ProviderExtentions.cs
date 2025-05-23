@@ -27,7 +27,6 @@ namespace Dorak.ViewModels
                 Country = viewModel.Country,
                 BirthDate = viewModel.BirthDate,
                 Image = viewModel.Image,
-                Availability = viewModel.Availability,
                 EstimatedDuration = viewModel.EstimatedDuration
             };
         }
@@ -51,7 +50,6 @@ namespace Dorak.ViewModels
                 Country = provider.Country,
                 BirthDate = provider.BirthDate,
                 Image = provider.Image,
-                Availability = provider.Availability,
                 EstimatedDuration = provider.EstimatedDuration
             };
         }
@@ -65,7 +63,6 @@ namespace Dorak.ViewModels
                 Specialization = provider.Specialization,
                 ExperienceYears = provider.ExperienceYears,
                 LicenseNumber = provider.LicenseNumber,
-                Availability = provider.Availability,
                 EstimatedDuration = provider.EstimatedDuration
             };
         }
@@ -79,7 +76,6 @@ namespace Dorak.ViewModels
                 Specialization = viewModel.Specialization,
                 ExperienceYears = viewModel.ExperienceYears,
                 LicenseNumber = viewModel.LicenseNumber,
-                Availability = viewModel.Availability,
                 EstimatedDuration = viewModel.EstimatedDuration
             };
         }

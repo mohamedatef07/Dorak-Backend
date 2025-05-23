@@ -5,13 +5,8 @@ using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
 using Repositories;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
 using Dorak.DataTransferObject;
-using System.Data.Entity.Core.Common;
-using Dorak.DataTransferObject.ProviderDTO;
-using System.Globalization;
+
 
 
 namespace Services
@@ -83,7 +78,6 @@ namespace Services
                 Country = provider.Country,
                 BirthDate = provider.BirthDate,
                 Image = provider.Image,
-                Availability = provider.Availability,
                 EstimatedDuration = provider.EstimatedDuration,
                 //AddDate = provider.AddDate,
                 Email = user?.Email,
@@ -189,7 +183,6 @@ namespace Services
                     LicenseNumber = model.LicenseNumber,
                     Bio = model.Bio,
                     EstimatedDuration = model.EstimatedDuration,
-                    Availability = model.Availability,
                     Specialization = model.Specialization,
                     Image = model.Image
                 };
@@ -266,36 +259,25 @@ namespace Services
         // manually
         public string AssignProviderToCenter(ProviderAssignmentViewModel model)
         {
-            // Log the input and server time for debugging
-            Console.WriteLine($"AssignProviderToCenter called at {DateTime.UtcNow} (Local: {DateTime.Now})");
-
-            // Log the raw model data as received
-            Console.WriteLine($"Raw Input - StartDate: {model.StartDate.ToString()}, EndDate: {(model.EndDate.HasValue ? model.EndDate.ToString() : "null")}, " +
-                             $"ProviderId: {model.ProviderId}, CenterId: {model.CenterId}");
-
             // Validate ProviderId
             if (string.IsNullOrEmpty(model.ProviderId) || !providerRepository.GetAll().Any(p => p.ProviderId == model.ProviderId))
             {
-                Console.WriteLine($"Validation failed: ProviderId {model.ProviderId} does not exist in Providers table.");
                 return "Invalid ProviderId: The specified provider does not exist.";
             }
 
             // Validate CenterId
             if (!centerRepository.GetAll().Any(c => c.CenterId == model.CenterId))
             {
-                Console.WriteLine($"Validation failed: CenterId {model.CenterId} does not exist in Centers table.");
                 return "Invalid CenterId: The specified center does not exist.";
             }
 
             // Log server time details
             DateTime utcNow = DateTime.UtcNow;
             DateOnly today = DateOnly.FromDateTime(utcNow.Date); // Normalize to midnight UTC
-            Console.WriteLine($"Server UTC Now: {utcNow}, Today (UTC): {today}, Parsed StartDate: {model.StartDate}");
 
             // Validation: Check if EndDate is before StartDate
             if (model.EndDate.HasValue && model.EndDate < model.StartDate)
             {
-                Console.WriteLine($"Validation failed: EndDate {model.EndDate} is before StartDate {model.StartDate}");
                 return "End date cannot be before start date.";
             }
 
@@ -305,7 +287,6 @@ namespace Services
                            pa.StartDate <= (model.EndDate ?? pa.StartDate) && (pa.EndDate ?? pa.StartDate) >= model.StartDate);
             if (overlappingAssignment)
             {
-                Console.WriteLine("Validation failed: Overlapping assignment found");
                 return "Provider is already assigned to this center for the specified date range.";
             }
 
@@ -324,18 +305,9 @@ namespace Services
             {
                 providerAssignmentRepository.Add(assignment);
                 commitData.SaveChanges();
-                Console.WriteLine($"Assignment saved successfully for ProviderId: {model.ProviderId}, CenterId: {model.CenterId}");
             }
             catch (Exception ex)
             {
-                // Log the full exception details, including inner exceptions
-                Console.WriteLine($"SaveChanges failed: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner Exception: {ex.InnerException.Message}");
-                    Console.WriteLine($"Inner Exception StackTrace: {ex.InnerException.StackTrace}");
-                }
-                Console.WriteLine($"StackTrace: {ex.StackTrace}");
                 return $"Failed to save assignment: {ex.Message}. Inner Exception: {ex.InnerException?.Message ?? "None"}";
             }
 
@@ -348,7 +320,6 @@ namespace Services
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"Failed to create shift for assignment: {ex.Message}, StackTrace: {ex.StackTrace}");
                     return $"Failed to create shift: {ex.Message}";
                 }
             }

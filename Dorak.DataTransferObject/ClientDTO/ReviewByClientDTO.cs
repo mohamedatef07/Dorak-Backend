@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dorak.DataTransferObject.ClientDTO
+namespace Dorak.DataTransferObject
 {
     public class ReviewByClientDTO
     {

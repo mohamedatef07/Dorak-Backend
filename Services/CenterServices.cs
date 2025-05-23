@@ -1,5 +1,5 @@
 ﻿using Data;
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using LinqKit;
@@ -250,7 +250,6 @@ namespace Services
                 Country = pa.Provider.Country,
                 BirthDate = pa.Provider.BirthDate,
                 Image = pa.Provider.Image,
-                Availability = pa.Provider.Availability,
                 EstimatedDuration = pa.Provider.EstimatedDuration,
                 AddDate = pa.StartDate,
                 Status = GetProviderStatus(pa.ProviderId),

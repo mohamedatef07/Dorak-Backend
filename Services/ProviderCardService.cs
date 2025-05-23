@@ -60,7 +60,7 @@ namespace Services
         {
             return context.Providers
                 .Include(p => p.ProviderCenterServices)
-                .Where(p => !p.IsDeleted && p.Availability.ToLower().Contains(day.ToLower()))
+                .Where(p => !p.IsDeleted)
                 .Select(p => p.ToCardView())
                 .ToList();
         }
