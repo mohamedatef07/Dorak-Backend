@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Repositories;
 using Models.Enums;
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject;
 
 
 namespace Services

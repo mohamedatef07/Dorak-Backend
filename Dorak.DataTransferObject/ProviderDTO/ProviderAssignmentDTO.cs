@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dorak.DataTransferObject.ProviderDTO
+namespace Dorak.DataTransferObject
 {
 
     public class WorkingDates
