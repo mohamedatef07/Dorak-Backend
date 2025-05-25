@@ -1,7 +1,5 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
-using Dorak.DataTransferObject.ClientDTO;
-using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +19,16 @@ namespace API.Controllers
         private readonly ProviderServices providerServices;
         private readonly ShiftServices shiftServices;
         private readonly AppointmentServices appointmentServices;
-        private readonly Review_Service reviewService;
-        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, Review_Service _reviewService)
+        private readonly ReviewServices reviewServices;
+        private readonly ClientServices clientServices;
+
+        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
             appointmentServices = _appointmentServices;
-            reviewService = _reviewService;
+            reviewServices = _reviewServices;
+            clientServices = _clientServices;
         }
         [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -240,7 +241,7 @@ namespace API.Controllers
                     ClientId = model.ClientId
                 };
 
-                var result = reviewService.CreateReview(review);
+                var result = reviewServices.CreateReview(review);
                 return Ok(new ApiResponse<string>
                 {
                     Message = result,
@@ -254,7 +255,7 @@ namespace API.Controllers
         [HttpGet("provider-reviews")]
         public IActionResult GetReviewsForProvider([FromQuery] string providerId)
         {
-            var reviews = reviewService.GetReviewsForProvider(providerId);
+            var reviews = reviewServices.GetReviewsForProvider(providerId);
             if (!reviews.Any())
             {
                 return NotFound(new ApiResponse<object>
@@ -277,7 +278,7 @@ namespace API.Controllers
             if (string.IsNullOrWhiteSpace(clientId))
                 return BadRequest(new ApiResponse<string> { Message = "Client ID is required", Status = 400 });
 
-            var reviews = reviewService.GetReviewsForClient(clientId);
+            var reviews = reviewServices.GetReviewsForClient(clientId);
 
             if (!reviews.Any())
                 return NotFound(new ApiResponse<string> { Message = "No reviews found for this client", Status = 404 });
@@ -290,15 +291,16 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("get-all-appointment/{userId}")]
-        public IActionResult GetAllAppointments(string userId)
+        [HttpGet("Profile-all-appointment/{userId}")]
+        public IActionResult ProfileAndAllAppointments(string userId)
         {
-            var AllAppointments = appointmentServices.GetAppointmentsByUserId(userId);
-            if (AllAppointments == null || !AllAppointments.Any())
+            var profile = clientServices.GetProfile(userId);
+            if (profile == null)
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "All Appointments retrived.", Data = AllAppointments });
+            return Ok(new ApiResponse<ClientProfileDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
         }
+
     }
 }

@@ -10,6 +10,7 @@ namespace Dorak.ViewModels
     public class ProviderViewModel
     {
         public string ProviderId { get; set; }
+        public int AssignmentId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Specialization { get; set; }
@@ -23,7 +24,10 @@ namespace Dorak.ViewModels
         public string Country { get; set; }
         public DateOnly BirthDate { get; set; }
         public string? Image { get; set; }
-        public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
+        public ProviderStatus Status { get; set; } = ProviderStatus.Offline;
+        public DateOnly? AddDate { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
     }
 }

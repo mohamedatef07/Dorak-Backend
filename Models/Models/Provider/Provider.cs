@@ -23,7 +23,6 @@ namespace Dorak.Models
         public string? Image { get; set; }
         public UserStatus? Status { get; set; } = UserStatus.none;
         public ProviderType providerType { get; set; }
-        public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
         public decimal Rate { get; set; } = 0;
         public bool IsDeleted { get; set; } = false;

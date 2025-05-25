@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Data;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -17,12 +18,15 @@ namespace Services
         public TemperoryClientRepository temperoryClientRepository;
         public AppointmentRepository appointmentRepository;
         public CommitData commitData;
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData)
+        private readonly AppointmentServices appointmentServices;
+
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
             appointmentRepository = _appointmentRepository;
             commitData = _commitData;
+            this.appointmentServices = appointmentServices;
         }
 
         public async Task<IdentityResult> CreateClient(string userId, ClientRegisterViewModel model)
@@ -63,5 +67,21 @@ namespace Services
             }
             return IdentityResult.Success;
         }
+
+        public ClientProfileDTO GetProfile(string userId)
+        {
+            var Client = clientRepository.GetById(c => c.ClientId == userId);
+            var clientProfile = new ClientProfileDTO()
+            {
+                ID = Client.ClientId,
+                Image = Client.Image,
+                Name = $"{Client.FirstName} {Client.LastName}",
+                Phone = Client.User.PhoneNumber,
+                Email = Client.User.Email,
+                Appointments = appointmentServices.GetAppointmentsByUserId(userId)
+            };
+            return clientProfile;
+        }
+
     }
 }

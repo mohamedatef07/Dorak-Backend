@@ -97,7 +97,7 @@ namespace API
             builder.Services.AddScoped(typeof(PaymentRepository));
             builder.Services.AddScoped(typeof(PaymentServices));
             builder.Services.AddScoped(typeof(ReviewRepository));
-            builder.Services.AddScoped(typeof(Review_Service));
+            builder.Services.AddScoped(typeof(ReviewServices));
             builder.Services.AddTransient<MailKitEmailSender>();
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -202,7 +202,7 @@ namespace API
                 pattern: "{controller=Home}/{action=index}");
 
 
-            RecurringJob.AddOrUpdate<Review_Service>(
+            RecurringJob.AddOrUpdate<ReviewServices>(
              "update-provider-ratings",
               service => service.UpdateAllProvidersAverageRating(),
                Cron.Monthly);
