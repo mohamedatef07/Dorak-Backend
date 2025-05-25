@@ -49,7 +49,10 @@ namespace Repositories
         {
             return GetAll().Where(a => a.ShiftId == ShiftId);
         }
-
+        public IQueryable<Appointment> GetByShiftId(int shiftId)
+        {
+            return Table.AsQueryable().Where(a => a.ShiftId == shiftId);
+        }
 
     }
 }

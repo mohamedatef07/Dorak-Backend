@@ -56,10 +56,10 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
            
-            Appointment createdAppointment;
-            createdAppointment = appointmentRepository.CreateAppoinment(app);
-
+            var createdAppointment=app;
             createdAppointment.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
+            appointmentRepository.CreateAppoinment(createdAppointment);
+
             commitData.SaveChanges();
 
             var queue = AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
@@ -275,8 +275,10 @@ namespace Services
 
         public TimeOnly CalculateEstimatedTime(int shiftId)
         {
-            var appointments = appointmentRepository.GetAll().Where(a=>a.ShiftId==shiftId);
+            var appointments = appointmentRepository.GetByShiftId(shiftId).ToList();
             int TotalDuration = 0;
+            Console.WriteLine(appointments.ToString());
+
             foreach (var appointment in appointments)
             {
                 TotalDuration += appointment.ProviderCenterService.Duration;
