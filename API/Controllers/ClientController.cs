@@ -211,28 +211,20 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("filter-by-day")]
-        public IActionResult FilterByDay([FromQuery] DateOnly date)
+        [HttpPost("filter")]
+        public IActionResult FilterDoctors([FromBody] FilterProviderDTO filter)
         {
-            var providers = providerServices.FilterByDay(date);
-
-            if (!providers.Any())
-            {
-                return NotFound(new ApiResponse<List<ProviderCardViewModel>>
-                {
-                    Message = "Day is required",
-                    Status = 400,
-                    Data = new List<ProviderCardViewModel>()
-                });
-            }
+            var result = providerServices.FilterProviders(filter);
 
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
-                Message = $"providers available on {date} retrieved successfully.",
                 Status = 200,
-                Data = providers
+                Message = "Filtered Successfully",
+                Data = result
             });
         }
+
+
 
         // Add new review
         [HttpPost("add-review")]
