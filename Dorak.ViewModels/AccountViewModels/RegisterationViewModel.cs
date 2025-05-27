@@ -59,7 +59,6 @@ namespace Dorak.ViewModels
         public int? ExperienceYears { get; set; }
         public ProviderType ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
-        public string? Availability { get; set; }
         public int? EstimatedDuration { get; set; }
         public decimal? Rate { get; set; }
 

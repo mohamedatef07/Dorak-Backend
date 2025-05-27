@@ -11,6 +11,7 @@ namespace Dorak.DataTransferObject
     {
         public DateOnly AppointmentDate { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
+        public AppointmentType AppointmentType { get; set; } = AppointmentType.Normal;
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public ClientType clientType { get; set; } = ClientType.Normal;

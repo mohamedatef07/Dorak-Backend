@@ -10,6 +10,8 @@ namespace Dorak.ViewModels
 
     public class ProviderCardViewModel
     {
+        public string id {  get; set; }
+        public string Image {  get; set; }  
         public string FullName { get; set; }
         public string Specialization { get; set; }
         public decimal Rate { get; set; }

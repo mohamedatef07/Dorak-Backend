@@ -58,10 +58,10 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
            
-            Appointment createdAppointment;
-            createdAppointment = appointmentRepository.CreateAppoinment(app);
+            Appointment createdAppointment = appointmentRepository.CreateAppoinment(app);
 
             createdAppointment.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
+
             commitData.SaveChanges();
 
             var queue = AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);

@@ -24,7 +24,6 @@ namespace Dorak.ViewModels
         public string Country { get; set; }
         public DateOnly BirthDate { get; set; }
         public string? Image { get; set; }
-        public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
         public ProviderStatus Status { get; set; } = ProviderStatus.Offline;
         public DateOnly? AddDate { get; set; }

@@ -1,5 +1,4 @@
 ﻿using Dorak.DataTransferObject;
-using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;

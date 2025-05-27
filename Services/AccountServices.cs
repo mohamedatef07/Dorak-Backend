@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
 using Repositories;
 using Models.Enums;
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject;
 
 
 namespace Services
@@ -97,7 +97,6 @@ namespace Services
                         Country = user.Country,
                         Image = user.Image,
                         EstimatedDuration = user.EstimatedDuration ?? 0,
-                        Availability = user.Availability
 
                     });
                     if (providerres.Succeeded)

@@ -1,8 +1,7 @@
 ﻿using Data;
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Dorak.ViewModels.CenterViewModel;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -167,7 +166,6 @@ namespace Services
                 Country = pa.Provider.Country,
                 BirthDate = pa.Provider.BirthDate,
                 Image = pa.Provider.Image,
-                Availability = pa.Provider.Availability,
                 EstimatedDuration = pa.Provider.EstimatedDuration,
                 AddDate = pa.StartDate,
                 Status = GetProviderStatus(pa.ProviderId),
@@ -201,7 +199,7 @@ namespace Services
                     FirstName = providerDto.FirstName,
                     LastName = providerDto.LastName,
                     Gender = providerDto.Gender,
-                    BirthDate = providerDto.BirthDate,
+                    BirthDate = (DateOnly)providerDto.BirthDate,
                     Street = providerDto.Street,
                     City = providerDto.City,
                     Governorate = providerDto.Governorate,

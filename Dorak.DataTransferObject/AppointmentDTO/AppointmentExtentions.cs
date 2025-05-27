@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dorak.DataTransferObject;
-using Dorak.DataTransferObject;
+
 using Dorak.Models;
 
 namespace Dorak.ViewModels
@@ -69,6 +69,7 @@ namespace Dorak.ViewModels
             {
                 AppointmentDate = reserveApointmentDTO.AppointmentDate,
                 AppointmentStatus = reserveApointmentDTO.AppointmentStatus,
+                AppointmentType = reserveApointmentDTO.AppointmentType,
                 CreatedAt = reserveApointmentDTO.CreatedAt,
                 UpdatedAt = reserveApointmentDTO.UpdatedAt,
                 ClientType = reserveApointmentDTO.clientType,

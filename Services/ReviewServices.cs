@@ -7,16 +7,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Data.Entity;
-using Dorak.DataTransferObject.ClientDTO;
+using Dorak.DataTransferObject;
 
 namespace Services
 {
-    public class Review_Service
+    public class ReviewServices
     {
         private readonly CommitData commitData;
         private readonly DorakContext context;
 
-        public Review_Service(CommitData _commitData, DorakContext _context)
+        public ReviewServices(CommitData _commitData, DorakContext _context)
         {
             commitData = _commitData;
             context = _context;
