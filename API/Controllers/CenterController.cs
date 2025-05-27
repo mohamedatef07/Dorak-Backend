@@ -23,7 +23,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("AddProviderAndAssignIt")]
-        public async Task<IActionResult> AddProviderAndAssignIt(ProviderAssignmentDTO providerDto)
+        public async Task<IActionResult> AddProviderAndAssignIt([FromForm]ProviderAssignmentDTO providerDto)
         {
 
             var res = await centerServices.GetProviderID(providerDto);

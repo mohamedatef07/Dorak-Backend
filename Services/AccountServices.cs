@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Repositories;
 using Models.Enums;
 using Dorak.DataTransferObject;
+using Microsoft.AspNetCore.Hosting;
 
 
 namespace Services
@@ -24,6 +25,7 @@ namespace Services
         public OperatorRepository operatorRepository;
         public AdminCenterManagement adminCenterManagement;
         private UserManager<User> userManager;
+        private readonly IWebHostEnvironment _env;
         private readonly IConfiguration configuration;
         public AccountServices(AccountRepository _AccountRepository,
                                ClientServices _clientServices,
@@ -32,7 +34,8 @@ namespace Services
                                ProviderRepository _ProviderRepository,
                                IConfiguration _configuration,
                                AdminCenterManagement _adminCenterManagement,
-                               UserManager<User> _userManager)
+                               UserManager<User> _userManager,
+                               IWebHostEnvironment env)
         {
             accountRepository = _AccountRepository;
             clientServices = _clientServices;
@@ -42,7 +45,36 @@ namespace Services
             configuration = _configuration;
             adminCenterManagement = _adminCenterManagement;
             userManager = _userManager;
+            _env = env;
         }
+
+
+
+        #region Helper
+        private async Task<string> SaveImageAsync(RegisterationViewModel user)
+        {
+            var currentUser = accountRepository.FindByUserName(user.UserName);
+            if (user.Image != null && user.Image.Length > 0)
+            {
+                var folderPath = Path.Combine(_env.WebRootPath, "image", $"{user.Role}", currentUser.Id.ToString());
+                Directory.CreateDirectory(folderPath);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(user.Image.FileName);
+                var fullPath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await user.Image.CopyToAsync(stream);
+                }
+
+                string ImagePath = $"/image/{user.Role}/{currentUser.Id}/{fileName}";
+
+                return ImagePath;
+
+            }
+            return null;
+        }
+        #endregion
 
         public async Task<string> getIdByUserName(string username)
         {
@@ -70,7 +102,7 @@ namespace Services
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Gender = user.Gender,
-                        Image = user.Image
+                        Image = await SaveImageAsync(user)
                     });
                     if (operarorres.Succeeded)
                     {
@@ -95,7 +127,7 @@ namespace Services
                         City = user.City,
                         Governorate = user.Governorate,
                         Country = user.Country,
-                        Image = user.Image,
+                        Image = await SaveImageAsync(user),
                         EstimatedDuration = user.EstimatedDuration ?? 0,
 
                     });
@@ -116,7 +148,7 @@ namespace Services
                         City = user.City,
                         Governorate = user.Governorate,
                         Country = user.Country,
-                        Image = user.Image
+                        Image = await SaveImageAsync(user)
                     });
                     if (clientRes.Succeeded)
                     {

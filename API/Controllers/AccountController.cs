@@ -38,7 +38,7 @@ namespace API.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterationViewModel user)
+        public async Task<IActionResult> Register([FromForm]RegisterationViewModel user)
         {
             if (!ModelState.IsValid)
             {
