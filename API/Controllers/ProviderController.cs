@@ -5,6 +5,7 @@ using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Repositories;
 using Services;
 
 namespace API.Controllers
@@ -51,6 +52,41 @@ namespace API.Controllers
             {
                 Console.WriteLine($"Error in GetProviderById: {ex.Message} - StackTrace: {ex.StackTrace}");
                 return StatusCode(500, new ApiResponse<ProviderViewModel> { Message = "Internal server error", Status = 500 });
+            }
+        }
+
+        [HttpGet("{providerId}/assignments")]
+        public IActionResult GetProviderAssignments(string providerId, int centerId)
+        {
+            try
+            {
+                var assignments = providerServices.GetProviderAssignments(providerId, centerId);
+
+                if (!assignments.Any())
+                {
+                    return NotFound(new ApiResponse<object[]>
+                    {
+                        Message = "No assignments found for the given criteria.",
+                        Status = 404
+                    });
+                }
+
+                Console.WriteLine($"Assignments retrieved: {System.Text.Json.JsonSerializer.Serialize(assignments)}");
+                return Ok(new ApiResponse<object[]>
+                {
+                    Message = "Assignments retrieved successfully",
+                    Status = 200,
+                    Data = assignments.ToArray()
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetProviderAssignments: {ex.Message} - StackTrace: {ex.StackTrace}");
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Message = "Internal server error",
+                    Status = 500
+                });
             }
         }
 

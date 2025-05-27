@@ -14,7 +14,7 @@ namespace Dorak.ViewModels
         public DateOnly? StartDate { get; set; }
         public DateOnly? EndDate { get; set; }
         public AssignmentType AssignmentType { get; set; }
-        public List<ShiftViewModel>? Shifts { get; set; }
+        public List<ShiftViewModel> Shifts { get; set; }
 
     }
 }

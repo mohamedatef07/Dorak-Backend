@@ -25,8 +25,8 @@ namespace Dorak.DataTransferObject.ProviderDTO
         public string Role { get; set; } = "Provider";
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public string? Gender { get; set; }
-        public DateOnly? BirthDate { get; set; }
+        public GenderType Gender { get; set; }
+        public DateOnly BirthDate { get; set; }
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }
