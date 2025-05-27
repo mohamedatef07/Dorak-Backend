@@ -21,37 +21,20 @@ namespace API.Controllers
             providerServices = _providerServices;
         }
 
+        
         [HttpPost]
         [Route("AddProviderAndAssignIt")]
-        public async Task<IActionResult> AddProviderAndAssignIt([FromForm]ProviderAssignmentDTO providerDto)
+        public async Task<IActionResult> AddProviderAndAssignIt([FromBody] RegisterationViewModel provider)
         {
-
-            var res = await centerServices.GetProviderID(providerDto);
+            var res = await centerServices.AddProviderAsync(provider);
             return Ok(new ApiResponse<string>
-
             {
                 Data = res,
                 Message = "Success",
                 Status = 200
             });
-
-
         }
 
-
-        //[HttpGet]
-        //[Route("AllProviders")]
-        //public IActionResult AllProvider(int CenterId)
-        //{
-
-        //    var res = centerServices.GetProvidersOfCenter(CenterId);
-        //    return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>>
-        //    {
-        //        Data = res,
-        //        Message = "Success",
-        //        Status = 200
-        //    });
-        //}
 
         [HttpGet]
         [Route("AllProviders")]
@@ -83,15 +66,13 @@ namespace API.Controllers
             });
         }
 
-
-
         [HttpGet]
         [Route("SearchProvider")]
-        public IActionResult SearchProvider(string searchText = "", int pageNumber = 1, int pageSize = 9, string sortBy = "", string specializationFilter = "")
+        public IActionResult SearchProvider(string searchText = "", int pageNumber = 1, int pageSize = 9, string sortBy = "", string specializationFilter = "", int centerId = 0)
         {
             try
             {
-                var res = centerServices.ProviderSearch(searchText, pageNumber, pageSize, specializationFilter);
+                var res = centerServices.ProviderSearch(searchText, pageNumber, pageSize, specializationFilter, centerId);
                 return Ok(new ApiResponse<PaginationViewModel<ProviderViewModel>> { Data = res, Message = "Success", Status = 200 });
             }
             catch (Exception ex)
@@ -117,7 +98,7 @@ namespace API.Controllers
             });
         }
 
-        [Authorize(Roles = "Admin, Operator")]
+        // [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("AssignProviderToCenterWeekly")]
         public IActionResult AssignWeekly([FromBody] WeeklyProviderAssignmentViewModel model)
