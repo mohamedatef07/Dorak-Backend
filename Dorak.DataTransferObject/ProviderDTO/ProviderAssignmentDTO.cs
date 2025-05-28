@@ -1,4 +1,5 @@
-﻿using Models.Enums;
+﻿using Microsoft.AspNetCore.Http;
+using Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -26,12 +27,12 @@ namespace Dorak.DataTransferObject
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public GenderType Gender { get; set; }
-        public DateOnly? BirthDate { get; set; }
+        public DateOnly BirthDate { get; set; }
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? Governorate { get; set; }
         public string? Country { get; set; }
-        public string? Image { get; set; }
+        public IFormFile? Image { get; set; }
         public string? Specialization { get; set; }
         public string? LicenseNumber { get; set; }
         public AssignmentType AssignmentType { get; set; }
