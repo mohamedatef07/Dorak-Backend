@@ -60,17 +60,16 @@ namespace API.Controllers
             {
                 var assignments = providerServices.GetProviderAssignments(providerId, centerId);
 
-                if (!assignments.Any())
+                if (!assignments.Any() || assignments == null)
                 {
-                    return NotFound(new ApiResponse<object[]>
+                    return NotFound(new ApiResponse<object>
                     {
                         Message = "No assignments found for the given criteria.",
                         Status = 404
                     });
                 }
 
-                Console.WriteLine($"Assignments retrieved: {System.Text.Json.JsonSerializer.Serialize(assignments)}");
-                return Ok(new ApiResponse<object[]>
+                return Ok(new ApiResponse<object>
                 {
                     Message = "Assignments retrieved successfully",
                     Status = 200,
@@ -79,66 +78,29 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetProviderAssignments: {ex.Message} - StackTrace: {ex.StackTrace}");
-                return StatusCode(500, new ApiResponse<string>
+                return StatusCode(500, new ApiResponse<object>
                 {
                     Message = "Internal server error",
                     Status = 500
                 });
             }
         }
-
-        [HttpGet("{providerId}/assignments")]
-        public IActionResult GetProviderAssignments(string providerId, int centerId)
-        {
-            try
-            {
-                var assignments = providerServices.GetProviderAssignments(providerId, centerId);
-
-                if (!assignments.Any())
-                {
-                    return NotFound(new ApiResponse<object[]>
-                    {
-                        Message = "No assignments found for the given criteria.",
-                        Status = 404
-                    });
-                }
-
-                Console.WriteLine($"Assignments retrieved: {System.Text.Json.JsonSerializer.Serialize(assignments)}");
-                return Ok(new ApiResponse<object[]>
-                {
-                    Message = "Assignments retrieved successfully",
-                    Status = 200,
-                    Data = assignments.ToArray()
-                });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetProviderAssignments: {ex.Message} - StackTrace: {ex.StackTrace}");
-                return StatusCode(500, new ApiResponse<string>
-                {
-                    Message = "Internal server error",
-                    Status = 500
-                });
-            }
-        }
-
         [HttpGet("schedule-details")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Provider ID is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderScheduleDetailsDTO> scheduleDetails = providerServices.GetScheduleDetails(provider);
             if (scheduleDetails == null || !scheduleDetails.Any())
             {
-                return NotFound(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider schedule details not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider schedule details not found", Status = 404 });
             }
             return Ok(new ApiResponse<List<GetProviderScheduleDetailsDTO>>
             {
@@ -174,27 +136,37 @@ namespace API.Controllers
         public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string> { Message = "Invalid data", Status = 400 });
-
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
+            }
             var result = await providerServices.UpdateDoctorProfile(model);
 
-            return Ok(new ApiResponse<string>
+            return Ok(new ApiResponse<object>
             {
                 Message = result,
                 Status = 200,
-                Data = result
             });
         }
         [HttpPut("update-professional-info")]
         public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
         {
-            var result = providerServices.UpdateProfessionalInfo(model);
-
-            return Ok(new ApiResponse<string>
+            if (!ModelState.IsValid)
             {
-                Message = result,
+                return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
+            }
+            var result = providerServices.UpdateProfessionalInfo(model);
+            if(result == false)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Message = "Provider not found",
+                    Status= 404,
+                });
+            }
+            return Ok(new ApiResponse<object>
+            {
+                Message = "Updated professional info successfuly",
                 Status = 200,
-                Data = result
             });
         }
         [HttpGet("Queue-Entries")]
@@ -202,17 +174,17 @@ namespace API.Controllers
         {
             if (string.IsNullOrEmpty(providerId))
             {
-                return BadRequest(new ApiResponse<GetQueueEntriesDTO> { Message = "Provider Id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<List<GetQueueEntriesDTO>> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
             }
             List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
             if (queueEntries == null || !queueEntries.Any())
             {
-                return NotFound(new ApiResponse<List<GetQueueEntriesDTO>> { Message = "Queue entries not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
             }
             return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
             {
@@ -220,10 +192,6 @@ namespace API.Controllers
                 Status = 200,
                 Data = queueEntries
             });
-
         }
-
-
-
     }
 }
