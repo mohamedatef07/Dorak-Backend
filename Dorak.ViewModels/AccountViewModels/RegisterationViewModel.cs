@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Models.Enums;
 
 namespace Dorak.ViewModels
@@ -50,7 +51,7 @@ namespace Dorak.ViewModels
         public string? City { get; set; }
         public string? Governorate { get; set; }
         public string? Country { get; set; }
-        public string? Image { get; set; }
+        public IFormFile? Image { get; set; }
 
 
         // From ProviderRegisterViewModel
