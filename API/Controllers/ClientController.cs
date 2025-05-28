@@ -11,7 +11,7 @@ using Services;
 
 namespace API.Controllers
 {
-    //[Authorize(Roles ="Client")]
+    [Authorize(Roles ="Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -113,7 +113,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
-            return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully", Data = appointment });
+            return Ok(new ApiResponse<object> { Status = 200, Message = "Appointment reserved successfully" });
         }
 
         [HttpPost("Checkout")]
@@ -299,7 +299,7 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("Profile-all-appointment/{userId}")]
+        [HttpGet("profile-all-appointment/{userId}")]
         public IActionResult ProfileAndAllAppointments(string userId)
         {
             var profile = clientServices.GetProfile(userId);

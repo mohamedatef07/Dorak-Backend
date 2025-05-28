@@ -48,12 +48,11 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetProviderById: {ex.Message} - StackTrace: {ex.StackTrace}");
                 return StatusCode(500, new ApiResponse<ProviderViewModel> { Message = "Internal server error", Status = 500 });
             }
         }
 
-        [HttpGet("ScheduleDetails")]
+        [HttpGet("schedule-details")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
@@ -77,7 +76,7 @@ namespace API.Controllers
                 Data = scheduleDetails
             });
         }
-        [HttpGet("ShiftDetails")]
+        [HttpGet("shift-details")]
         public IActionResult ShiftDetails([FromQuery] int shiftId)
         {
             if (shiftId <= 0)
