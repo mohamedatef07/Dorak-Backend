@@ -170,7 +170,6 @@ namespace Services
                     {
                         // Proceed to cancel the appointment
                         await CancelAppointment(appointment.AppointmentId);
-                        Console.WriteLine($"Appointment {appointment.AppointmentId} canceled due to non-payment.");
                     }
                     catch (Exception ex)
                     {
