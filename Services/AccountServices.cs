@@ -39,7 +39,6 @@ namespace Services
                                IConfiguration _configuration,
                                AdminCenterManagement _adminCenterManagement,
                                CommitData _commitData,
-                               UserManager<User> _userManager)
                                UserManager<User> _userManager,
                                IWebHostEnvironment env)
         {
@@ -113,8 +112,6 @@ namespace Services
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        Gender = Genders.FirstOrDefault(e => string.Equals(e.ToString(), user.Gender.ToString(), StringComparison.OrdinalIgnoreCase)),
-                        Image = user.Image
                         Gender = user.Gender,
                         Image = await SaveImageAsync(user)
                     });
