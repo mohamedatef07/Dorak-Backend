@@ -58,7 +58,7 @@ namespace Dorak.ViewModels
         public string? Specialization { get; set; }
         public string? Bio { get; set; }
         public int? ExperienceYears { get; set; }
-        public ProviderType ProviderType { get; set; }
+        public ProviderType? ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
         public int? EstimatedDuration { get; set; }
         public decimal? Rate { get; set; }
@@ -66,5 +66,8 @@ namespace Dorak.ViewModels
 
         // From AdminCenterViewModel
         // FirstName, LastName, Gender, and Image are already included above.
+
+        // From Operator
+        public int? CenterId { get;set; }
     }
 }

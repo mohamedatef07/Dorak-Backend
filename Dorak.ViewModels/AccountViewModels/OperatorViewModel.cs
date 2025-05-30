@@ -16,5 +16,7 @@ namespace Dorak.ViewModels
         [Required(ErrorMessage = "This field is required")]
         public GenderType Gender { get; set; }
         public string? Image { get; set; }
+        public int? CenterId { get; set; }
+
     }
 }

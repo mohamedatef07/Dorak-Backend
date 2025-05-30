@@ -27,6 +27,11 @@ namespace Dorak.Models
                 .HasForeignKey(provderAssignment => provderAssignment.CenterId)
                  .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasMany(center => center.Operators)
+                .WithOne(o => o.Center)
+                .HasForeignKey(o => o.CenterId)
+                .OnDelete(DeleteBehavior.NoAction);
+
             //Properties
             builder.Property(center => center.CenterName)
                 .HasMaxLength(50)

@@ -17,9 +17,10 @@ namespace Dorak.Models
         public decimal? Longitude { get; set; }
         public string MapURL { get; set; }
         public bool IsDeleted { get; set; }
-        public CenterStatus CenterStatus { get; set; }
+        public virtual CenterStatus CenterStatus { get; set; }
         public virtual ICollection<AdminCenterManagement> AdminCentersManagement { get; set; }
         public virtual ICollection<ProviderCenterService> ProviderCenterServices { get; set; }
         public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
+        public virtual ICollection<Operator> Operators { get; set; }
     }
 }
