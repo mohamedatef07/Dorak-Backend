@@ -1,4 +1,5 @@
 using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.OperatorDTO;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,28 @@ namespace API.Controllers
             });
         }
 
+        [HttpGet]
+        [Route("OperatorstoCenter")]
+        public IActionResult GetOperators(int centerId)
+        {
+            var operators = operatorServices.GetOperatorsByCenterId(centerId);
+
+            if (operators == null || !operators.Any())
+            {
+                return Ok(new ApiResponse<List<OperatorDTO>>
+                {
+                    Status = 404,
+                    Message = "No Operators Found"
+                });
+            }
+
+            return Ok(new ApiResponse<List<OperatorDTO>>
+            {
+                Status = 200,
+                Message = "Operators retrieved successfully",
+                Data = operators.OperatorToOperatorDTO()
+            });
+        }
 
         [HttpGet]
         [Route("AllProviders")]

@@ -42,13 +42,16 @@ namespace Services
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Gender = model.Gender,
-                Image = model.Image
+                Image = model.Image,
+                CenterId = model.CenterId,
+                IsDeleted = false
             };
 
             operatorRepository.Add(_operator);
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
+
         public bool SoftDelete(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
@@ -262,6 +265,11 @@ namespace Services
             commitData.SaveChanges();
 
             return "Queue status updated successfully";
+        }
+
+        public List<Operator> GetOperatorsByCenterId(int centerId)
+        {
+            return operatorRepository.GetAll().Where(o => o.CenterId == centerId).ToList();
         }
     }
 }

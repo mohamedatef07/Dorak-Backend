@@ -89,7 +89,7 @@ namespace Services
         }
 
         public async Task<IdentityResult> CreateAccount(RegisterationViewModel user)
-        {
+          {
             var userRes = await accountRepository.Register(user);
 
             //Converting the Enums into Lists:
@@ -113,7 +113,8 @@ namespace Services
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Gender = user.Gender,
-                        Image = await SaveImageAsync(user)
+                        Image = await SaveImageAsync(user),
+                        CenterId = user.CenterId
                     });
                     if (operarorres.Succeeded)
                     {
