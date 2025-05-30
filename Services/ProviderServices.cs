@@ -817,11 +817,11 @@ namespace Services
 
         }
 
-        public string UpdateProfessionalInfo(UpdateProviderProfessionalInfoDTO model)
+        public bool UpdateProfessionalInfo(UpdateProviderProfessionalInfoDTO model)
         {
             var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
             if (provider == null)
-                return "Provider not found.";
+                return false;
 
             provider.Specialization = model.Specialization;
             provider.ExperienceYears = model.ExperienceYears;
@@ -831,7 +831,7 @@ namespace Services
             providerRepository.Edit(provider);
             commitData.SaveChanges();
 
-            return "Professional info updated successfully.";
+            return true;
         }
 
 
@@ -843,7 +843,7 @@ namespace Services
                 {
                     id=p.ProviderId,
                     Image = p.Image,
-                    FullName = p.FirstName + " " + p.LastName,
+                    FullName = $"{p.FirstName} {p.LastName}",
                     Specialization = p.Specialization,
                     City = p.City,
                     Rate = p.Rate,
