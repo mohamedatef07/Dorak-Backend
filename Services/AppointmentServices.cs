@@ -38,7 +38,6 @@ namespace Services
 
         public Appointment ReserveAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
-            // Validate appointment details
             if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
 
