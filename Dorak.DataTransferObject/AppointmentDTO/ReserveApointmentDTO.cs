@@ -16,6 +16,7 @@ namespace Dorak.DataTransferObject
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public ClientType clientType { get; set; } = ClientType.Normal;
         public decimal Fees { get; set; }
+        public decimal AdditionalFees { get; set; } = 0;
         public string? OperatorId { get; set; }
         public string? ProviderId { get; set; }
         public int? CenterId { get; set; }
@@ -23,5 +24,8 @@ namespace Dorak.DataTransferObject
         public int ShiftId { get; set; }
         public string? UserId { get; set; }
         public int? TemporaryClientId { get; set; }
+        public string? ContactInfo { get; set; } 
+        public string? FirstName { get; set; } 
+        public string? LastName { get; set; }  
     }
 }

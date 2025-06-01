@@ -11,10 +11,12 @@ namespace API.Controllers
     public class OperatorController : ControllerBase
     {
         private readonly OperatorServices operatorServices;
+        private readonly AppointmentServices appointmentServices;
 
-        public OperatorController(OperatorServices _operatorServices) 
+        public OperatorController(OperatorServices _operatorServices,AppointmentServices _appointmentServices) 
         {
             operatorServices = _operatorServices;
+            appointmentServices = _appointmentServices;
         }
 
         [HttpGet("GetAll")]
@@ -70,5 +72,47 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Failed to End Shift." });
         }
+
+        [HttpPost("reserve-appointment")]
+        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Status = 400,
+                    Message = "Invalid appointment data"
+                });
+            }
+            try
+            {
+                var appointment = operatorServices.CreateAppointment(reserveApointmentDTO);
+
+                return Ok(new ApiResponse<object>
+                {
+                    Status = 200,
+                    Message = "Appointment reserved successfully",
+                    Data = appointment
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Status = 400,
+                    Message = ex.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Status = 500,
+                    Message = "An error occurred while reserving the appointment",
+                    Data = ex.Message 
+                });
+            }
+        }
+
     }
 }
