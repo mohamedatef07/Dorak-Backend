@@ -36,7 +36,7 @@ namespace Services
                         FullName = $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
                         ArrivalTime = liveQueue.ArrivalTime,
                         AppointmentDate = appointment.AppointmentDate,
-                        Type = appointment.ClientType,
+                        ClientType = appointment.ClientType,
                         Status = liveQueue.AppointmentStatus,
                         PhoneNumber = appointment.TemporaryClient.ContactInfo,
                         CurrentQueuePosition = liveQueue.CurrentQueuePosition
@@ -50,7 +50,7 @@ namespace Services
                         FullName = $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}",
                         ArrivalTime = liveQueue.ArrivalTime,
                         AppointmentDate = appointment.AppointmentDate,
-                        Type = appointment.ClientType,
+                        ClientType = appointment.ClientType,
                         Status = liveQueue.AppointmentStatus,
                         PhoneNumber = appointment.User.PhoneNumber,
                         CurrentQueuePosition = liveQueue.CurrentQueuePosition

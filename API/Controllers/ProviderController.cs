@@ -169,8 +169,8 @@ namespace API.Controllers
                 Status = 200,
             });
         }
-        [HttpGet("Queue-Entries")]
-        public IActionResult QueueEntries(string providerId)
+        [HttpGet("queue-entries")]
+        public IActionResult GetQueueEntries([FromQuery]string providerId)
         {
             if (string.IsNullOrEmpty(providerId))
             {
