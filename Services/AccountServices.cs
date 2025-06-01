@@ -92,11 +92,6 @@ namespace Services
           {
             var userRes = await accountRepository.Register(user);
 
-            //Converting the Enums into Lists:
-            List<GenderType> Genders = Enum.GetValues(typeof(GenderType)).Cast<GenderType>().ToList();
-            List<UserStatus> statuses = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().ToList();
-            List<ProviderType> ProviderTypes = Enum.GetValues(typeof(ProviderType)).Cast<ProviderType>().ToList();
-
             if (userRes.Succeeded)
             {
                 // Our Roles:
@@ -131,10 +126,10 @@ namespace Services
                         Specialization = user.Specialization,
                         Bio = user.Bio,
                         ExperienceYears = user.ExperienceYears,
-                        ProviderType = ProviderTypes.FirstOrDefault(p => string.Equals(p.ToString(), user.ProviderType.ToString(), StringComparison.OrdinalIgnoreCase)),
+                        ProviderType = user.ProviderType,
                         LicenseNumber = user.LicenseNumber,
-                        Gender = Genders.FirstOrDefault(e => string.Equals(e.ToString(), user.Gender.ToString(), StringComparison.OrdinalIgnoreCase)),
-                        BirthDate = user.BirthDate != default(DateOnly) ? user.BirthDate : DateOnly.FromDateTime(DateTime.MinValue),
+                        Gender = user.Gender,
+                        BirthDate = user.BirthDate,
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,
@@ -154,8 +149,8 @@ namespace Services
                     {
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        BirthDate = user.BirthDate != default(DateOnly) ? user.BirthDate : DateOnly.FromDateTime(DateTime.MinValue),
-                        Gender = Genders.FirstOrDefault(e => string.Equals(e.ToString(), user.Gender.ToString(), StringComparison.OrdinalIgnoreCase)),
+                        BirthDate = user.BirthDate,
+                        Gender = user.Gender,
                         Street = user.Street,
                         City = user.City,
                         Governorate = user.Governorate,

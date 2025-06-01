@@ -80,7 +80,23 @@ namespace Dorak.ViewModels
                 TemporaryClientId = reserveApointmentDTO.TemporaryClientId ?? null
             };
         }
-        
+        public static Appointment ToAppointmentFromDTO(this ReserveApointmentDTO dto)
+        {
+            return new Appointment
+            {
+                AppointmentDate = dto.AppointmentDate,
+                AppointmentStatus = dto.AppointmentStatus,
+                AppointmentType = dto.AppointmentType,
+                CreatedAt = dto.CreatedAt,
+                UpdatedAt = dto.UpdatedAt,
+                ClientType = dto.clientType,
+                Fees = dto.Fees,
+                AdditionalFees = dto.AdditionalFees,
+                OperatorId = dto.OperatorId,
+                ShiftId = dto.ShiftId
+            };
+        }
+
         public static AppointmentForClientProfileDTO AppointmentToAppointmentForClientProfileDTO(this Appointment appointment)
         {
 
