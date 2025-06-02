@@ -20,8 +20,6 @@ namespace Dorak.ViewModels
                 LastName = appointment.User.Client.LastName,
                 AppointmentDate = appointment.AppointmentDate,
                 AppointmentStatus = appointment.AppointmentStatus,
-                CreatedAt = appointment.CreatedAt,
-                UpdatedAt = appointment.UpdatedAt,
                 clientType = appointment.ClientType,
                 Fees = appointment.Fees,
                 AdditionalFees = appointment.AdditionalFees,
@@ -35,7 +33,10 @@ namespace Dorak.ViewModels
                 ServiceId = appointment.ProviderCenterService.ServiceId,
                 ShiftId = appointment.ShiftId,
                 UserId = appointment.UserId,
-                TemporaryClientId = appointment.TemporaryClientId
+                TemporaryClientId = appointment.TemporaryClientId,
+                ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName} {appointment.ProviderCenterService.Provider.LastName}",
+                Rate = appointment.ProviderCenterService.Provider.Rate,
+                Specialization = appointment.ProviderCenterService.Provider.Specialization
 
             };
         }
@@ -48,8 +49,7 @@ namespace Dorak.ViewModels
                 AppointmentId = appointmentDTO.appointmentId,
                 AppointmentDate = appointmentDTO.AppointmentDate,
                 AppointmentStatus = appointmentDTO.AppointmentStatus,
-                CreatedAt = appointmentDTO.CreatedAt,
-                UpdatedAt = appointmentDTO.UpdatedAt,
+
                 ClientType = appointmentDTO.clientType,
                 Fees = appointmentDTO.Fees,
                 AdditionalFees = appointmentDTO.AdditionalFees,
@@ -60,7 +60,7 @@ namespace Dorak.ViewModels
                 OperatorId = appointmentDTO.OperatorId,
                 ShiftId = appointmentDTO.ShiftId,
                 UserId = appointmentDTO.UserId,
-                TemporaryClientId = appointmentDTO.TemporaryClientId ?? null
+                TemporaryClientId = appointmentDTO.TemporaryClientId ?? null,
             };
         }
         public static Appointment reserveApointmentDTOToAppointment(this ReserveApointmentDTO reserveApointmentDTO)
