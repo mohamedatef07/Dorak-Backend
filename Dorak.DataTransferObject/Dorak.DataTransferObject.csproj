@@ -10,4 +10,8 @@
     <ProjectReference Include="..\Models\Dorak.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="WalletDTO\" />
+  </ItemGroup>
+
 </Project>

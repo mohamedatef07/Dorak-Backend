@@ -175,7 +175,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
+            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
         }
 
         [HttpGet("cards")]
@@ -299,10 +299,24 @@ namespace API.Controllers
             var profile = clientServices.GetProfile(userId);
             if (profile == null)
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
+                return Ok(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
             }
             return Ok(new ApiResponse<ClientProfileDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
         }
+
+
+
+        [HttpGet("client-wallet/{userId}")]
+        public IActionResult ClientWalletAndProfile(string userId)
+        {
+            var clientWalletProfileDTO = clientServices.GetClientWalletAndProfile(userId);
+            if (clientWalletProfileDTO == null)
+            {
+                return Ok(new ApiResponse<object> { Status = 404, Message = "No found wallet" });
+            }
+            return Ok(new ApiResponse<ClientWalletAndProfileDTO> { Status = 200, Message = "wallet Retrive", Data = clientWalletProfileDTO });
+        }
+
 
     }
 }
