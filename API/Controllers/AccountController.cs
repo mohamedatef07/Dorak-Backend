@@ -233,7 +233,7 @@ namespace API.Controllers
         //change password
         [Authorize]
         [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDTO model)
         {
             if (!ModelState.IsValid)
             {

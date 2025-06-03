@@ -151,7 +151,7 @@ namespace API.Controllers
 
         [Authorize(Roles = "Provider")]
         [HttpPut("update-professional-info")]
-        public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
+        public IActionResult UpdateProfessionalInfo([FromForm] UpdateProviderProfessionalInfoDTO model)
         {
             if (!ModelState.IsValid)
             {
