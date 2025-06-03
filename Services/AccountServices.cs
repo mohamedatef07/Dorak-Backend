@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using Data;
 using Dorak.DataTransferObject;
 using Microsoft.AspNetCore.Hosting;
+using Dorak.DataTransferObject.AccountDTO;
 
 
 
@@ -276,9 +277,9 @@ namespace Services
             return await userManager.GetRolesAsync(user);
         }
 
-        public async Task<string> ChangePasswordAsync(ChangePasswordDTO model)
+        public async Task<string> ChangePasswordAsync(string userId, ChangePasswordDTO model)
         {
-            var user = await userManager.FindByIdAsync(model.UserId);
+            var user = await userManager.FindByIdAsync(userId);
             if (user == null)
                 return "User not found.";
 
@@ -291,11 +292,12 @@ namespace Services
 
             if (model.LogoutAllDevices)
             {
-                await userManager.UpdateSecurityStampAsync(user);
+                await userManager.UpdateSecurityStampAsync(user); // ⛔ Logs out all other sessions
             }
 
             return "Password changed successfully.";
         }
+
 
         private string GenetrateRefreshToken()
         {
