@@ -1,4 +1,6 @@
-﻿using Dorak.DataTransferObject;
+﻿using System.Security.Claims;
+using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
@@ -132,21 +134,22 @@ namespace API.Controllers
                 Data = shiftDetails
             });
         }
-        [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
-            }
-            var result = await providerServices.UpdateDoctorProfile(model);
 
-            return Ok(new ApiResponse<object>
-            {
-                Message = result,
-                Status = 200,
-            });
+        [Authorize(Roles = "Provider")]
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateProviderProfileDTO model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized("User not authorized.");
+
+            var result = await providerServices.UpdateDoctorProfile(userId, model);
+            return Ok(new { message = result });
         }
+
+
+        [Authorize(Roles = "Provider")]
         [HttpPut("update-professional-info")]
         public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
         {
@@ -154,21 +157,33 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
             }
-            var result = providerServices.UpdateProfessionalInfo(model);
-            if(result == false)
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "Unauthorized", Status = 401 });
+            }
+
+            var result = providerServices.UpdateProfessionalInfo(userId, model);
+
+            if (!result)
             {
                 return NotFound(new ApiResponse<object>
                 {
                     Message = "Provider not found",
-                    Status= 404,
+                    Status = 404,
                 });
             }
+
             return Ok(new ApiResponse<object>
             {
-                Message = "Updated professional info successfuly",
+                Message = "Updated professional info successfully",
                 Status = 200,
             });
         }
+
+
         [HttpGet("Queue-Entries")]
         public IActionResult QueueEntries(string providerId)
         {
@@ -193,5 +208,42 @@ namespace API.Controllers
                 Data = queueEntries
             });
         }
+
+        [HttpGet("ProviderProfile")]
+        [Authorize(Roles = "Provider")] 
+        public IActionResult GetMyProviderProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "User ID is required",
+                    Status = 400,
+                    Data = null
+                });
+            }
+
+            var profile = providerServices.GetProviderProfile(userId);
+
+            if (profile == null)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Message = "Provider not found",
+                    Status = 404,
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<ProviderProfileDTO>
+            {
+                Message = "Provider profile retrieved successfully",
+                Status = 200,
+                Data = profile
+            });
+        }
+
     }
 }
