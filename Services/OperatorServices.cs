@@ -26,9 +26,10 @@ namespace Services
         private readonly AppointmentServices appointmentServices;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly TemperoryClientRepository temperoryClientRepository;
+        private UserManager<User> userManager;
 
         public CommitData commitData;
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository, UserManager<User> _userManager)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -41,6 +42,7 @@ namespace Services
             providerCenterServiceRepository = _providerCenterServiceRepository;
             temperoryClientRepository = _temperoryClientRepository;
             accountRepository = _accountRepository;
+            userManager = _userManager;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -59,6 +61,28 @@ namespace Services
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
+        public async Task<bool> DeleteOperator(string operatorId)
+        {
+            var selectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (selectedOperator == null)
+                return false;
+
+            operatorRepository.Delete(selectedOperator);
+
+            var selectedUser = await userManager.FindByIdAsync(operatorId);
+            if (selectedUser != null)
+            {
+                var result = await userManager.DeleteAsync(selectedUser);
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+            }
+            commitData.SaveChanges();
+            return true;
+        }
+
 
         public bool SoftDelete(string operatorId)
         {
