@@ -292,7 +292,7 @@ namespace Services
 
             if (model.LogoutAllDevices)
             {
-                await userManager.UpdateSecurityStampAsync(user); // ⛔ Logs out all other sessions
+                await userManager.UpdateSecurityStampAsync(user);
             }
 
             return "Password changed successfully.";
