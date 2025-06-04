@@ -7,6 +7,8 @@ using Models.Enums;
 using Repositories;
 using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ProviderDTO;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 
 
@@ -25,6 +27,8 @@ namespace Services
         public UserManager<User> userManager;
         public CommitData commitData;
         private readonly DorakContext context;
+        private readonly IWebHostEnvironment _env;
+
 
 
 
@@ -38,7 +42,8 @@ namespace Services
             UserManager<User> _userManager,
             CommitData _commitData,
             ServicesRepository _servicesRepository,
-            DorakContext _context
+            DorakContext _context,
+            IWebHostEnvironment env
             )
 
         {
@@ -52,6 +57,8 @@ namespace Services
             commitData = _commitData;
             servicesRepository = _servicesRepository;
             context = _context;
+            _env = env;
+
         }
 
         public async Task<ProviderViewModel> GetProviderDetailsById(string providerId)
@@ -775,51 +782,75 @@ namespace Services
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
 
-        //////
 
-        public async Task<string> UpdateDoctorProfile(UpdateProviderProfileDTO model)
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
         {
-            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            if (imageFile == null || imageFile.Length == 0)
+                return null;
+
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+            var filePath = Path.Combine("wwwroot/images/providers", fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(stream);
+            }
+
+            return "/images/providers/" + fileName;
+        }
+
+
+        public async Task<string> UpdateDoctorProfile(string userId, UpdateProviderProfileDTO model)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == userId && !p.IsDeleted);
+
             if (provider == null)
                 return "Provider not found.";
 
-            // Update Provider Info
-            provider.FirstName = model.FirstName;
-            provider.LastName = model.LastName;
-            provider.BirthDate = model.BirthDate;
-            provider.Gender = model.Gender;
-            provider.Image = model.Image;
+            var user = provider.User;
+            if (user == null)
+                return "User data not found.";
+
+            if (!string.IsNullOrWhiteSpace(model.FirstName))
+                provider.FirstName = model.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(model.LastName))
+                provider.LastName = model.LastName;
+
+            if (model.BirthDate != default)
+                provider.BirthDate = model.BirthDate;
+
+            if (model.Image != null)
+            {
+                var savedImagePath = await SaveImageAsync(model.Image);
+                provider.Image = savedImagePath;
+            }
+
 
             providerRepository.Edit(provider);
 
-            // Update Identity User Info
-            var user = await userManager.FindByIdAsync(model.ProviderId);
-            if (user != null)
-            {
+            if (!string.IsNullOrWhiteSpace(model.Email))
                 user.Email = model.Email;
+
+            if (!string.IsNullOrWhiteSpace(model.Phone))
                 user.PhoneNumber = model.Phone;
 
-                var updateResult = await userManager.UpdateAsync(user);
-                if (!updateResult.Succeeded)
-                {
-                    var errorMessages = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                    return $"Failed to update user account: {errorMessages}";
-                }
-            }
-            else
+            var updateResult = await userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
             {
-                return "User not found in Identity.";
+                var errorMessages = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                return $"Failed to update user account: {errorMessages}";
             }
 
             commitData.SaveChanges();
-
             return "Doctor profile updated successfully.";
-
         }
 
-        public bool UpdateProfessionalInfo(UpdateProviderProfessionalInfoDTO model)
+
+
+        public bool UpdateProfessionalInfo(string userId, UpdateProviderProfessionalInfoDTO model)
         {
-            var provider = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
+            var provider = providerRepository.GetById(p => p.ProviderId == userId && !p.IsDeleted);
             if (provider == null)
                 return false;
 
@@ -936,6 +967,46 @@ namespace Services
                 .Select(p => p.ToCardView()) 
                 .ToList();
         }
+
+        public List<ProviderCardViewModel> GetTopRatedProviders(int count = 3)
+        {
+            return context.Providers
+                .OrderByDescending(p => p.Rate)
+                .Take(count)
+                .Select(p => new ProviderCardViewModel
+                {
+                    id = p.ProviderId,
+                    FullName = p.FirstName + " " + p.LastName,
+                    Specialization = p.Specialization,
+                    Rate = p.Rate,
+                    Image = p.Image,
+
+                }).ToList();
+        }
+
+        public ProviderProfileDTO GetProviderProfile(string userId)
+        {
+            var provider = providerRepository.GetById(p => p.ProviderId == userId && !p.IsDeleted);
+
+            if (provider == null || provider.User == null)
+                return null;
+
+            return new ProviderProfileDTO
+            {
+               ID = provider.ProviderId,
+                FullName = $"{provider.FirstName} {provider.LastName}",
+                Email = provider.User.Email,
+                Phone = provider.User.PhoneNumber,
+                Gender = provider.Gender,
+                BirthDate = provider.BirthDate,
+                Image = provider.Image,
+                Specialization = provider.Specialization,
+                Experience = provider.ExperienceYears,
+                MedicalLicenseNumber = provider.LicenseNumber,
+                About = provider.Bio
+            };
+        }
+
 
 
     }

@@ -15,8 +15,6 @@ namespace Dorak.DataTransferObject
         public string? LastName { get; set; }
         public DateOnly AppointmentDate { get; set; }
         public AppointmentStatus AppointmentStatus { get; set; }= AppointmentStatus.Pending;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public ClientType clientType { get; set; }
         public decimal Fees { get; set; }
         public decimal AdditionalFees { get; set; } = decimal.Zero;
@@ -32,6 +30,9 @@ namespace Dorak.DataTransferObject
         public int ShiftId { get; set; }
         public string? UserId { get; set; }
         public int? TemporaryClientId { get; set; }
+        public string ProviderName { get; set; }
+        public decimal Rate { get; set; }
+        public string Specialization { get; set; }
 
     }
 }

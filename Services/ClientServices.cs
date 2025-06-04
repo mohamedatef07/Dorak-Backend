@@ -19,14 +19,17 @@ namespace Services
         public AppointmentRepository appointmentRepository;
         public CommitData commitData;
         private readonly AppointmentServices appointmentServices;
+        private readonly WalletRepository walletRepository;
 
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices)
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
             appointmentRepository = _appointmentRepository;
             commitData = _commitData;
             this.appointmentServices = appointmentServices;
+            walletRepository = _walletRepository;
+
         }
 
         public async Task<IdentityResult> CreateClient(string userId, ClientRegisterViewModel model)
@@ -81,6 +84,23 @@ namespace Services
                 Appointments = appointmentServices.GetAppointmentsByUserId(userId)
             };
             return clientProfile;
+        }
+
+        public ClientWalletAndProfileDTO GetClientWalletAndProfile(string userId)
+        {
+            var Client = clientRepository.GetById(c => c.ClientId == userId);
+            var wallet = new ClientWalletAndProfileDTO()
+            {
+                ID = Client.ClientId,
+                Image = Client.Image,
+                Name = $"{Client.FirstName} {Client.LastName}",
+                Phone = Client.User.PhoneNumber,
+                Email = Client.User.Email,
+                Balance = walletRepository.GetWalletByUserId(userId).Balance
+            };
+
+            return wallet;
+
         }
 
     }
