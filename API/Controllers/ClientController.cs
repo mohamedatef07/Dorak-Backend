@@ -23,14 +23,16 @@ namespace API.Controllers
         private readonly AppointmentServices appointmentServices;
         private readonly ReviewServices reviewServices;
         private readonly ClientServices clientServices;
+        private LiveQueueServices liveQueueServices;
 
-        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
+        public ClientController(AppointmentServices _appointmentServices,LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
             appointmentServices = _appointmentServices;
             reviewServices = _reviewServices;
             clientServices = _clientServices;
+            liveQueueServices = _liveQueueServices;
         }
         [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
@@ -317,6 +319,26 @@ namespace API.Controllers
             return Ok(new ApiResponse<ClientWalletAndProfileDTO> { Status = 200, Message = "wallet Retrive", Data = clientWalletProfileDTO });
         }
 
+
+
+        //live queue NT
+        [HttpGet("shift-queue/{shiftId}/user/{userId}")]
+        public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
+        {
+            var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
+
+            if (queue == null || !queue.Any())
+            {
+                return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
+            }
+
+            return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
+            {
+                Status = 200,
+                Message = "Queue retrieved successfully.",
+                Data = queue
+            });
+        }
 
     }
 }

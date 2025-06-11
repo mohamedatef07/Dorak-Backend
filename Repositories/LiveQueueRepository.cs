@@ -123,6 +123,19 @@ namespace Repositories
             return GetAll().Where(a => a.ShiftId == ShiftId);
         }
 
+       
+        public async Task<List<LiveQueue>> GetLiveQueueDetailsForShiftAsync(int shiftId)
+        {
+            return await Table
+                .Where(lq => lq.ShiftId == shiftId)
+                .Include(lq => lq.Appointment)
+                    .ThenInclude(a => a.User)
+                        .ThenInclude(u => u.Client)
+                .Include(lq => lq.Appointment.TemporaryClient)
+                .OrderBy(lq => lq.CurrentQueuePosition)
+                .ToListAsync();
+        }
+
     }
 
 }

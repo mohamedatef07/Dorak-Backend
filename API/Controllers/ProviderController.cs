@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
+using System.Data.Entity.Core.Common;
 
 namespace API.Controllers
 {
@@ -16,14 +17,21 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
     {
+        public CenterServices centerServices;
         public ProviderServices providerServices;
+        public OperatorServices operatorServices;
         public ShiftServices shiftServices;
         public LiveQueueServices liveQueueServices;
-        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices)
+        LiveQueueRepository liveQueueRepository;
+        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices, CenterServices _centerServices, OperatorServices _operatorServices, LiveQueueRepository _liveQueueRepository)
         {
+            centerServices = _centerServices;
             providerServices = _providerServices;
             shiftServices = _shiftServices;
             liveQueueServices = _liveQueueServices;
+            operatorServices = _operatorServices;
+            liveQueueRepository = _liveQueueRepository;
+
         }
 
         [HttpGet("GetProviderById/{providerId}")]
@@ -208,7 +216,7 @@ namespace API.Controllers
         }
 
         [HttpGet("ProviderProfile")]
-        [Authorize(Roles = "Provider")] 
+        [Authorize(Roles = "Provider")]
         public IActionResult GetMyProviderProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -242,6 +250,5 @@ namespace API.Controllers
                 Data = profile
             });
         }
-
     }
 }
