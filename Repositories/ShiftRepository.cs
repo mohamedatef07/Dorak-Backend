@@ -14,6 +14,10 @@ namespace Dorak.Models.Models.Wallet
     {
         public ShiftRepository(DorakContext _context) : base(_context){ }
 
+        public  Shift GetShiftById(int shiftId)
+        {
+            return Table.Where(shift => shift.ShiftId == shiftId).FirstOrDefault();
+        }
         public async Task<IEnumerable<Shift>> GetShiftsByProviderId(string providerId)
         {
             return await Table.Where(s => s.ProviderAssignment.ProviderId == providerId).ToListAsync();

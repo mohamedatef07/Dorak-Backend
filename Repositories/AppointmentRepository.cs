@@ -45,7 +45,7 @@ namespace Repositories
 
         //public void MakeAppointment(AppointmentViewModel appointmentViewModel);
 
-        public IQueryable<Appointment> GetAllAppointmentForShift(int ShiftId)
+        public IQueryable<Appointment> GetAllShiftAppointments(int ShiftId)
         {
             return GetAll().Where(a => a.ShiftId == ShiftId);
         }

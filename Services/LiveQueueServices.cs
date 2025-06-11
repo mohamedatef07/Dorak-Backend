@@ -57,6 +57,7 @@ namespace Services
                     });
                 }
             }
+            result = result.OrderBy((entry) => entry.CurrentQueuePosition).ToList();
             return result;
         }
     }

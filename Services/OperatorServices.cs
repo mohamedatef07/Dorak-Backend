@@ -197,7 +197,7 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<Appointment> appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId);
+            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
 
             foreach (var appointment in appointments)
             {
@@ -239,14 +239,13 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllLiveQueueForShift(ShiftId);
+            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllShiftLiveQueues(ShiftId);
 
             foreach (var liveQueue in liveQueues)
             {
                 liveQueueRepository.Delete(liveQueue);
             }
             commitData.SaveChanges();
-
             return true;
         }
 
