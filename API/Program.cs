@@ -179,6 +179,7 @@ namespace API
 
                 #endregion
             });
+
             builder.Services.AddSignalR();
 
             var app = builder.Build();
