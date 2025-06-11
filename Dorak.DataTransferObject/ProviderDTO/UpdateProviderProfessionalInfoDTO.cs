@@ -8,10 +8,9 @@ namespace Dorak.DataTransferObject
 {
     public class UpdateProviderProfessionalInfoDTO
     {
-        public string ProviderId { get; set; }
-        public string Specialization { get; set; }
+        public string? Specialization { get; set; }
         public int? ExperienceYears { get; set; }
-        public string LicenseNumber { get; set; }
-        public string Bio { get; set; } 
+        public string? LicenseNumber { get; set; }
+        public string? Bio { get; set; } 
     }
 }

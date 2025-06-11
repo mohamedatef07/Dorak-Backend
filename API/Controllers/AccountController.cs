@@ -1,9 +1,12 @@
 ﻿using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.AccountDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Security.Claims;
 using System.Web;
 
 namespace API.Controllers
@@ -38,11 +41,13 @@ namespace API.Controllers
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register(RegisterationViewModel user)
+        public async Task<IActionResult> Register([FromForm]RegisterationViewModel user)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(new ApiResponse<object> { Message = "Please provide all required data in the correct format", Status = 400 });
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
             }
 
             var result = await _accountServices.CreateAccount(user);
@@ -140,27 +145,83 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
+
+                return BadRequest(new ApiResponse<object>
+                {
+                    Message = string.Join(" ", errors),
+                    Status = 400,
+                    Data = null
+                });
             }
 
-            var token = await _accountServices.LoginWithGenerateJWTToken(user);
+            var (token, refreshToken) = await _accountServices.LoginWithGenerateJWTToken(user);
+
             if (string.IsNullOrEmpty(token))
             {
-                return Unauthorized(new ApiResponse<object> { Message = "Invalid Email, Username, or Password", Status = 400 });
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Message = "Invalid Email, Username, or Password",
+                    Status = 401,
+                    Data = null
+                });
             }
 
             var roles = await _accountServices.GetUserRolesAsync(user.UserName);
-            return Ok(new ApiResponse<AuthResponseDTO>
+
+            var responseData = new
+            {
+                Token = token,
+                RefreshToken = refreshToken,
+                Roles = roles
+            };
+
+            return Ok(new ApiResponse<object>
             {
                 Message = "Logged In Successfully",
                 Status = 200,
-                Data = new AuthResponseDTO
+                Data = responseData
+            });
+        }
+
+        [HttpPost("RefreshToken")]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new ApiResponse<string>
                 {
-                    Token = token,
-                    Roles = roles
+                    Message = string.Join(" ", errors),
+                    Status = 400,
+                    Data = null
+                });
+            }
+
+            var result = await _accountServices.RefreshTokenAsync(request);
+            if (result.NewAccessToken == null)
+            {
+                return Unauthorized(new ApiResponse<string>
+                {
+                    Message = "Invalid or expired refresh token.",
+                    Status = 401,
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<object>
+            {
+                Message = "Token refreshed successfully.",
+                Status = 200,
+                Data = new
+                {
+                    AccessToken = result.NewAccessToken,
+                    RefreshToken = result.NewRefreshToken
+
                 }
             });
         }
+
 
         [HttpPost("SignOut")]
         public async Task<IActionResult> SignOut()
@@ -170,18 +231,51 @@ namespace API.Controllers
         }
 
         //change password
+        [Authorize]
         [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDTO model)
         {
-            var result = await _accountServices.ChangePasswordAsync(model);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Message = "Invalid data",
+                    Status = 400,
+                    Data = null
+                });
+            }
 
-            return Ok(new ApiResponse<object>
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Message = "Unauthorized",
+                    Status = 401,
+                    Data = null
+                });
+            }
+
+            var result = await _accountServices.ChangePasswordAsync(userId, model);
+
+            if (result.StartsWith("Password changed"))
+            {
+                return Ok(new ApiResponse<object>
+                {
+                    Message = result,
+                    Status = 200,
+                    Data = null
+                });
+            }
+
+            return BadRequest(new ApiResponse<object>
             {
                 Message = result,
-                Status = 200,
-                Data = result
+                Status = 400,
+                Data = null
             });
         }
+
         //Forgot Password
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)

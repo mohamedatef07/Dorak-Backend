@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Data;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
@@ -18,16 +19,20 @@ namespace Services
 {
     public class OperatorServices
     {
-        public OperatorRepository operatorRepository;
-        public ClientRepository clientRepository;
+        private readonly OperatorRepository operatorRepository;
+        private readonly ClientRepository clientRepository;
+        private readonly AccountRepository accountRepository;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
         private readonly LiveQueueRepository liveQueueRepository;
         private readonly AppointmentServices appointmentServices;
+        private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
+        private readonly TemperoryClientRepository temperoryClientRepository;
+
         public CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
 
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -37,6 +42,9 @@ namespace Services
             commitData = _commitData;
             
             appointmentServices = _appointmentServices;
+            providerCenterServiceRepository = _providerCenterServiceRepository;
+            temperoryClientRepository = _temperoryClientRepository;
+            accountRepository = _accountRepository;
             hubContext = _hubContext;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
@@ -47,13 +55,16 @@ namespace Services
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Gender = model.Gender,
-                Image = model.Image
+                Image = model.Image,
+                CenterId = model.CenterId,
+                IsDeleted = false
             };
 
             operatorRepository.Add(_operator);
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
+
         public bool SoftDelete(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
@@ -98,32 +109,80 @@ namespace Services
             }
             return null;
         }
-        public Appointment CreateAppointment(AppointmentViewModel model)
+
+        public Appointment CreateAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
-            var appointment = new Appointment
+            if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
+                throw new InvalidOperationException("Cannot reserve an appointment in the past.");
+
+            var app = reserveApointmentDTO.ToAppointmentFromDTO();
+
+            string? phoneNumber = reserveApointmentDTO.ContactInfo;
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                throw new Exception("Phone number (ContactInfo) is required to reserve an appointment.");
+
+            var existingUser = accountRepository
+                .GetAll()
+                .FirstOrDefault(u => u.PhoneNumber == phoneNumber);
+
+            if (existingUser != null)
             {
-                AppointmentDate = model.AppointmentDate,
-                AppointmentStatus = model.AppointmentStatus,
-                ClientType = model.ClientType,
-                Fees = model.Fees,
-                AdditionalFees = model.AdditionalFees,
-                EstimatedTime = appointmentServices.CalculateEstimatedTime(model.ShiftId),
-                ExactTime = model.ExactTime,
-                EndTime = model.EndTime,
-                OperatorId = model.OperatorId,
+                app.UserId = existingUser.Id;
+            }
+            else
+            {
+                var existingTempClient = temperoryClientRepository
+                    .GetAll()
+                    .FirstOrDefault(tc => tc.ContactInfo == phoneNumber && !tc.IsDeleted);
 
-                ShiftId = model.ShiftId,
-                UserId = model.UserId,
-                TemporaryClientId = model.TemporaryClientId,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+                if (existingTempClient != null)
+                {
+                    app.TemporaryClientId = existingTempClient.TempClientId;
+                }
+                else
+                {
+                    var newTempClient = new TemporaryClient
+                    {
+                        FirstName = string.IsNullOrWhiteSpace(reserveApointmentDTO.FirstName) ? "TempFirst" : reserveApointmentDTO.FirstName,
+                        LastName = string.IsNullOrWhiteSpace(reserveApointmentDTO.LastName) ? "TempLast" : reserveApointmentDTO.LastName,
+                        ContactInfo = phoneNumber,
+                        TempCode = GenerateTempCode(),
+                        OperatorId = reserveApointmentDTO.OperatorId,
+                        IsDeleted = false
+                    };
+                    temperoryClientRepository.Add(newTempClient);
+                    commitData.SaveChanges(); 
 
-            return appointmentRepository.CreateAppoinment(appointment);
+                    app.TemporaryClientId = newTempClient.TempClientId;
+                }
+            }
 
-            //>>>>>>>>>>>>>>>>>>>>>Call Queueing function 
+            var pcs = providerCenterServiceRepository
+                .GetAll()
+                .FirstOrDefault(p =>
+                    p.ProviderId == reserveApointmentDTO.ProviderId &&
+                    p.CenterId == reserveApointmentDTO.CenterId &&
+                    p.ServiceId == reserveApointmentDTO.ServiceId);
 
-        }     //NOT DONE>>>>>>>>
+            if (pcs == null)
+                throw new Exception("Invalid provider, center, or service combination.");
+
+            app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
+
+            var createdAppointment = appointmentRepository.CreateAppoinment(app);
+            createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
+
+            commitData.SaveChanges();
+
+            return createdAppointment;
+        }
+
+
+        private string GenerateTempCode()
+        {
+            return $"TMP-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
+        }
+
         public bool StartShift(int ShiftId, string operatorId)
         {
             DateTime currentTime = DateTime.Now;
@@ -269,6 +328,11 @@ namespace Services
             hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
 
             return "Queue status updated successfully";
+        }
+
+        public List<Operator> GetOperatorsByCenterId(int centerId)
+        {
+            return operatorRepository.GetAll().Where(o => o.CenterId == centerId).ToList();
         }
     }
 }

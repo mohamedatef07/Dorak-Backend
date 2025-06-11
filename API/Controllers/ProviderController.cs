@@ -1,4 +1,6 @@
-﻿using Dorak.DataTransferObject;
+﻿using System.Security.Claims;
+using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
@@ -57,7 +59,6 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetProviderById: {ex.Message} - StackTrace: {ex.StackTrace}");
                 return StatusCode(500, new ApiResponse<ProviderViewModel> { Message = "Internal server error", Status = 500 });
             }
         }
@@ -69,17 +70,16 @@ namespace API.Controllers
             {
                 var assignments = providerServices.GetProviderAssignments(providerId, centerId);
 
-                if (!assignments.Any())
+                if (!assignments.Any() || assignments == null)
                 {
-                    return NotFound(new ApiResponse<object[]>
+                    return NotFound(new ApiResponse<object>
                     {
                         Message = "No assignments found for the given criteria.",
                         Status = 404
                     });
                 }
 
-                Console.WriteLine($"Assignments retrieved: {System.Text.Json.JsonSerializer.Serialize(assignments)}");
-                return Ok(new ApiResponse<object[]>
+                return Ok(new ApiResponse<object>
                 {
                     Message = "Assignments retrieved successfully",
                     Status = 200,
@@ -88,31 +88,29 @@ namespace API.Controllers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetProviderAssignments: {ex.Message} - StackTrace: {ex.StackTrace}");
-                return StatusCode(500, new ApiResponse<string>
+                return StatusCode(500, new ApiResponse<object>
                 {
                     Message = "Internal server error",
                     Status = 500
                 });
             }
         }
-
-        [HttpGet("ScheduleDetails")]
+        [HttpGet("schedule-details")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider ID is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Provider ID is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderScheduleDetailsDTO> scheduleDetails = providerServices.GetScheduleDetails(provider);
             if (scheduleDetails == null || !scheduleDetails.Any())
             {
-                return NotFound(new ApiResponse<List<GetProviderScheduleDetailsDTO>> { Message = "Provider schedule details not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider schedule details not found", Status = 404 });
             }
             return Ok(new ApiResponse<List<GetProviderScheduleDetailsDTO>>
             {
@@ -121,7 +119,7 @@ namespace API.Controllers
                 Data = scheduleDetails
             });
         }
-        [HttpGet("ShiftDetails")]
+        [HttpGet("shift-details")]
         public IActionResult ShiftDetails([FromQuery] int shiftId)
         {
             if (shiftId <= 0)
@@ -144,31 +142,52 @@ namespace API.Controllers
                 Data = shiftDetails
             });
         }
-        [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
+
+        [Authorize(Roles = "Provider")]
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateProviderProfileDTO model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized("User not authorized.");
+
+            var result = await providerServices.UpdateDoctorProfile(userId, model);
+            return Ok(new { message = result });
+        }
+
+
+        [Authorize(Roles = "Provider")]
+        [HttpPut("update-professional-info")]
+        public IActionResult UpdateProfessionalInfo([FromForm] UpdateProviderProfessionalInfoDTO model)
         {
             if (!ModelState.IsValid)
-                return BadRequest(new ApiResponse<string> { Message = "Invalid data", Status = 400 });
-
-            var result = await providerServices.UpdateDoctorProfile(model);
-
-            return Ok(new ApiResponse<string>
             {
-                Message = result,
-                Status = 200,
-                Data = result
-            });
-        }
-        [HttpPut("update-professional-info")]
-        public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
-        {
-            var result = providerServices.UpdateProfessionalInfo(model);
+                return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
+            }
 
-            return Ok(new ApiResponse<string>
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                Message = result,
+                return Unauthorized(new ApiResponse<object> { Message = "Unauthorized", Status = 401 });
+            }
+
+            var result = providerServices.UpdateProfessionalInfo(userId, model);
+
+            if (!result)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Message = "Provider not found",
+                    Status = 404,
+                });
+            }
+
+            return Ok(new ApiResponse<object>
+            {
+                Message = "Updated professional info successfully",
                 Status = 200,
-                Data = result
             });
         }
 
@@ -262,7 +281,7 @@ namespace API.Controllers
                     Status = 500
                 });
             }
-            }
+        }
 
         // [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
@@ -301,5 +320,41 @@ namespace API.Controllers
                 });
             }
         }
+
+        [HttpGet("ProviderProfile")]
+        [Authorize(Roles = "Provider")]
+        public IActionResult GetMyProviderProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "User ID is required",
+                    Status = 400,
+                    Data = null
+                });
+            }
+
+            var profile = providerServices.GetProviderProfile(userId);
+
+            if (profile == null)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Message = "Provider not found",
+                    Status = 404,
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<ProviderProfileDTO>
+            {
+                Message = "Provider profile retrieved successfully",
+                Status = 200,
+                Data = profile
+            });
+        }
     }
-    }
+}

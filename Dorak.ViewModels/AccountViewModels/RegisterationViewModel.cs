@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 using Models.Enums;
 
 namespace Dorak.ViewModels
@@ -50,14 +51,14 @@ namespace Dorak.ViewModels
         public string? City { get; set; }
         public string? Governorate { get; set; }
         public string? Country { get; set; }
-        public string? Image { get; set; }
+        public IFormFile? Image { get; set; }
 
 
         // From ProviderRegisterViewModel
         public string? Specialization { get; set; }
         public string? Bio { get; set; }
         public int? ExperienceYears { get; set; }
-        public ProviderType ProviderType { get; set; }
+        public ProviderType? ProviderType { get; set; }
         public string? LicenseNumber { get; set; }
         public int? EstimatedDuration { get; set; }
         public decimal? Rate { get; set; }
@@ -65,5 +66,8 @@ namespace Dorak.ViewModels
 
         // From AdminCenterViewModel
         // FirstName, LastName, Gender, and Image are already included above.
+
+        // From Operator
+        public int? CenterId { get;set; }
     }
 }

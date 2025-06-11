@@ -13,7 +13,7 @@ using Dorak.DataTransferObject.ProviderDTO;
 
 namespace API.Controllers
 {
-    //[Authorize(Roles ="Client")]
+    [Authorize(Roles ="Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -23,27 +23,29 @@ namespace API.Controllers
         private readonly AppointmentServices appointmentServices;
         private readonly ReviewServices reviewServices;
         private readonly ClientServices clientServices;
+        private LiveQueueServices liveQueueServices;
 
-        public ClientController(AppointmentServices _appointmentServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
+        public ClientController(AppointmentServices _appointmentServices,LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
             appointmentServices = _appointmentServices;
             reviewServices = _reviewServices;
             clientServices = _clientServices;
+            liveQueueServices = _liveQueueServices;
         }
         [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Provider id is required", Status = 400 });
             }
             var provider = providerServices.GetProviderById(providerId);
 
             if (provider == null)
             {
-                return NotFound(new ApiResponse<GetProviderMainInfoDTO> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
             }
             GetProviderMainInfoDTO mainInfo = providerServices.GetProviderMainInfo(provider);
             return Ok(new ApiResponse<GetProviderMainInfoDTO>
@@ -58,17 +60,17 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Provider id is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderBookingInfoDTO> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
             if (providerBookingInfo == null || !providerBookingInfo.Any())
             {
-                return NotFound(new ApiResponse<GetProviderBookingInfoDTO> { Message = "Provider booking info not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider booking info not found", Status = 404 });
             }
             return Ok(new ApiResponse<List<GetProviderBookingInfoDTO>>
             {
@@ -83,17 +85,17 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<GetProviderCenterServicesDTO> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Provider id is required", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<GetProviderCenterServicesDTO> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
             }
             List<GetProviderCenterServicesDTO> centerServices = providerServices.GetCenterServices(provider);
             if (centerServices == null || !centerServices.Any())
             {
-                return NotFound(new ApiResponse<GetProviderCenterServicesDTO> { Message = "Provider center services not found", Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Provider center services not found", Status = 404 });
             }
             return Ok(new ApiResponse<List<GetProviderCenterServicesDTO>>
             {
@@ -115,7 +117,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
-            return Ok(new ApiResponse<Appointment> { Status = 200, Message = "Appointment reserved successfully", Data = appointment });
+            return Ok(new ApiResponse<object> { Status = 200, Message = "Appointment reserved successfully" });
         }
 
         [HttpPost("Checkout")]
@@ -175,7 +177,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
+            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
         }
 
         [HttpGet("cards")]
@@ -293,15 +295,49 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("Profile-all-appointment/{userId}")]
+        [HttpGet("profile-all-appointment/{userId}")]
         public IActionResult ProfileAndAllAppointments(string userId)
         {
             var profile = clientServices.GetProfile(userId);
             if (profile == null)
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
+                return Ok(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
             }
             return Ok(new ApiResponse<ClientProfileDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
+        }
+
+
+
+        [HttpGet("client-wallet/{userId}")]
+        public IActionResult ClientWalletAndProfile(string userId)
+        {
+            var clientWalletProfileDTO = clientServices.GetClientWalletAndProfile(userId);
+            if (clientWalletProfileDTO == null)
+            {
+                return Ok(new ApiResponse<object> { Status = 404, Message = "No found wallet" });
+            }
+            return Ok(new ApiResponse<ClientWalletAndProfileDTO> { Status = 200, Message = "wallet Retrive", Data = clientWalletProfileDTO });
+        }
+
+
+
+        //live queue NT
+        [HttpGet("shift-queue/{shiftId}/user/{userId}")]
+        public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
+        {
+            var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
+
+            if (queue == null || !queue.Any())
+            {
+                return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
+            }
+
+            return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
+            {
+                Status = 200,
+                Message = "Queue retrieved successfully.",
+                Data = queue
+            });
         }
 
     }

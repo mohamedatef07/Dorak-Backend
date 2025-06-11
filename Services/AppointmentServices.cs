@@ -38,7 +38,6 @@ namespace Services
 
         public Appointment ReserveAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
-            // Validate appointment details
             if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
 
@@ -140,10 +139,10 @@ namespace Services
             return appointments?.AppointmentToAppointmentDTO();
         }
 
-        public List<AppointmentDTO> GetUpcomingAppointments(string userId)
+        public List<AppointmentForClientProfileDTO> GetUpcomingAppointments(string userId)
         {
             var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
-                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentDTO());
+                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentForClientProfileDTO());
             return upcoming.ToList();
         }
 
@@ -170,7 +169,6 @@ namespace Services
                     {
                         // Proceed to cancel the appointment
                         await CancelAppointment(appointment.AppointmentId);
-                        Console.WriteLine($"Appointment {appointment.AppointmentId} canceled due to non-payment.");
                     }
                     catch (Exception ex)
                     {

@@ -7,13 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="OperatorDTO\**" />
-    <EmbeddedResource Remove="OperatorDTO\**" />
-    <None Remove="OperatorDTO\**" />
+    <ProjectReference Include="..\Models\Dorak.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Models\Dorak.Models.csproj" />
+    <Folder Include="WalletDTO\" />
   </ItemGroup>
 
 </Project>

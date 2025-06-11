@@ -84,6 +84,7 @@ namespace API
             builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(ProviderCenterServiceRepository));
             builder.Services.AddScoped(typeof(AppointmentRepository));
+            builder.Services.AddScoped(typeof(WalletRepository));
             builder.Services.AddScoped(typeof(S_Services));
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(CommitData));

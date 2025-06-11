@@ -14,9 +14,11 @@ namespace Services
 {
     public class LiveQueueServices
     {
+        private readonly LiveQueueRepository liveQueueRepository;
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
         public LiveQueueServices(LiveQueueRepository _liveQueueRepository, ProviderServices _providerServices, ClientRepository _clientRepository, ProviderAssignmentRepository _providerAssignmentRepository, OperatorRepository _operatorRepository)
         {
+            liveQueueRepository = _liveQueueRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
         }
 
@@ -230,5 +232,65 @@ namespace Services
                 Total = total
             };
         }
+
+
+        //public async Task<GetQueueEntriesDTO?> GetQueueEntryByAppointmentIdAsync(int appointmentId)
+        //{
+        //    var liveQueue = await liveQueueRepository.GetByAppointmentIdAsync(appointmentId);
+
+        //    if (liveQueue == null)
+        //        return null;
+
+        //    var appointment = liveQueue.Appointment;
+
+        //    return new GetQueueEntriesDTO
+        //    {
+        //        FullName = appointment.User != null
+        //            ? $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}"
+        //            : $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
+        //        ArrivalTime = liveQueue.ArrivalTime,
+        //        AppointmentDate = appointment.AppointmentDate,
+        //        Type = appointment.ClientType,
+        //        Status = liveQueue.AppointmentStatus,
+        //        PhoneNumber = appointment.User != null
+        //            ? appointment.User.PhoneNumber
+        //            : appointment.TemporaryClient.ContactInfo,
+        //        CurrentQueuePosition = liveQueue.CurrentQueuePosition
+        //    };
+        //}
+
+        public async Task<List<ClientLiveQueueDTO>> GetLiveQueueForShiftAsync(int shiftId, string? userId)
+        {
+            var liveQueues = await liveQueueRepository.GetLiveQueueDetailsForShiftAsync(shiftId);
+            var result = new List<ClientLiveQueueDTO>();
+
+            foreach (var liveQueue in liveQueues)
+            {
+                var appointment = liveQueue.Appointment;
+
+                var dto = new ClientLiveQueueDTO
+                {
+                    FullName = appointment.User != null
+                        ? $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}"
+                        : $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
+                    ArrivalTime = liveQueue.ArrivalTime,
+                    AppointmentDate = appointment.AppointmentDate,
+                    Type = appointment.ClientType,
+                    Status = liveQueue.AppointmentStatus,
+                    PhoneNumber = appointment.User != null
+                        ? appointment.User.PhoneNumber
+                        : appointment.TemporaryClient.ContactInfo,
+                    CurrentQueuePosition = liveQueue.CurrentQueuePosition,
+
+                    // 🔥 This flag helps you identify the logged-in client's appointment
+                    IsCurrentClient = appointment.UserId == userId
+                };
+
+                result.Add(dto);
+            }
+
+            return result;
+        }
+
     }
 }
