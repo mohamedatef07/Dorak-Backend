@@ -8,7 +8,9 @@ using Data;
 using Dorak.Models;
 using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
+using Hubs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
 
@@ -23,7 +25,9 @@ namespace Services
         private readonly LiveQueueRepository liveQueueRepository;
         private readonly AppointmentServices appointmentServices;
         public CommitData commitData;
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices)
+        private readonly IHubContext<QueueHub> hubContext;
+
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -31,8 +35,9 @@ namespace Services
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
-            liveQueueRepository = _liveQueueRepository;
+            
             appointmentServices = _appointmentServices;
+            hubContext = _hubContext;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -260,6 +265,8 @@ namespace Services
 
             appointment.UpdatedAt = now;
             commitData.SaveChanges();
+
+            hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
 
             return "Queue status updated successfully";
         }
