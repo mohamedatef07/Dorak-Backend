@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repositories;
 using Services;
+using Hubs;
 using System.Text;
 using System.Text.Json.Serialization;
 using Hangfire;
@@ -135,13 +136,14 @@ namespace API
                 {
                     builder.WithOrigins("http://localhost:4200")
                            .AllowAnyHeader()
-                           .AllowAnyMethod();
+                           .AllowAnyMethod()
+                           .AllowCredentials();
                 });
             });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            builder.Services.AddSignalR();
 
             var app = builder.Build();
 
@@ -168,7 +170,7 @@ namespace API
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors();
+            app.UseCors("AllowAngularApp");
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -207,7 +209,7 @@ namespace API
              "update-provider-ratings",
               service => service.UpdateAllProvidersAverageRating(),
                Cron.Monthly);
-
+            app.MapHub<QueueHub>("/queueHub");
             app.MapControllers();
             app.Run();
         }
