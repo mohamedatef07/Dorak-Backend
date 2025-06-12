@@ -118,7 +118,7 @@ namespace Repositories
             return count;
         }
 
-        public IQueryable<LiveQueue> GetAllLiveQueueForShift(int ShiftId)
+        public IQueryable<LiveQueue> GetAllShiftLiveQueues(int ShiftId)
         {
             return GetAll().Where(a => a.ShiftId == ShiftId);
         }

@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Services;
+﻿using Dorak.DataTransferObject;
 using Dorak.ViewModels;
-using Dorak.DataTransferObject;
+using Microsoft.AspNetCore.Mvc;
+using Services;
 
 namespace API.Controllers
 {
@@ -11,11 +11,13 @@ namespace API.Controllers
     {
         private readonly ProviderServices providerServices;
         private readonly ShiftServices shiftServices;
+        private readonly CenterServices centerServices;
 
-        public ShiftController(ProviderServices _providerServices, ShiftServices _shiftServices)
+        public ShiftController(ProviderServices _providerServices, ShiftServices _shiftServices, CenterServices _centerServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
+            centerServices = _centerServices;
         }
 
 
@@ -42,6 +44,25 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on retriving Data" });
 
+        }
+        [HttpGet("get-all-center-shifts")]
+        public IActionResult GetAllCenterShifts([FromQuery]int centerId)
+        {
+            if(centerId <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid center ID provided" ,Status=400});
+            }
+            var center = centerServices.GetCenterById(centerId);
+            if (center == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Center not found", Status = 404 });
+            }
+            var allCenterShifts = shiftServices.GetAllCenterShifts(center);
+            if(allCenterShifts == null || !allCenterShifts.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "No shifts found for this center", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetAllCenterShiftsDTO>> { Message = "Get all center shifts successfully", Status = 200 , Data = allCenterShifts});
         }
     }
 }

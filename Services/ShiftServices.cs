@@ -6,29 +6,29 @@ using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
+using Models.Enums;
 using Repositories;
 
 namespace Services
 {
     public class ShiftServices
     {
-        ShiftRepository shiftRepository;
-        CenterRepository centerRepository;
-        AppointmentRepository appointmentRepository;
-        LiveQueueRepository liveQueueRepository;
-        public CommitData commitData;
+        private readonly ShiftRepository shiftRepository;
+        private readonly AppointmentRepository appointmentRepository;
+        private readonly LiveQueueRepository liveQueueRepository;
 
-        public ShiftServices(ShiftRepository _shiftRepository,CenterRepository _centerRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData)
+
+        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository)
         {
             shiftRepository = _shiftRepository;
-            centerRepository = _centerRepository;
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
-            commitData = _commitData;
         }
-
+        public Shift GetShiftById(int shiftId)
+        {
+            return shiftRepository.GetShiftById(shiftId);
+        }
         public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateOnly _shiftDate, int centerId)
         {
             var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
@@ -37,16 +37,18 @@ namespace Services
 
         public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
         {
-            var appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId);
+            var appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
         }
 
         public IQueryable<Appointment> LiveShiftAppointments()
-        {   
+        {
             var shifts = shiftRepository.LiveQueueShift().ToList();
-            foreach (var shift in shifts) {
-                var appointments = appointmentRepository.GetAllAppointmentForShift(shift.ShiftId);
-                foreach (var appointment in appointments) {
+            foreach (var shift in shifts)
+            {
+                var appointments = appointmentRepository.GetAllShiftAppointments(shift.ShiftId);
+                foreach (var appointment in appointments)
+                {
 
                     liveQueueRepository.Add(new LiveQueue
                     {
@@ -65,6 +67,50 @@ namespace Services
             }
             return null;
         }
+        public List<GetAllCenterShiftsDTO> GetAllCenterShifts(Center center)
+        {
+            if (center?.ProviderAssignments == null || !center.ProviderAssignments.Any())
+            {
+                return new List<GetAllCenterShiftsDTO>();
+            }
+            var proivderAssignments = center.ProviderAssignments;
+
+            var shifts = proivderAssignments.SelectMany(
+                pa =>
+                     pa.Shifts.Select(shift => new GetAllCenterShiftsDTO
+                     {
+                         ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
+                         ShiftId = shift.ShiftId,
+                         ShiftDate = shift.ShiftDate,
+                         StartTime = shift.StartTime,
+                         EndTime = shift.EndTime,
+                     })
+                ).ToList();
+            return shifts;
+        }
+        public bool ShiftCancelation(Shift shift)
+        {
+            if (shift == null)
+            {
+                return false;
+            }
+            if (shift.ShiftType == ShiftType.Cancelled)
+            {
+                return false;
+            }
+            shift.ShiftType = ShiftType.Cancelled;
+            if (shift.Appointments != null && shift.Appointments.Any())
+            {
+                foreach (var appointment in shift.Appointments)
+                {
+                    appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                }
+                shiftRepository.Edit(shift);
+                return true;
+            }
+            return false;
+        }
     }
+
 
 }

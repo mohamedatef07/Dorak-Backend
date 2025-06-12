@@ -31,7 +31,7 @@ namespace AdminArea.Controllers
         [HttpGet]
         public IActionResult Details(int centerId)
         {
-            var center = centerServices.GetById(centerId);
+            var center = centerServices.GetCenterById(centerId);
             if (center != null)
             {
                 return View("Details", center);
@@ -68,7 +68,7 @@ namespace AdminArea.Controllers
         [HttpPost]
         public IActionResult ToggleStatus([FromBody] ToggleStatusViewModel model)
         {
-            var center = centerServices.GetById(model.CenterId);
+            var center = centerServices.GetCenterById(model.CenterId);
             if (center == null)
             {
                 return RedirectToAction("Index");

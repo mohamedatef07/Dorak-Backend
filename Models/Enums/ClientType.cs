@@ -8,7 +8,7 @@ namespace Models.Enums
 {
     public enum ClientType
     {
-        Unknown,
+        none,
         Normal,
         Urgent,
         Consultation
