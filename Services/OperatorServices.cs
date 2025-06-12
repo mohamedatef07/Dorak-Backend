@@ -175,7 +175,7 @@ namespace Services
         {
             return $"TMP-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
         }
-
+        // we need the list from the algorithm
         public bool StartShift(int ShiftId, string operatorId)
         {
             DateTime currentTime = DateTime.Now;
@@ -195,8 +195,8 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
-
+            IQueryable<Appointment> appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId).OrderBy(app=>app.EstimatedTime);
+            int count = 0;
             foreach (var appointment in appointments)
             {
                 appointment.OperatorId = operatorId;
@@ -209,7 +209,9 @@ namespace Services
                     Capacity =  appointment.Shift.MaxPatientsPerDay,
                     OperatorId = appointment.OperatorId,
                     AppointmentId = appointment.AppointmentId,
-                    ShiftId = appointment.ShiftId
+                    ShiftId = appointment.ShiftId,
+                    CurrentQueuePosition = ++count,
+                    
                 };
 
                 liveQueueRepository.Add(livequeue);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Models.Enums;
 
 namespace Dorak.DataTransferObject.ProviderDTO
@@ -20,7 +21,11 @@ namespace Dorak.DataTransferObject.ProviderDTO
         public int? Experience { get; set; }
         public string MedicalLicenseNumber { get; set; }
         public string About { get; set; }
-        public string Image { get; set; } 
+        public string Image { get; set; }
+
+        public IFormFile ImageFile { get; set; } 
+
+        public string Role { get; set; }
 
     }
 }
