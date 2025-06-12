@@ -177,37 +177,100 @@ namespace Services
 
 
         // manually
+        //public string AssignProviderToCenter(ProviderAssignmentViewModel model)
+        //{
+
+
+        //    if (string.IsNullOrEmpty(model.ProviderId) || !providerRepository.GetAll().Any(p => p.ProviderId == model.ProviderId))
+        //    {
+        //        return "Invalid ProviderId: The specified provider does not exist.";
+        //    }
+
+
+        //    if (!centerRepository.GetAll().Any(c => c.CenterId == model.CenterId))
+        //    {
+        //        return "Invalid CenterId: The specified center does not exist.";
+        //    }
+
+
+        //    DateTime utcNow = DateTime.UtcNow;
+        //    DateOnly today = DateOnly.FromDateTime(utcNow.Date);
+
+
+
+        //    if (model.EndDate.HasValue && model.EndDate < model.StartDate)
+        //    {
+
+        //        return "End date cannot be before start date.";
+        //    }
+
+
+        //    var overlappingAssignment = providerAssignmentRepository.GetAll()
+        //        .Any(pa => pa.ProviderId == model.ProviderId && pa.CenterId == model.CenterId && !pa.IsDeleted &&
+        //                   pa.StartDate <= (model.EndDate ?? pa.StartDate) && (pa.EndDate ?? pa.StartDate) >= model.StartDate);
+        //    if (overlappingAssignment)
+        //    {
+        //        return "Provider is already assigned to this center for the specified date range.";
+        //    }
+
+        //    // Create the assignment
+        //    var assignment = new ProviderAssignment
+        //    {
+        //        ProviderId = model.ProviderId,
+        //        CenterId = model.CenterId,
+        //        StartDate = model.StartDate,
+        //        EndDate = model.EndDate,
+        //        AssignmentType = model.AssignmentType,
+        //        IsDeleted = false
+        //    };
+
+        //    try
+        //    {
+        //        providerAssignmentRepository.Add(assignment);
+        //        commitData.SaveChanges();
+        //    }
+        //    catch (Exception ex)
+        //    {
+
+        //        return $"Failed to save assignment: {ex.Message}. Inner Exception: {ex.InnerException?.Message ?? "None"}";
+        //    }
+
+
+        //    foreach (ShiftViewModel shift in model.Shifts)
+        //    {
+        //        try
+        //        {
+        //            CreateShift(shift, assignment);
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            return $"Failed to create shift: {ex.Message}";
+        //        }
+        //    }
+
+        //    return "Provider assigned successfully!";
+        //}
+
         public string AssignProviderToCenter(ProviderAssignmentViewModel model)
         {
-           
-
-           
-
-           
             if (string.IsNullOrEmpty(model.ProviderId) || !providerRepository.GetAll().Any(p => p.ProviderId == model.ProviderId))
             {
                 return "Invalid ProviderId: The specified provider does not exist.";
             }
 
-            
             if (!centerRepository.GetAll().Any(c => c.CenterId == model.CenterId))
             {
                 return "Invalid CenterId: The specified center does not exist.";
             }
 
-            
             DateTime utcNow = DateTime.UtcNow;
             DateOnly today = DateOnly.FromDateTime(utcNow.Date);
-            
 
-            
             if (model.EndDate.HasValue && model.EndDate < model.StartDate)
             {
-                
                 return "End date cannot be before start date.";
             }
 
-            
             var overlappingAssignment = providerAssignmentRepository.GetAll()
                 .Any(pa => pa.ProviderId == model.ProviderId && pa.CenterId == model.CenterId && !pa.IsDeleted &&
                            pa.StartDate <= (model.EndDate ?? pa.StartDate) && (pa.EndDate ?? pa.StartDate) >= model.StartDate);
@@ -216,7 +279,6 @@ namespace Services
                 return "Provider is already assigned to this center for the specified date range.";
             }
 
-            // Create the assignment
             var assignment = new ProviderAssignment
             {
                 ProviderId = model.ProviderId,
@@ -234,27 +296,107 @@ namespace Services
             }
             catch (Exception ex)
             {
-             
                 return $"Failed to save assignment: {ex.Message}. Inner Exception: {ex.InnerException?.Message ?? "None"}";
             }
 
-            
-            foreach (ShiftViewModel shift in model.Shifts)
+            try
             {
-                try
-                {
-                    CreateShift(shift, assignment);
-                }
-                catch (Exception ex)
-                {
-                    return $"Failed to create shift: {ex.Message}";
-                }
+                CreateShift(model.Shifts.ToList(), assignment);
+            }
+            catch (Exception ex)
+            {
+                return $"Failed to create shift: {ex.Message}";
             }
 
             return "Provider assigned successfully!";
         }
 
         // weekly
+        //public string AssignProviderToCenterWithWorkingDays(WeeklyProviderAssignmentViewModel model)
+        //{
+        //    if (model.WorkingDays == null || !model.WorkingDays.Any())
+        //        return "Please select at least one working day.";
+
+        //    if (model.StartDate == null)
+        //        return "Please provide a start date.";
+
+        //    if (DateOnly.FromDateTime(model.StartDate.Value) < DateOnly.FromDateTime(DateTime.Now))
+        //        return "Start date cannot be in the past.";
+
+        //    DateOnly startDate = DateOnly.FromDateTime(model.StartDate.Value);
+        //    DateOnly endDate = startDate.AddDays(27);
+        //    var overlappingAssignment = providerAssignmentRepository.GetAll()
+        //        .Any(pa => pa.ProviderId == model.ProviderId && pa.CenterId == model.CenterId && !pa.IsDeleted &&
+        //                   pa.StartDate <= endDate && (pa.EndDate ?? endDate) >= startDate);
+        //    if (overlappingAssignment)
+        //        return "Provider is already assigned to this center for the specified date range.";
+
+        //    DateOnly currentDate = startDate;
+        //    DateOnly? rangeStart = null;
+        //    List<ProviderAssignment> assignments = new List<ProviderAssignment>();
+
+        //    for (int i = 0; i < 28; i++)
+        //    {
+        //        int dayOfWeek = (int)currentDate.DayOfWeek;
+
+        //        if (model.WorkingDays.Contains(dayOfWeek))
+        //        {
+        //            if (rangeStart == null)
+        //            {
+        //                rangeStart = currentDate;
+        //            }
+        //        }
+        //        else
+        //        {
+        //            if (rangeStart != null)
+        //            {
+        //                assignments.Add(new ProviderAssignment
+        //                {
+        //                    ProviderId = model.ProviderId,
+        //                    CenterId = model.CenterId,
+        //                    AssignmentType = model.AssignmentType,
+        //                    StartDate = rangeStart.Value,
+        //                    EndDate = currentDate.AddDays(-1),
+        //                    IsDeleted = false
+        //                });
+
+        //                rangeStart = null;
+        //            }
+        //        }
+
+        //        currentDate = currentDate.AddDays(1);
+        //    }
+
+        //    if (rangeStart != null)
+        //    {
+        //        assignments.Add(new ProviderAssignment
+        //        {
+        //            ProviderId = model.ProviderId,
+        //            CenterId = model.CenterId,
+        //            AssignmentType = model.AssignmentType,
+        //            StartDate = rangeStart.Value,
+        //            EndDate = currentDate.AddDays(-1),
+        //            IsDeleted = false
+        //        });
+        //    }
+
+        //    foreach (var assignment in assignments)
+        //    {
+        //        providerAssignmentRepository.Add(assignment);
+        //    }
+        //    commitData.SaveChanges();
+
+        //    foreach (var assignment in assignments)
+        //    {
+        //        foreach (ShiftViewModel shift in model.Shifts)
+        //        {
+        //            CreateShift(shift, assignment);
+        //        }
+        //    }
+
+        //    return "Weekly assignment completed successfully.";
+        //}
+
         public string AssignProviderToCenterWithWorkingDays(WeeklyProviderAssignmentViewModel model)
         {
             if (model.WorkingDays == null || !model.WorkingDays.Any())
@@ -331,23 +473,165 @@ namespace Services
 
             foreach (var assignment in assignments)
             {
-                foreach (ShiftViewModel shift in model.Shifts)
-                {
-                    CreateShift(shift, assignment);
-                }
+                CreateShift(model.Shifts.ToList(), assignment);
             }
 
             return "Weekly assignment completed successfully.";
         }
 
-
         // Reschedule provider assignment
+        //public string RescheduleAssignment(RescheduleAssignmentViewModel model)
+        //{
+        //    var existingAssignments = providerAssignmentRepository.GetAll()
+        //        .Where(pa => pa.ProviderId == model.ProviderId && pa.CenterId == model.CenterId && !pa.IsDeleted)
+        //        .ToList();
+
+
+        //    if (model.WorkingDays == null || !model.WorkingDays.Any() || model.EndDate != null)
+        //    {
+        //        if (!existingAssignments.Any())
+        //        {
+        //            return "No existing assignments found to reschedule.";
+        //        }
+
+
+        //        var assignmentToUpdate = existingAssignments.First();
+        //        assignmentToUpdate.StartDate = model.StartDate;
+        //        assignmentToUpdate.EndDate = model.EndDate;
+        //        assignmentToUpdate.AssignmentType = AssignmentType.Visiting;
+
+
+        //        var existingShifts = shiftRepository.GetAll()
+        //            .Where(s => s.ProviderAssignmentId == assignmentToUpdate.AssignmentId && !s.IsDeleted)
+        //            .ToList();
+
+
+        //        if (model.Shifts != null && model.Shifts.Any())
+        //        {
+        //            for (int i = 0; i < model.Shifts.Count; i++)
+        //            {
+        //                var shiftViewModel = model.Shifts[i];
+        //                if (i < existingShifts.Count)
+        //                {
+
+        //                    var shiftToUpdate = existingShifts[i];
+        //                    shiftToUpdate.StartTime = shiftViewModel.StartTime;
+        //                    shiftToUpdate.EndTime = shiftViewModel.EndTime;
+        //                }
+        //                else
+        //                {
+
+        //                    CreateShift(shiftViewModel, assignmentToUpdate);
+        //                }
+        //            }
+
+
+        //            for (int i = model.Shifts.Count; i < existingShifts.Count; i++)
+        //            {
+        //                existingShifts[i].IsDeleted = true;
+        //            }
+        //        }
+        //        else
+        //        {
+
+        //            foreach (var shift in existingShifts)
+        //            {
+        //                shift.IsDeleted = true;
+        //            }
+        //        }
+
+        //        commitData.SaveChanges();
+        //        return "Manual assignment rescheduled successfully.";
+        //    }
+        //    else
+        //    {
+
+        //        foreach (var oldAssignment in existingAssignments)
+        //        {
+        //            var oldShifts = shiftRepository.GetAll()
+        //                .Where(s => s.ProviderAssignmentId == oldAssignment.AssignmentId)
+        //                .ToList();
+
+        //            foreach (var shift in oldShifts)
+        //            {
+        //                shift.IsDeleted = true;
+        //            }
+
+        //            oldAssignment.IsDeleted = true;
+        //        }
+
+        //        commitData.SaveChanges();
+
+        //        List<ProviderAssignment> newAssignments = new();
+        //        DateOnly currentDate = model.StartDate.Value;
+        //        DateOnly? rangeStart = null;
+
+        //        for (int i = 0; i < 28; i++)
+        //        {
+        //            int dow = (int)currentDate.DayOfWeek;
+
+        //            if (model.WorkingDays.Contains(dow))
+        //            {
+        //                rangeStart ??= currentDate;
+        //            }
+        //            else if (rangeStart != null)
+        //            {
+        //                newAssignments.Add(new ProviderAssignment
+        //                {
+        //                    ProviderId = model.ProviderId,
+        //                    CenterId = model.CenterId,
+        //                    AssignmentType = AssignmentType.Permanent,
+        //                    StartDate = rangeStart.Value,
+        //                    EndDate = currentDate.AddDays(-1),
+        //                    IsDeleted = false
+        //                });
+
+        //                rangeStart = null;
+        //            }
+
+        //            currentDate = currentDate.AddDays(1);
+        //        }
+
+        //        if (rangeStart != null)
+        //        {
+        //            newAssignments.Add(new ProviderAssignment
+        //            {
+        //                ProviderId = model.ProviderId,
+        //                CenterId = model.CenterId,
+        //                AssignmentType = AssignmentType.Permanent,
+        //                StartDate = rangeStart.Value,
+        //                EndDate = currentDate.AddDays(-1),
+        //                IsDeleted = false
+        //            });
+        //        }
+
+        //        foreach (var assignment in newAssignments)
+        //        {
+        //            providerAssignmentRepository.Add(assignment);
+        //        }
+
+        //        commitData.SaveChanges();
+
+        //        if (model.Shifts != null)
+        //        {
+        //            foreach (var assignment in newAssignments)
+        //            {
+        //                foreach (var shift in model.Shifts)
+        //                {
+        //                    CreateShift(shift, assignment);
+        //                }
+        //            }
+        //        }
+
+        //        return "Weekly assignment rescheduled successfully.";
+        //    }
+        //}
+
         public string RescheduleAssignment(RescheduleAssignmentViewModel model)
         {
             var existingAssignments = providerAssignmentRepository.GetAll()
                 .Where(pa => pa.ProviderId == model.ProviderId && pa.CenterId == model.CenterId && !pa.IsDeleted)
                 .ToList();
-
 
             if (model.WorkingDays == null || !model.WorkingDays.Any() || model.EndDate != null)
             {
@@ -356,17 +640,14 @@ namespace Services
                     return "No existing assignments found to reschedule.";
                 }
 
-
                 var assignmentToUpdate = existingAssignments.First();
                 assignmentToUpdate.StartDate = model.StartDate;
                 assignmentToUpdate.EndDate = model.EndDate;
                 assignmentToUpdate.AssignmentType = AssignmentType.Visiting;
 
-
                 var existingShifts = shiftRepository.GetAll()
                     .Where(s => s.ProviderAssignmentId == assignmentToUpdate.AssignmentId && !s.IsDeleted)
                     .ToList();
-
 
                 if (model.Shifts != null && model.Shifts.Any())
                 {
@@ -375,18 +656,15 @@ namespace Services
                         var shiftViewModel = model.Shifts[i];
                         if (i < existingShifts.Count)
                         {
-
                             var shiftToUpdate = existingShifts[i];
                             shiftToUpdate.StartTime = shiftViewModel.StartTime;
                             shiftToUpdate.EndTime = shiftViewModel.EndTime;
                         }
                         else
                         {
-
-                            CreateShift(shiftViewModel, assignmentToUpdate);
+                            CreateShift(new List<ShiftViewModel> { shiftViewModel }, assignmentToUpdate);
                         }
                     }
-
 
                     for (int i = model.Shifts.Count; i < existingShifts.Count; i++)
                     {
@@ -395,7 +673,6 @@ namespace Services
                 }
                 else
                 {
-
                     foreach (var shift in existingShifts)
                     {
                         shift.IsDeleted = true;
@@ -407,7 +684,6 @@ namespace Services
             }
             else
             {
-
                 foreach (var oldAssignment in existingAssignments)
                 {
                     var oldShifts = shiftRepository.GetAll()
@@ -478,10 +754,7 @@ namespace Services
                 {
                     foreach (var assignment in newAssignments)
                     {
-                        foreach (var shift in model.Shifts)
-                        {
-                            CreateShift(shift, assignment);
-                        }
+                        CreateShift(model.Shifts.ToList(), assignment);
                     }
                 }
 
@@ -490,6 +763,90 @@ namespace Services
         }
 
         // background service to rescedule 
+
+        //public string RegenerateWeeklyAssignments()
+        //{
+        //    var weeklyAssignments = providerAssignmentRepository.GetAll()
+        //        .Where(pa => pa.AssignmentType == AssignmentType.Permanent && !pa.IsDeleted)
+        //        .ToList();
+
+        //    if (!weeklyAssignments.Any())
+        //        return "No weekly assignments found.";
+
+        //    var distinctProviders = weeklyAssignments
+        //        .Select(pa => pa.ProviderId)
+        //        .Distinct()
+        //        .ToList();
+
+        //    foreach (var providerId in distinctProviders)
+        //    {
+        //        var latestAssignment = providerAssignmentRepository.GetAll()
+        //            .Where(pa => pa.ProviderId == providerId)
+        //            .OrderByDescending(pa => pa.EndDate)
+        //            .FirstOrDefault();
+
+        //        if (latestAssignment == null) continue;
+
+        //        DateOnly? startDate = latestAssignment.EndDate.HasValue
+        //        ? latestAssignment.EndDate.Value.AddDays(-30)
+        //        : null;
+
+        //        if (!startDate.HasValue) continue;
+
+        //        var betweenAssignments = providerAssignmentRepository.GetAll()
+        //            .Where(pa => pa.ProviderId == providerId && pa.StartDate >= startDate)
+        //            .ToList();
+
+        //        foreach (var betweenDays in betweenAssignments)
+        //        {
+
+
+        //            var newAssignment = new ProviderAssignment
+        //            {
+
+        //                ProviderId = betweenDays.ProviderId,
+        //                CenterId = betweenDays.CenterId,
+        //                AssignmentType = betweenDays.AssignmentType,
+        //                StartDate = betweenDays.StartDate.Value.AddDays(28),
+        //                EndDate = betweenDays.EndDate.Value.AddDays(28),
+        //                IsDeleted = false
+        //            };
+
+
+        //            providerAssignmentRepository.Add(newAssignment);
+        //            commitData.SaveChanges();
+
+
+        //            var existingShifts = shiftRepository.GetAll()
+        //                .Where(s => s.ProviderAssignmentId == betweenDays.AssignmentId && !s.IsDeleted)
+        //                .ToList();
+
+        //            foreach (var shift in existingShifts)
+        //            {
+
+        //                var shiftExists = shiftRepository.GetAll()
+        //                .Any(s => s.ProviderAssignmentId == newAssignment.AssignmentId
+        //                    && s.ShiftType == shift.ShiftType
+        //                    && s.StartTime == shift.StartTime
+        //                    && s.EndTime == shift.EndTime
+        //                    && !s.IsDeleted);
+
+        //                if (shiftExists) continue;
+
+        //                ShiftViewModel shiftView = new ShiftViewModel
+        //                {
+        //                    ShiftType = shift.ShiftType,
+        //                    StartTime = shift.StartTime,
+        //                    EndTime = shift.EndTime,
+        //                    MaxPatientsPerDay = shift.MaxPatientsPerDay
+        //                };
+        //                CreateShift(shiftView, newAssignment);
+        //            }
+        //        }
+        //    }
+
+        //    return "Weekly assignments regenerated successfully.";
+        //}
 
         public string RegenerateWeeklyAssignments()
         {
@@ -526,11 +883,8 @@ namespace Services
 
                 foreach (var betweenDays in betweenAssignments)
                 {
-                    
-
                     var newAssignment = new ProviderAssignment
                     {
-
                         ProviderId = betweenDays.ProviderId,
                         CenterId = betweenDays.CenterId,
                         AssignmentType = betweenDays.AssignmentType,
@@ -539,10 +893,8 @@ namespace Services
                         IsDeleted = false
                     };
 
-
                     providerAssignmentRepository.Add(newAssignment);
                     commitData.SaveChanges();
-
 
                     var existingShifts = shiftRepository.GetAll()
                         .Where(s => s.ProviderAssignmentId == betweenDays.AssignmentId && !s.IsDeleted)
@@ -550,7 +902,6 @@ namespace Services
 
                     foreach (var shift in existingShifts)
                     {
-
                         var shiftExists = shiftRepository.GetAll()
                         .Any(s => s.ProviderAssignmentId == newAssignment.AssignmentId
                             && s.ShiftType == shift.ShiftType
@@ -567,7 +918,7 @@ namespace Services
                             EndTime = shift.EndTime,
                             MaxPatientsPerDay = shift.MaxPatientsPerDay
                         };
-                        CreateShift(shiftView, newAssignment);
+                        CreateShift(new List<ShiftViewModel> { shiftView }, newAssignment);
                     }
                 }
             }
@@ -702,14 +1053,14 @@ namespace Services
             if (!isAssigned)
                 return "Provider is not assigned to the selected center.";
 
-            // Validation: Check for duplicate service assignment
+            
             var existingService = providerCenterServiceRepository.GetAll()
                 .Any(pcs => pcs.ProviderId == model.ProviderId && pcs.CenterId == model.CenterId &&
                             pcs.ServiceId == model.ServiceId && !pcs.IsDeleted);
             if (existingService)
                 return "This service is already assigned to the provider at this center.";
 
-            // Validation: Ensure duration and price are positive
+            
             if (model.Duration <= 0)
                 return "Duration must be greater than zero.";
             if (model.Price < 0)
@@ -733,34 +1084,22 @@ namespace Services
         }
 
         // Create shift
-        public void CreateShift(ShiftViewModel model, ProviderAssignment assignment)
+        public void CreateShift(List<ShiftViewModel> shifts, ProviderAssignment assignment)
         {
-            // Validation: Ensure start time is before end time
-            if (model.StartTime >= model.EndTime)
-                return; // Silently return since this is a void method
-
-            // Validation: Ensure max patients is non-negative
-            if (model.MaxPatientsPerDay.HasValue && model.MaxPatientsPerDay < 0)
-                return;
-
-            // Validation: Check for overlapping shifts on each date
+            
             DateOnly currentDate = assignment.StartDate.Value;
-            DateOnly endDate = assignment.EndDate ?? currentDate; // Use StartDate if EndDate is null
+            DateOnly endDate = assignment.EndDate ?? currentDate;
 
-            while (currentDate <= endDate)
+            foreach (var  model in shifts)
             {
-                var existingShifts = shiftRepository.GetAll()
-                    .Where(s => s.ProviderAssignmentId == assignment.AssignmentId &&
-                                s.ShiftDate == currentDate && !s.IsDeleted)
-                    .ToList();
 
-                // Check if the new shift overlaps with any existing shift on this date
-                bool hasOverlap = existingShifts.Any(existingShift =>
-                    model.StartTime < existingShift.EndTime && existingShift.StartTime < model.EndTime);
+                
+                if (model.StartTime >= model.EndTime)
+                    return; 
 
-                if (hasOverlap)
+                
+                if (model.MaxPatientsPerDay.HasValue && model.MaxPatientsPerDay < 0)
                     return;
-
                 var shift = new Shift
                 {
                     ProviderAssignmentId = assignment.AssignmentId,
@@ -769,16 +1108,50 @@ namespace Services
                     EndTime = model.EndTime,
                     MaxPatientsPerDay = model.MaxPatientsPerDay,
                     IsDeleted = false,
-                    ShiftDate = currentDate,
+                    ShiftDate = model.ShiftDate,
                     OperatorId = model.OperatorId
                 };
 
                 shiftRepository.Add(shift);
-                currentDate = currentDate.AddDays(1);
+                 }
+
+               commitData.SaveChanges();
+
+
             }
 
-            commitData.SaveChanges();
-        }
+        //    while (currentDate <= endDate)
+        //    {
+        //        var existingShifts = shiftRepository.GetAll()
+        //            .Where(s => s.ProviderAssignmentId == assignment.AssignmentId &&
+        //                        s.ShiftDate == currentDate && !s.IsDeleted)
+        //            .ToList();
+
+            //        // Check if the new shift overlaps with any existing shift on this date
+            //        bool hasOverlap = existingShifts.Any(existingShift =>
+            //            model.StartTime < existingShift.EndTime && existingShift.StartTime < model.EndTime);
+
+            //        if (hasOverlap)
+            //            return;
+
+            //        var shift = new Shift
+            //        {
+            //            ProviderAssignmentId = assignment.AssignmentId,
+            //            ShiftType = model.ShiftType,
+            //            StartTime = model.StartTime,
+            //            EndTime = model.EndTime,
+            //            MaxPatientsPerDay = model.MaxPatientsPerDay,
+            //            IsDeleted = false,
+            //            ShiftDate = currentDate,
+            //            OperatorId = model.OperatorId
+            //        };
+
+            //        shiftRepository.Add(shift);
+            //        currentDate = currentDate.AddDays(1);
+            //    }
+
+            //    commitData.SaveChanges();
+            //}
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
