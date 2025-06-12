@@ -2,7 +2,6 @@
 using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -190,30 +189,30 @@ namespace API.Controllers
                 Status = 200,
             });
         }
-        [HttpGet("queue-entries")]
-        public IActionResult GetQueueEntries([FromQuery]string providerId)
-        {
-            if (string.IsNullOrEmpty(providerId))
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
-            }
-            Provider provider = providerServices.GetProviderById(providerId);
-            if (provider == null)
-            {
-                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
-            }
-            List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
-            if (queueEntries == null || !queueEntries.Any())
-            {
-                return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
-            }
-            return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
-            {
-                Message = "Get queue entries successfully",
-                Status = 200,
-                Data = queueEntries
-            });
-        }
+        //[HttpGet("queue-entries")]
+        //public IActionResult GetQueueEntries([FromQuery]string providerId)
+        //{
+        //    if (string.IsNullOrEmpty(providerId))
+        //    {
+        //        return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
+        //    }
+        //    Provider provider = providerServices.GetProviderById(providerId);
+        //    if (provider == null)
+        //    {
+        //        return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
+        //    }
+        //    List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
+        //    if (queueEntries == null || !queueEntries.Any())
+        //    {
+        //        return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
+        //    }
+        //    return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
+        //    {
+        //        Message = "Get queue entries successfully",
+        //        Status = 200,
+        //        Data = queueEntries
+        //    });
+        //}
 
         [HttpGet("ProviderProfile")]
         [Authorize(Roles = "Provider")]

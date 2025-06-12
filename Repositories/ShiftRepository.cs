@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using Data;
 using Models.Enums;
 using Microsoft.EntityFrameworkCore;
-using Repositories;
+using Dorak.Models;
 
-namespace Dorak.Models.Models.Wallet
+namespace Repositories
 {
     public class ShiftRepository : BaseRepository<Shift>
     {

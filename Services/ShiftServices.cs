@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Models.Enums;
 using Repositories;
@@ -95,13 +94,21 @@ namespace Services
             {
                 return false;
             }
-            shift.ShiftType = ShiftType.Cancelled;
-            foreach(var appointment in shift.Appointments)
+            if (shift.ShiftType == ShiftType.Cancelled)
             {
-                appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                return false;
             }
-            shiftRepository.Edit(shift);
-            return true;
+            shift.ShiftType = ShiftType.Cancelled;
+            if (shift.Appointments != null && shift.Appointments.Any())
+            {
+                foreach (var appointment in shift.Appointments)
+                {
+                    appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                }
+                shiftRepository.Edit(shift);
+                return true;
+            }
+            return false;
         }
     }
 

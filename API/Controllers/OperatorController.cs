@@ -33,10 +33,10 @@ namespace API.Controllers
             return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "No operators exist" });
         }
 
-        [HttpGet("Delete")]
-        public IActionResult Delete(string operatorid)
+        [HttpDelete("delete-operator")]
+        public IActionResult DeleteOperator(string operatorId)
         {
-            var result = operatorServices.SoftDelete(operatorid);
+            var result = operatorServices.DeleteOperator(operatorId);
             if (result == true)
             {
                 return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfully Deleted." });
@@ -45,9 +45,9 @@ namespace API.Controllers
         }
 
         [HttpGet("Restore")]
-        public IActionResult RestoreOperator(string operatorid)
+        public IActionResult RestoreOperator(string operatorId)
         {
-            var result = operatorServices.RestoreOperator(operatorid);
+            var result = operatorServices.RestoreOperator(operatorId);
             if (result == true)
             {
                 return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfully Restored." });
@@ -137,8 +137,7 @@ namespace API.Controllers
             var isCanceled = shiftServices.ShiftCancelation(shift);
             if (!isCanceled)
             {
-                return NotFound(new ApiResponse<object> { Message = "Shift is not found", Status = 404 });
-
+                return BadRequest(new ApiResponse<object> { Message = "Failed to cancel shift", Status = 400});
             }
             return Ok(new ApiResponse<object> { Message = "Shift canceled successfully", Status = 200 });
         }

@@ -1,6 +1,5 @@
 ﻿using Data;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
