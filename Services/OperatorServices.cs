@@ -195,7 +195,7 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<Appointment> appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId).OrderBy(app=>app.EstimatedTime);
+            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app=>app.EstimatedTime);
             int count = 0;
             foreach (var appointment in appointments)
             {
