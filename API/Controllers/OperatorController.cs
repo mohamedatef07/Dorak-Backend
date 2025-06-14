@@ -80,6 +80,25 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Failed to End Shift." });
         }
+        [HttpGet("cancel-shift")]
+        public IActionResult CancelShift([FromQuery] int shiftId, [FromQuery] int centerId)
+        {
+            if (shiftId <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Shift ID Provided", Status = 400 });
+            }
+            var shift = shiftServices.GetShiftById(shiftId);
+            if (shift == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Shift is not found", Status = 404 });
+            }
+            var isCanceled = shiftServices.ShiftCancelation(shift, centerId);
+            if (!isCanceled.Result)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Failed to cancel shift", Status = 400 });
+            }
+            return Ok(new ApiResponse<object> { Message = "Shift canceled successfully", Status = 200 });
+        }
 
         [HttpPost("reserve-appointment")]
         public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
@@ -120,26 +139,6 @@ namespace API.Controllers
                     Data = ex.Message
                 });
             }
-        }
-
-        [HttpGet("cancel-shift")]
-        public IActionResult CancelShift([FromQuery]int shiftId)
-        {
-            if (shiftId <= 0)
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Invalid Shift ID Provided", Status = 400 });
-            }
-            var shift = shiftServices.GetShiftById(shiftId);
-            if (shift == null)
-            {
-                return NotFound(new ApiResponse<object> { Message = "Shift is not found", Status = 404 });
-            }
-            var isCanceled = shiftServices.ShiftCancelation(shift);
-            if (!isCanceled)
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Failed to cancel shift", Status = 400});
-            }
-            return Ok(new ApiResponse<object> { Message = "Shift canceled successfully", Status = 200 });
         }
     }
 }
