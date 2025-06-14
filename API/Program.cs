@@ -13,6 +13,8 @@ using Hangfire;
 using Hangfire.SqlServer;
 using Stripe;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using System.Diagnostics;
 
 namespace API
 {
@@ -28,7 +30,17 @@ namespace API
             
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}")));
+            // logging
+            Serilog.Log.Logger = new LoggerConfiguration()
+                .WriteTo.File(@"Logs\DorakLog.txt",
+                        rollingInterval: RollingInterval.Day,
+                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
+                        retainedFileCountLimit: null,
+                        fileSizeLimitBytes: null,
+                        rollOnFileSizeLimit: true).CreateLogger();
+
+            builder.Host.UseSerilog();
 
             // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
@@ -178,8 +190,12 @@ namespace API
 
             builder.Services.AddSignalR();
 
-            var app = builder.Build();
+            builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
+            builder.Services.AddScoped<TransactionMiddleware>();
 
+            var app = builder.Build();
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>();
+            app.UseMiddleware<TransactionMiddleware>();
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
