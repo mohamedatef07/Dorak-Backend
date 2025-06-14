@@ -23,7 +23,7 @@ namespace API.Controllers
         private readonly AppointmentServices appointmentServices;
         private readonly ReviewServices reviewServices;
         private readonly ClientServices clientServices;
-        private LiveQueueServices liveQueueServices;
+        private readonly LiveQueueServices liveQueueServices;
 
         public ClientController(AppointmentServices _appointmentServices,LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
         {

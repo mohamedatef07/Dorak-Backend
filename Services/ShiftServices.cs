@@ -1,14 +1,16 @@
-﻿using System;
+﻿using Data;
+using Dorak.DataTransferObject;
+using Dorak.Models;
+using Dorak.ViewModels;
+using Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Models.Enums;
+using Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Data;
-using Dorak.DataTransferObject;
-using Dorak.Models;
-using Dorak.ViewModels;
-using Models.Enums;
-using Repositories;
 
 namespace Services
 {
@@ -17,13 +19,19 @@ namespace Services
         private readonly ShiftRepository shiftRepository;
         private readonly AppointmentRepository appointmentRepository;
         private readonly LiveQueueRepository liveQueueRepository;
+        private readonly CenterServices centerServices;
+        private readonly CommitData commitData;
+        private readonly IHubContext<ShiftListHub> shiftListHubContext;
 
 
-        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository)
+        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, IHubContext<ShiftListHub> _shiftListHubContext, CenterServices _centerServices)
         {
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
+            commitData = _commitData;
+            shiftListHubContext = _shiftListHubContext;
+            centerServices = _centerServices;
         }
         public Shift GetShiftById(int shiftId)
         {
@@ -77,7 +85,7 @@ namespace Services
 
             var shifts = proivderAssignments.SelectMany(
                 pa =>
-                     pa.Shifts.Select(shift => new GetAllCenterShiftsDTO
+                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled).Select(shift => new GetAllCenterShiftsDTO
                      {
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
                          ShiftId = shift.ShiftId,
@@ -88,7 +96,7 @@ namespace Services
                 ).ToList();
             return shifts;
         }
-        public bool ShiftCancelation(Shift shift)
+        public async Task<bool> ShiftCancelation(Shift shift, int centerId)
         {
             if (shift == null)
             {
@@ -106,6 +114,10 @@ namespace Services
                     appointment.AppointmentStatus = AppointmentStatus.Cancelled;
                 }
                 shiftRepository.Edit(shift);
+                commitData.SaveChanges();
+                var center = centerServices.GetCenterById(centerId);
+                var updatedShiftList = GetAllCenterShifts(center);
+                await shiftListHubContext.Clients.All.SendAsync("updateShiftsList", updatedShiftList);
                 return true;
             }
             return false;
