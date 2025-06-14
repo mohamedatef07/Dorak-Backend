@@ -1,6 +1,5 @@
 ﻿using Data;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -13,9 +12,6 @@ using System.Text.Json.Serialization;
 using Hangfire;
 using Hangfire.SqlServer;
 using Stripe;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Dorak.DataTransferObject;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
 namespace API

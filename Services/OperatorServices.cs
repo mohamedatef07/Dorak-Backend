@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Hubs;
 using Microsoft.AspNetCore.Identity;
@@ -28,8 +22,7 @@ namespace Services
         private readonly AppointmentServices appointmentServices;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly TemperoryClientRepository temperoryClientRepository;
-
-        public CommitData commitData;
+        private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
 
         public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository)
@@ -65,7 +58,7 @@ namespace Services
             return IdentityResult.Success;
         }
 
-        public bool SoftDelete(string operatorId)
+        public bool DeleteOperator(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
 
@@ -202,7 +195,7 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<Appointment> appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId).OrderBy(app=>app.EstimatedTime);
+            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app=>app.EstimatedTime);
             int count = 0;
             foreach (var appointment in appointments)
             {
@@ -246,14 +239,13 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllLiveQueueForShift(ShiftId);
+            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllShiftLiveQueues(ShiftId);
 
             foreach (var liveQueue in liveQueues)
             {
                 liveQueueRepository.Delete(liveQueue);
             }
             commitData.SaveChanges();
-
             return true;
         }
 
