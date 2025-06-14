@@ -16,12 +16,12 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
     {
-        public CenterServices centerServices;
-        public ProviderServices providerServices;
-        public OperatorServices operatorServices;
-        public ShiftServices shiftServices;
-        public LiveQueueServices liveQueueServices;
-        LiveQueueRepository liveQueueRepository;
+        private readonly CenterServices centerServices;
+        private readonly ProviderServices providerServices;
+        private readonly OperatorServices operatorServices;
+        private readonly ShiftServices shiftServices;
+        private readonly LiveQueueServices liveQueueServices;
+        private readonly LiveQueueRepository liveQueueRepository;
         public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices, CenterServices _centerServices, OperatorServices _operatorServices, LiveQueueRepository _liveQueueRepository)
         {
             centerServices = _centerServices;

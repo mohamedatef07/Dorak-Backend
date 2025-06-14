@@ -243,6 +243,7 @@ namespace API
               service => service.UpdateAllProvidersAverageRating(),
                Cron.Monthly);
             app.MapHub<QueueHub>("/queueHub");
+            app.MapHub<ShiftListHub>("/shiftListHub");
             app.MapControllers();
             app.Run();
         }
