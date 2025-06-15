@@ -1,10 +1,15 @@
-﻿using Dorak.DataTransferObject;
+﻿using Data;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models.Enums;
 using Repositories;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -15,11 +20,22 @@ namespace Services
     public class LiveQueueServices
     {
         private readonly LiveQueueRepository liveQueueRepository;
+        private readonly AppointmentRepository appointmentRepository;
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
-        public LiveQueueServices(LiveQueueRepository _liveQueueRepository, ProviderServices _providerServices, ClientRepository _clientRepository, ProviderAssignmentRepository _providerAssignmentRepository, OperatorRepository _operatorRepository)
+        private readonly IHubContext<QueueHub> hubContext;
+
+        public LiveQueueServices(LiveQueueRepository _liveQueueRepository,
+            AppointmentRepository appointmentRepository,
+            ProviderServices _providerServices,
+            ClientRepository _clientRepository,
+            ProviderAssignmentRepository _providerAssignmentRepository,
+            OperatorRepository _operatorRepository,
+            IHubContext<QueueHub> hubContext)
         {
             liveQueueRepository = _liveQueueRepository;
+            this.appointmentRepository = appointmentRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
+            this.hubContext = hubContext;
         }
 
         //Get Queue Entries for a provider
@@ -234,34 +250,38 @@ namespace Services
         }
 
 
-        //public async Task<GetQueueEntriesDTO?> GetQueueEntryByAppointmentIdAsync(int appointmentId)
-        //{
-        //    var liveQueue = await liveQueueRepository.GetByAppointmentIdAsync(appointmentId);
-
-        //    if (liveQueue == null)
-        //        return null;
-
-        //    var appointment = liveQueue.Appointment;
-
-        //    return new GetQueueEntriesDTO
-        //    {
-        //        FullName = appointment.User != null
-        //            ? $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}"
-        //            : $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
-        //        ArrivalTime = liveQueue.ArrivalTime,
-        //        AppointmentDate = appointment.AppointmentDate,
-        //        Type = appointment.ClientType,
-        //        Status = liveQueue.AppointmentStatus,
-        //        PhoneNumber = appointment.User != null
-        //            ? appointment.User.PhoneNumber
-        //            : appointment.TemporaryClient.ContactInfo,
-        //        CurrentQueuePosition = liveQueue.CurrentQueuePosition
-        //    };
-        //}
-
-        public async Task<List<ClientLiveQueueDTO>> GetLiveQueueForShiftAsync(int shiftId, string? userId)
+        public List<ClientLiveQueueDTO> GetQueueEntryByAppointmentId(int appointmentId)
         {
-            var liveQueues = await liveQueueRepository.GetLiveQueueDetailsForShiftAsync(shiftId);
+
+
+            var app = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
+            if (app==null)
+            {
+                return null;
+            }
+
+           
+
+            var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(app.ShiftId);
+
+            var result = liveQueues.Select(lq => new ClientLiveQueueDTO
+            {
+                
+                ArrivalTime = lq.ArrivalTime,
+                AppointmentDate = lq.Appointment.AppointmentDate,
+                Type = lq.Appointment.ClientType,
+                Status = lq.AppointmentStatus,
+               
+                CurrentQueuePosition = lq.CurrentQueuePosition,
+                IsCurrentClient = lq.Appointment.AppointmentId == appointmentId
+            }).ToList();
+
+            return result;
+        }
+
+        public List<ClientLiveQueueDTO> GetLiveQueueForShift(int shiftId, string? userId)
+        {
+            var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(shiftId);
             var result = new List<ClientLiveQueueDTO>();
 
             foreach (var liveQueue in liveQueues)
@@ -270,16 +290,11 @@ namespace Services
 
                 var dto = new ClientLiveQueueDTO
                 {
-                    FullName = appointment.User != null
-                        ? $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}"
-                        : $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
                     ArrivalTime = liveQueue.ArrivalTime,
                     AppointmentDate = appointment.AppointmentDate,
                     Type = appointment.ClientType,
                     Status = liveQueue.AppointmentStatus,
-                    PhoneNumber = appointment.User != null
-                        ? appointment.User.PhoneNumber
-                        : appointment.TemporaryClient.ContactInfo,
+                    
                     CurrentQueuePosition = liveQueue.CurrentQueuePosition,
 
                     // 🔥 This flag helps you identify the logged-in client's appointment
@@ -290,6 +305,27 @@ namespace Services
             }
 
             return result;
+        }
+
+        public async Task NotifyShiftQueueUpdate(int shiftId)
+        {
+            var liveQueueList = liveQueueRepository
+                .GetLiveQueueDetailsForShift(shiftId)
+                .Select(lq => new ClientLiveQueueDTO
+                {
+
+                    ArrivalTime = lq.ArrivalTime,
+                    AppointmentDate = lq.Appointment.AppointmentDate,
+                    Type = lq.Appointment.ClientType,
+                    Status = lq.AppointmentStatus,
+
+                    CurrentQueuePosition = lq.CurrentQueuePosition,
+                    IsCurrentClient = false // سيتم تحديده بالفرونت
+                }).ToList();
+
+            await hubContext.Clients
+                .Group($"shift_{shiftId}")
+                .SendAsync("QueueUpdated", liveQueueList);
         }
 
     }

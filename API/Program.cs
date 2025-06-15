@@ -195,11 +195,11 @@ namespace API
                     options.PayloadSerializerOptions.PropertyNameCaseInsensitive = false;
                 });
 
-            builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
+            //builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             builder.Services.AddScoped<TransactionMiddleware>();
 
             var app = builder.Build();
-            app.UseMiddleware<GlobalErrorHandlerMiddleware>();
+            //app.UseMiddleware<GlobalErrorHandlerMiddleware>();
             app.UseMiddleware<TransactionMiddleware>();
             using (var scope = app.Services.CreateScope())
             {
