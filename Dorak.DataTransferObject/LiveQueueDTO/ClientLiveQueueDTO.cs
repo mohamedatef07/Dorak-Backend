@@ -9,8 +9,7 @@ namespace Dorak.DataTransferObject
 {
     public class ClientLiveQueueDTO
     {
-        public string FullName { get; set; }
-        public string PhoneNumber { get; set; }
+       
         public int? CurrentQueuePosition { get; set; }
         public TimeOnly? ArrivalTime { get; set; }
         public DateOnly AppointmentDate { get; set; }
