@@ -22,10 +22,11 @@ namespace Services
         private readonly AppointmentServices appointmentServices;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly TemperoryClientRepository temperoryClientRepository;
+        private readonly UserManager<User> userManager;
         private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
 
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -38,7 +39,10 @@ namespace Services
             providerCenterServiceRepository = _providerCenterServiceRepository;
             temperoryClientRepository = _temperoryClientRepository;
             accountRepository = _accountRepository;
+            userManager = _userManager;
+
             hubContext = _hubContext;
+
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -57,6 +61,28 @@ namespace Services
             commitData.SaveChanges();
             return IdentityResult.Success;
         }
+        public async Task<bool> DeleteOperator(string operatorId)
+        {
+            var selectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+            if (selectedOperator == null)
+                return false;
+
+            operatorRepository.Delete(selectedOperator);
+
+            var selectedUser = await userManager.FindByIdAsync(operatorId);
+            if (selectedUser != null)
+            {
+                var result = await userManager.DeleteAsync(selectedUser);
+                if (!result.Succeeded)
+                {
+                    return false;
+                }
+            }
+            commitData.SaveChanges();
+            return true;
+        }
+
 
         public bool DeleteOperator(string operatorId)
         {
@@ -166,6 +192,14 @@ namespace Services
             createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
             commitData.SaveChanges();
+
+            var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
+
+            var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
+            if (queuedAppointment != null)
+            {
+                createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
+            }
 
             return createdAppointment;
         }
