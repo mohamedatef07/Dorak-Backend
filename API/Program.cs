@@ -1,18 +1,19 @@
 ﻿using Data;
 using Dorak.Models;
+using Hangfire;
+using Hangfire.SqlServer;
+using Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Repositories;
 using Services;
-using Hubs;
-using System.Text;
-using System.Text.Json.Serialization;
-using Hangfire;
-using Hangfire.SqlServer;
 using Stripe;
-using Microsoft.OpenApi.Models;
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace API
 {
@@ -25,7 +26,7 @@ namespace API
             // Add services to the container
             builder.Services.AddControllersWithViews();
 
-            
+
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
@@ -40,7 +41,7 @@ namespace API
             {
                 throw new InvalidOperationException("Stripe SecretKey is not configured in appsettings.json.");
             }
-            StripeConfiguration.ApiKey = stripeSecretKey; 
+            StripeConfiguration.ApiKey = stripeSecretKey;
 
 
             // ?? Hangfire Configuration
@@ -176,7 +177,12 @@ namespace API
                 #endregion
             });
 
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR(hubOptions =>{ })
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+                    options.PayloadSerializerOptions.PropertyNameCaseInsensitive = false;
+                });
 
             var app = builder.Build();
 
@@ -226,7 +232,7 @@ namespace API
                     "0 */10 * * *");
                 var appointmentServices = scope.ServiceProvider.GetRequiredService<AppointmentServices>();
 
-                
+
                 recurringJobManager.AddOrUpdate(
                     "CancelUnpaidAppointmentsJob",
                     () => appointmentServices.CancelUnpaidAppointments(),
