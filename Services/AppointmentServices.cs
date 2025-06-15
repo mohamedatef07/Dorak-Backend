@@ -1,7 +1,6 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models.Enums;
@@ -264,6 +263,7 @@ namespace Services
                 {
                     dbApp.EstimatedTime = app.EstimatedTime;
                     appointmentRepository.Edit(dbApp);
+
                 }
             }
 

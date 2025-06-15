@@ -65,36 +65,36 @@ namespace Services
 
         //public List<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId)
         //{
-            
+
         //    var providerAssignments = providerAssignmentRepository.GetAll()
         //        .Where(pa => pa.ProviderId == providerId && pa.CenterId == centerId && !pa.IsDeleted)
         //        .ToList();
 
         //    if (!providerAssignments.Any())
         //    {
-                
+
         //        return new List<ProviderLiveQueueViewModel>();
         //    }
 
-            
+
         //    List<Shift> shifts = providerAssignments.SelectMany(pa => pa.Shifts
         //        .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
         //        .ToList();
-            
+
 
         //    if (!shifts.Any())
         //    {
-                
+
         //        return new List<ProviderLiveQueueViewModel>();
         //    }
 
-            
+
         //    List<LiveQueue> liveQueues = shifts.SelectMany(sh => sh.LiveQueues
         //        .Where(lq => lq.ShiftId == sh.ShiftId))
         //        .ToList();
-            
 
-            
+
+
         //    List<ProviderLiveQueueViewModel> result = new List<ProviderLiveQueueViewModel>();
         //    foreach (var liveQueue in liveQueues)
         //    {
@@ -137,14 +137,14 @@ namespace Services
 
         public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId, int pageNumber = 1, int pageSize = 16)
         {
-            
+
             var providerAssignments = providerAssignmentRepository.GetAll()
                 .Where(pa => pa.ProviderId == providerId && pa.CenterId == centerId && !pa.IsDeleted)
                 .ToList();
 
             if (!providerAssignments.Any())
             {
-                
+
                 return new PaginationViewModel<ProviderLiveQueueViewModel>
                 {
                     Data = new List<ProviderLiveQueueViewModel>(),
@@ -154,15 +154,15 @@ namespace Services
                 };
             }
 
-            
+
             List<Shift> shifts = providerAssignments.SelectMany(pa => pa.Shifts
                 .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
                 .ToList();
-            
+
 
             if (!shifts.Any())
             {
-                
+
                 return new PaginationViewModel<ProviderLiveQueueViewModel>
                 {
                     Data = new List<ProviderLiveQueueViewModel>(),
@@ -172,12 +172,12 @@ namespace Services
                 };
             }
 
-            
+
             var liveQueues = shifts.SelectMany(sh => sh.LiveQueues
                 .Where(lq => lq.ShiftId == sh.ShiftId))
                 .OrderBy(lq => lq.CurrentQueuePosition)
                 .ToList();
-           
+
             var total = liveQueues.Count;
 
             var paginatedLiveQueues = liveQueues
@@ -185,7 +185,7 @@ namespace Services
                 .Take(pageSize)
                 .ToList();
 
-            
+
             List<ProviderLiveQueueViewModel> result = new List<ProviderLiveQueueViewModel>();
             foreach (var liveQueue in paginatedLiveQueues)
             {
@@ -222,7 +222,7 @@ namespace Services
                 }
             }
 
-            
+
 
             return new PaginationViewModel<ProviderLiveQueueViewModel>
             {

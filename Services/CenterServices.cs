@@ -38,7 +38,7 @@ namespace Services
         {
             return centerRepository.GetAll().ToList();
         }
-        public Center GetById(int id)
+        public Center GetCenterById(int id)
         {
             return centerRepository.GetById(c => c.CenterId == id);
         }

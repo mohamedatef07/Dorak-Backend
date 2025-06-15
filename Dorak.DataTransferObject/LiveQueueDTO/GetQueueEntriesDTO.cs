@@ -15,7 +15,7 @@ namespace Dorak.DataTransferObject
         public int? CurrentQueuePosition { get; set; }
         public TimeOnly? ArrivalTime { get; set; }
         public DateOnly AppointmentDate { get; set; }
-        public ClientType Type { get; set; }
+        public ClientType ClientType { get; set; }
         public QueueAppointmentStatus Status { get; set; }
 
     }

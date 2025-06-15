@@ -1,6 +1,5 @@
 ﻿using Data;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
@@ -26,6 +25,7 @@ namespace Services
         public AccountServices accountServices;
         public UserManager<User> userManager;
         public CommitData commitData;
+        public AccountRepository accountRepository;
         private readonly DorakContext context;
         private readonly IWebHostEnvironment _env;
 
@@ -37,6 +37,7 @@ namespace Services
             ProviderAssignmentRepository _providerAssignmentRepository,
             ShiftRepository _shiftRepository,
             ProviderCenterServiceRepository _providerCenterServiceRepository,
+            AccountRepository _accountRepository,
             CenterRepository _centerRepository,
            
             UserManager<User> _userManager,
@@ -52,6 +53,7 @@ namespace Services
             shiftRepository = _shiftRepository;
             providerCenterServiceRepository = _providerCenterServiceRepository;
             centerRepository = _centerRepository;
+            accountRepository = _accountRepository;
             
             userManager = _userManager;
             commitData = _commitData;
@@ -1156,27 +1158,35 @@ namespace Services
         }
 
 
-        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        private async Task<string> SaveImageAsync(ProviderProfileDTO user, string providerId)
         {
-            if (imageFile == null || imageFile.Length == 0)
-                return null;
-
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
-            var filePath = Path.Combine("wwwroot/images/providers", fileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            if (user.ImageFile != null && user.ImageFile.Length > 0)
             {
-                await imageFile.CopyToAsync(stream);
+                // المسار يكون داخل wwwroot/image/provider/{ID}
+                var folderPath = Path.Combine(_env.WebRootPath, "image", "provider", providerId);
+                Directory.CreateDirectory(folderPath);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(user.ImageFile.FileName);
+                var fullPath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await user.ImageFile.CopyToAsync(stream);
+                }
+
+                // هنا return path يكون من بعد wwwroot
+                string imagePath = $"/image/provider/{providerId}/{fileName}";
+                return imagePath;
             }
 
-            return "/images/providers/" + fileName;
+            return null;
         }
+
 
 
         public async Task<string> UpdateDoctorProfile(string userId, UpdateProviderProfileDTO model)
         {
             var provider = providerRepository.GetById(p => p.ProviderId == userId && !p.IsDeleted);
-
             if (provider == null)
                 return "Provider not found.";
 
@@ -1190,34 +1200,35 @@ namespace Services
             if (!string.IsNullOrWhiteSpace(model.LastName))
                 provider.LastName = model.LastName;
 
-            if (model.BirthDate != default)
-                provider.BirthDate = model.BirthDate;
-
-            if (model.Image != null)
-            {
-                var savedImagePath = await SaveImageAsync(model.Image);
-                provider.Image = savedImagePath;
-            }
-
-
-            providerRepository.Edit(provider);
-
             if (!string.IsNullOrWhiteSpace(model.Email))
                 user.Email = model.Email;
 
             if (!string.IsNullOrWhiteSpace(model.Phone))
                 user.PhoneNumber = model.Phone;
 
-            var updateResult = await userManager.UpdateAsync(user);
-            if (!updateResult.Succeeded)
+            if (model.BirthDate != default)
+                provider.BirthDate = model.BirthDate;
+
+            if (model.Image != null)
             {
-                var errorMessages = string.Join(", ", updateResult.Errors.Select(e => e.Description));
-                return $"Failed to update user account: {errorMessages}";
+                var imageDto = new ProviderProfileDTO
+                {
+                    Role = "Provider",
+                    ImageFile = model.Image
+                };
+
+                var savedImagePath = await SaveImageAsync(imageDto, provider.ProviderId);
+                provider.Image = savedImagePath;
             }
 
-            commitData.SaveChanges();
-            return "Doctor profile updated successfully.";
+            providerRepository.Edit(provider);
+            accountRepository.Edit(user);
+
+            await context.SaveChangesAsync();
+
+            return "Profile updated successfully.";
         }
+
 
 
 

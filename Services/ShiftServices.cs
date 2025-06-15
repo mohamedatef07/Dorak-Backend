@@ -1,34 +1,42 @@
-﻿using System;
+﻿using Data;
+using Dorak.DataTransferObject;
+using Dorak.Models;
+using Dorak.ViewModels;
+using Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Models.Enums;
+using Repositories;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Data;
-using Dorak.DataTransferObject;
-using Dorak.Models;
-using Dorak.Models.Models.Wallet;
-using Dorak.ViewModels;
-using Repositories;
 
 namespace Services
 {
     public class ShiftServices
     {
-        ShiftRepository shiftRepository;
-        CenterRepository centerRepository;
-        AppointmentRepository appointmentRepository;
-        LiveQueueRepository liveQueueRepository;
-        public CommitData commitData;
+        private readonly ShiftRepository shiftRepository;
+        private readonly AppointmentRepository appointmentRepository;
+        private readonly LiveQueueRepository liveQueueRepository;
+        private readonly CenterServices centerServices;
+        private readonly CommitData commitData;
+        private readonly IHubContext<ShiftListHub> shiftListHubContext;
 
-        public ShiftServices(ShiftRepository _shiftRepository,CenterRepository _centerRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData)
+
+        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, IHubContext<ShiftListHub> _shiftListHubContext, CenterServices _centerServices)
         {
             shiftRepository = _shiftRepository;
-            centerRepository = _centerRepository;
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
+            shiftListHubContext = _shiftListHubContext;
+            centerServices = _centerServices;
         }
-
+        public Shift GetShiftById(int shiftId)
+        {
+            return shiftRepository.GetShiftById(shiftId);
+        }
         public IQueryable<ShiftDTO> GetShiftsWithDateAndCenterId(DateOnly _shiftDate, int centerId)
         {
             var shifts = shiftRepository.GetShiftsWithDateAndCenterId(_shiftDate, centerId);
@@ -37,16 +45,18 @@ namespace Services
 
         public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
         {
-            var appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId);
+            var appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
         }
 
         public IQueryable<Appointment> LiveShiftAppointments()
-        {   
+        {
             var shifts = shiftRepository.LiveQueueShift().ToList();
-            foreach (var shift in shifts) {
-                var appointments = appointmentRepository.GetAllAppointmentForShift(shift.ShiftId);
-                foreach (var appointment in appointments) {
+            foreach (var shift in shifts)
+            {
+                var appointments = appointmentRepository.GetAllShiftAppointments(shift.ShiftId);
+                foreach (var appointment in appointments)
+                {
 
                     liveQueueRepository.Add(new LiveQueue
                     {
@@ -65,6 +75,55 @@ namespace Services
             }
             return null;
         }
+        public List<GetAllCenterShiftsDTO> GetAllCenterShifts(Center center)
+        {
+            if (center?.ProviderAssignments == null || !center.ProviderAssignments.Any())
+            {
+                return new List<GetAllCenterShiftsDTO>();
+            }
+            var proivderAssignments = center.ProviderAssignments;
+
+            var shifts = proivderAssignments.SelectMany(
+                pa =>
+                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled).Select(shift => new GetAllCenterShiftsDTO
+                     {
+                         ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
+                         ShiftId = shift.ShiftId,
+                         ShiftDate = shift.ShiftDate,
+                         StartTime = shift.StartTime,
+                         EndTime = shift.EndTime,
+                         ShiftType = shift.ShiftType,
+                     })
+                ).ToList();
+            return shifts;
+        }
+        public async Task<bool> ShiftCancelation(Shift shift, int centerId)
+        {
+            if (shift == null)
+            {
+                return false;
+            }
+            if (shift.ShiftType == ShiftType.Cancelled)
+            {
+                return false;
+            }
+            shift.ShiftType = ShiftType.Cancelled;
+            if (shift.Appointments != null && shift.Appointments.Any())
+            {
+                foreach (var appointment in shift.Appointments)
+                {
+                    appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                }
+                shiftRepository.Edit(shift);
+                commitData.SaveChanges();
+                var center = centerServices.GetCenterById(centerId);
+                var updatedShiftList = GetAllCenterShifts(center);
+                await shiftListHubContext.Clients.All.SendAsync("updateShiftsList", updatedShiftList);
+                return true;
+            }
+            return false;
+        }
     }
+
 
 }

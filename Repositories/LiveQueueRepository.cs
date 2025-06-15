@@ -118,20 +118,12 @@ namespace Repositories
             return count;
         }
 
-        public IQueryable<LiveQueue> GetAllLiveQueueForShift(int ShiftId)
+        public IQueryable<LiveQueue> GetAllShiftLiveQueues(int ShiftId)
         {
             return GetAll().Where(a => a.ShiftId == ShiftId);
         }
 
-        public async Task<LiveQueue?> GetByAppointmentIdAsync(int appointmentId)
-        {
-            return await Table
-                .Include(lq => lq.Appointment)
-                    .ThenInclude(a => a.User)
-                        .ThenInclude(u => u.Client)
-                .Include(lq => lq.Appointment.TemporaryClient)
-                .FirstOrDefaultAsync(lq => lq.AppointmentId == appointmentId);
-        }
+       
         public async Task<List<LiveQueue>> GetLiveQueueDetailsForShiftAsync(int shiftId)
         {
             return await Table

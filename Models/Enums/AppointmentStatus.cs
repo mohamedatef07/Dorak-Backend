@@ -12,6 +12,5 @@ namespace Models.Enums
         Confirmed,
         Pending,
         Cancelled,
-        Urgent
     }
 }
