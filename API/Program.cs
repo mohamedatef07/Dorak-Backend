@@ -12,12 +12,7 @@ using Repositories;
 using Services;
 using Stripe;
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
-using Hangfire;
-using Hangfire.SqlServer;
-using Stripe;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Diagnostics;
 
@@ -193,7 +188,7 @@ namespace API
                 #endregion
             });
 
-            builder.Services.AddSignalR(hubOptions =>{ })
+            builder.Services.AddSignalR()
                 .AddJsonProtocol(options =>
                 {
                     options.PayloadSerializerOptions.PropertyNamingPolicy = null;
