@@ -92,6 +92,7 @@ namespace Services
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
                          EndTime = shift.EndTime,
+                         ShiftType = shift.ShiftType,
                      })
                 ).ToList();
             return shifts;

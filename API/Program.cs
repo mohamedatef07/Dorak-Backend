@@ -1,18 +1,18 @@
 ﻿using Data;
 using Dorak.Models;
+using Hangfire;
+using Hangfire.SqlServer;
+using Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Repositories;
 using Services;
-using Hubs;
+using Stripe;
 using System.Text;
 using System.Text.Json.Serialization;
-using Hangfire;
-using Hangfire.SqlServer;
-using Stripe;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Diagnostics;
 
@@ -27,7 +27,7 @@ namespace API
             // Add services to the container
             builder.Services.AddControllersWithViews();
 
-            
+
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
                        .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}"),LogLevel.Information));
@@ -52,7 +52,7 @@ namespace API
             {
                 throw new InvalidOperationException("Stripe SecretKey is not configured in appsettings.json.");
             }
-            StripeConfiguration.ApiKey = stripeSecretKey; 
+            StripeConfiguration.ApiKey = stripeSecretKey;
 
 
             // ?? Hangfire Configuration
@@ -188,7 +188,12 @@ namespace API
                 #endregion
             });
 
-            builder.Services.AddSignalR();
+            builder.Services.AddSignalR()
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+                    options.PayloadSerializerOptions.PropertyNameCaseInsensitive = false;
+                });
 
             builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
             builder.Services.AddScoped<TransactionMiddleware>();
@@ -242,7 +247,7 @@ namespace API
                     "0 */10 * * *");
                 var appointmentServices = scope.ServiceProvider.GetRequiredService<AppointmentServices>();
 
-                
+
                 recurringJobManager.AddOrUpdate(
                     "CancelUnpaidAppointmentsJob",
                     () => appointmentServices.CancelUnpaidAppointments(),
