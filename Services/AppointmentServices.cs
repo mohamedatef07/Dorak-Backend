@@ -1,7 +1,6 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models.Enums;
@@ -139,10 +138,10 @@ namespace Services
             return appointments?.AppointmentToAppointmentDTO();
         }
 
-        public List<AppointmentDTO> GetUpcomingAppointments(string userId)
+        public List<AppointmentForClientProfileDTO> GetUpcomingAppointments(string userId)
         {
             var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
-                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentDTO());
+                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentForClientProfileDTO());
             return upcoming.ToList();
         }
 
@@ -264,6 +263,7 @@ namespace Services
                 {
                     dbApp.EstimatedTime = app.EstimatedTime;
                     appointmentRepository.Edit(dbApp);
+
                 }
             }
 

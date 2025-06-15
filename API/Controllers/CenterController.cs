@@ -39,6 +39,7 @@ namespace API.Controllers
         [HttpGet]
         [Route("OperatorstoCenter")]
         public IActionResult GetOperators([FromQuery]int centerId)
+
         {
             var operators = operatorServices.GetOperatorsByCenterId(centerId);
 

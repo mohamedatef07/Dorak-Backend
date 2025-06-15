@@ -1,15 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
+using Hubs;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
 
@@ -26,10 +22,11 @@ namespace Services
         private readonly AppointmentServices appointmentServices;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly TemperoryClientRepository temperoryClientRepository;
-        private UserManager<User> userManager;
+        private readonly UserManager<User> userManager;
+        private readonly CommitData commitData;
+        private readonly IHubContext<QueueHub> hubContext;
 
-        public CommitData commitData;
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository, UserManager<User> _userManager)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -37,12 +34,15 @@ namespace Services
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
-            liveQueueRepository = _liveQueueRepository;
+            
             appointmentServices = _appointmentServices;
             providerCenterServiceRepository = _providerCenterServiceRepository;
             temperoryClientRepository = _temperoryClientRepository;
             accountRepository = _accountRepository;
             userManager = _userManager;
+
+            hubContext = _hubContext;
+
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -84,7 +84,7 @@ namespace Services
         }
 
 
-        public bool SoftDelete(string operatorId)
+        public bool DeleteOperator(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
 
@@ -209,7 +209,7 @@ namespace Services
         {
             return $"TMP-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
         }
-
+        // we need the list from the algorithm
         public bool StartShift(int ShiftId, string operatorId)
         {
             DateTime currentTime = DateTime.Now;
@@ -229,8 +229,8 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<Appointment> appointments = appointmentRepository.GetAllAppointmentForShift(ShiftId);
-
+            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app=>app.EstimatedTime);
+            int count = 0;
             foreach (var appointment in appointments)
             {
                 appointment.OperatorId = operatorId;
@@ -243,7 +243,9 @@ namespace Services
                     Capacity =  appointment.Shift.MaxPatientsPerDay,
                     OperatorId = appointment.OperatorId,
                     AppointmentId = appointment.AppointmentId,
-                    ShiftId = appointment.ShiftId
+                    ShiftId = appointment.ShiftId,
+                    CurrentQueuePosition = ++count,
+                    
                 };
 
                 liveQueueRepository.Add(livequeue);
@@ -271,14 +273,13 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllLiveQueueForShift(ShiftId);
+            IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllShiftLiveQueues(ShiftId);
 
             foreach (var liveQueue in liveQueues)
             {
                 liveQueueRepository.Delete(liveQueue);
             }
             commitData.SaveChanges();
-
             return true;
         }
 
@@ -351,6 +352,8 @@ namespace Services
 
             appointment.UpdatedAt = now;
             commitData.SaveChanges();
+
+            hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
 
             return "Queue status updated successfully";
         }

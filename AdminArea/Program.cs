@@ -1,6 +1,5 @@
 using Data;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;

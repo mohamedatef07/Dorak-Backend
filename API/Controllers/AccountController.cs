@@ -1,9 +1,12 @@
 ﻿using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.AccountDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using System.Security.Claims;
 using System.Web;
 
 namespace API.Controllers
@@ -228,18 +231,51 @@ namespace API.Controllers
         }
 
         //change password
+        [Authorize]
         [HttpPut("change-password")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO model)
+        public async Task<IActionResult> ChangePassword([FromForm] ChangePasswordDTO model)
         {
-            var result = await _accountServices.ChangePasswordAsync(model);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Message = "Invalid data",
+                    Status = 400,
+                    Data = null
+                });
+            }
 
-            return Ok(new ApiResponse<object>
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object>
+                {
+                    Message = "Unauthorized",
+                    Status = 401,
+                    Data = null
+                });
+            }
+
+            var result = await _accountServices.ChangePasswordAsync(userId, model);
+
+            if (result.StartsWith("Password changed"))
+            {
+                return Ok(new ApiResponse<object>
+                {
+                    Message = result,
+                    Status = 200,
+                    Data = null
+                });
+            }
+
+            return BadRequest(new ApiResponse<object>
             {
                 Message = result,
-                Status = 200,
-                Data = result
+                Status = 400,
+                Data = null
             });
         }
+
         //Forgot Password
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)

@@ -1,20 +1,20 @@
 ﻿using Data;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
+using Hangfire;
+using Hangfire.SqlServer;
+using Hubs;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Repositories;
 using Services;
+using Stripe;
 using System.Text;
 using System.Text.Json.Serialization;
-using Hangfire;
-using Hangfire.SqlServer;
-using Stripe;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Dorak.DataTransferObject;
-using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using System.Diagnostics;
 
 namespace API
 {
@@ -27,10 +27,20 @@ namespace API
             // Add services to the container
             builder.Services.AddControllersWithViews();
 
-            
+
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}"),LogLevel.Information));
+            // logging
+            Serilog.Log.Logger = new LoggerConfiguration()
+                .WriteTo.File(@"Logs\DorakLog.txt",
+                        rollingInterval: RollingInterval.Day,
+                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning,
+                        retainedFileCountLimit: null,
+                        fileSizeLimitBytes: null,
+                        rollOnFileSizeLimit: true).CreateLogger();
+
+            builder.Host.UseSerilog();
 
             // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
@@ -42,7 +52,7 @@ namespace API
             {
                 throw new InvalidOperationException("Stripe SecretKey is not configured in appsettings.json.");
             }
-            StripeConfiguration.ApiKey = stripeSecretKey; 
+            StripeConfiguration.ApiKey = stripeSecretKey;
 
 
             // ?? Hangfire Configuration
@@ -83,6 +93,7 @@ namespace API
             builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(ProviderCenterServiceRepository));
             builder.Services.AddScoped(typeof(AppointmentRepository));
+            builder.Services.AddScoped(typeof(WalletRepository));
             builder.Services.AddScoped(typeof(S_Services));
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(CommitData));
@@ -134,16 +145,62 @@ namespace API
                 {
                     builder.WithOrigins("http://localhost:4200")
                            .AllowAnyHeader()
-                           .AllowAnyMethod();
+                           .AllowAnyMethod()
+                           .AllowCredentials();
                 });
             });
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API.PortalApp", Version = "v1" });
+                #region JWT Token
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = @"JWT Authorization header using the Bearer scheme. \r\n\r\n 
+                      Enter 'Bearer' [space] and then your token in the text input below.
+                      \r\n\r\nExample: 'Bearer 12345abcdef'",
+                    Name = "Authorization",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer"
+                });
 
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+              {
+                {
+                  new OpenApiSecurityScheme
+                  {
+                    Reference = new OpenApiReference
+                      {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                      },
+                      Scheme = "oauth2",
+                      Name = "Bearer",
+                      In = ParameterLocation.Header,
+
+                    },
+                    new List<string>()
+                  }
+                });
+
+                #endregion
+            });
+
+            builder.Services.AddSignalR()
+                .AddJsonProtocol(options =>
+                {
+                    options.PayloadSerializerOptions.PropertyNamingPolicy = null;
+                    options.PayloadSerializerOptions.PropertyNameCaseInsensitive = false;
+                });
+
+            builder.Services.AddScoped<GlobalErrorHandlerMiddleware>();
+            builder.Services.AddScoped<TransactionMiddleware>();
 
             var app = builder.Build();
-
+            app.UseMiddleware<GlobalErrorHandlerMiddleware>();
+            app.UseMiddleware<TransactionMiddleware>();
             using (var scope = app.Services.CreateScope())
             {
                 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -167,7 +224,7 @@ namespace API
 
             app.UseStaticFiles();
             app.UseRouting();
-            app.UseCors();
+            app.UseCors("AllowAngularApp");
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -190,7 +247,7 @@ namespace API
                     "0 */10 * * *");
                 var appointmentServices = scope.ServiceProvider.GetRequiredService<AppointmentServices>();
 
-                
+
                 recurringJobManager.AddOrUpdate(
                     "CancelUnpaidAppointmentsJob",
                     () => appointmentServices.CancelUnpaidAppointments(),
@@ -206,7 +263,8 @@ namespace API
              "update-provider-ratings",
               service => service.UpdateAllProvidersAverageRating(),
                Cron.Monthly);
-
+            app.MapHub<QueueHub>("/queueHub");
+            app.MapHub<ShiftListHub>("/shiftListHub");
             app.MapControllers();
             app.Run();
         }

@@ -1,11 +1,13 @@
-﻿using Dorak.DataTransferObject;
+﻿using System.Security.Claims;
+using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
-using Dorak.Models.Models.Wallet;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
+using System.Data.Entity.Core.Common;
 
 namespace API.Controllers
 {
@@ -14,14 +16,21 @@ namespace API.Controllers
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
     {
-        public ProviderServices providerServices;
-        public ShiftServices shiftServices;
-        public LiveQueueServices liveQueueServices;
-        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices)
+        private readonly CenterServices centerServices;
+        private readonly ProviderServices providerServices;
+        private readonly OperatorServices operatorServices;
+        private readonly ShiftServices shiftServices;
+        private readonly LiveQueueServices liveQueueServices;
+        private readonly LiveQueueRepository liveQueueRepository;
+        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices, CenterServices _centerServices, OperatorServices _operatorServices, LiveQueueRepository _liveQueueRepository)
         {
+            centerServices = _centerServices;
             providerServices = _providerServices;
             shiftServices = _shiftServices;
             liveQueueServices = _liveQueueServices;
+            operatorServices = _operatorServices;
+            liveQueueRepository = _liveQueueRepository;
+
         }
 
         [HttpGet("GetProviderById/{providerId}")]
@@ -132,65 +141,112 @@ namespace API.Controllers
                 Data = shiftDetails
             });
         }
-        [HttpPut("update-profile")]
-        public async Task<IActionResult> UpdateDoctorProfile([FromBody] UpdateProviderProfileDTO model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
-            }
-            var result = await providerServices.UpdateDoctorProfile(model);
 
-            return Ok(new ApiResponse<object>
-            {
-                Message = result,
-                Status = 200,
-            });
+        [Authorize(Roles = "Provider")]
+        [HttpPut("UpdateProfile")]
+        public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateProviderProfileDTO model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized("User not authorized.");
+
+            var result = await providerServices.UpdateDoctorProfile(userId, model);
+            return Ok(new { message = result });
         }
+
+
+        [Authorize(Roles = "Provider")]
         [HttpPut("update-professional-info")]
-        public IActionResult UpdateProfessionalInfo([FromBody] UpdateProviderProfessionalInfoDTO model)
+        public IActionResult UpdateProfessionalInfo([FromForm] UpdateProviderProfessionalInfoDTO model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<object> { Message = "Invalid data", Status = 400 });
             }
-            var result = providerServices.UpdateProfessionalInfo(model);
-            if(result == false)
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "Unauthorized", Status = 401 });
+            }
+
+            var result = providerServices.UpdateProfessionalInfo(userId, model);
+
+            if (!result)
             {
                 return NotFound(new ApiResponse<object>
                 {
                     Message = "Provider not found",
-                    Status= 404,
+                    Status = 404,
                 });
             }
+
             return Ok(new ApiResponse<object>
             {
-                Message = "Updated professional info successfuly",
+                Message = "Updated professional info successfully",
                 Status = 200,
             });
         }
-        [HttpGet("Queue-Entries")]
-        public IActionResult QueueEntries(string providerId)
+        //[HttpGet("queue-entries")]
+        //public IActionResult GetQueueEntries([FromQuery]string providerId)
+        //{
+        //    if (string.IsNullOrEmpty(providerId))
+        //    {
+        //        return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
+        //    }
+        //    Provider provider = providerServices.GetProviderById(providerId);
+        //    if (provider == null)
+        //    {
+        //        return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
+        //    }
+        //    List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
+        //    if (queueEntries == null || !queueEntries.Any())
+        //    {
+        //        return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
+        //    }
+        //    return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
+        //    {
+        //        Message = "Get queue entries successfully",
+        //        Status = 200,
+        //        Data = queueEntries
+        //    });
+        //}
+
+        [HttpGet("ProviderProfile")]
+        [Authorize(Roles = "Provider")]
+        public IActionResult GetMyProviderProfile()
         {
-            if (string.IsNullOrEmpty(providerId))
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "User ID is required",
+                    Status = 400,
+                    Data = null
+                });
             }
-            Provider provider = providerServices.GetProviderById(providerId);
-            if (provider == null)
+
+            var profile = providerServices.GetProviderProfile(userId);
+
+            if (profile == null)
             {
-                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
+                return NotFound(new ApiResponse<string>
+                {
+                    Message = "Provider not found",
+                    Status = 404,
+                    Data = null
+                });
             }
-            List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
-            if (queueEntries == null || !queueEntries.Any())
+
+            return Ok(new ApiResponse<ProviderProfileDTO>
             {
-                return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
-            }
-            return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
-            {
-                Message = "Get queue entries successfully",
+                Message = "Provider profile retrieved successfully",
                 Status = 200,
-                Data = queueEntries
+                Data = profile
             });
         }
     }
