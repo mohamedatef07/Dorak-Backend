@@ -30,7 +30,7 @@ namespace API
             
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}")));
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}"),LogLevel.Information));
             // logging
             Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(@"Logs\DorakLog.txt",
