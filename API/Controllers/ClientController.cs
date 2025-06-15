@@ -322,21 +322,38 @@ namespace API.Controllers
 
 
         //live queue NT
-        [HttpGet("shift-queue/{shiftId}/user/{userId}")]
-        public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
-        {
-            var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
+        //[HttpGet("shift-queue/{shiftId}/user/{userId}")]
+        //public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
+        //{
+        //    var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
 
-            if (queue == null || !queue.Any())
-            {
-                return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
-            }
+        //    if (queue == null || !queue.Any())
+        //    {
+        //        return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
+        //    }
+
+        //    return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
+        //    {
+        //        Status = 200,
+        //        Message = "Queue retrieved successfully.",
+        //        Data = queue
+        //    });
+        //}
+
+
+
+        [HttpGet("queue/by-appointment/{appointmentId}")]
+        public IActionResult GetQueueByAppointment(int appointmentId)
+        {
+            var result =  liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
+            if (!result.Any())
+                return NotFound("No live queue found for this appointment.");
 
             return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
             {
                 Status = 200,
                 Message = "Queue retrieved successfully.",
-                Data = queue
+                Data = result
             });
         }
 
