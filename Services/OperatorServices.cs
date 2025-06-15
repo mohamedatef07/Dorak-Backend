@@ -193,6 +193,14 @@ namespace Services
 
             commitData.SaveChanges();
 
+            var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
+
+            var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
+            if (queuedAppointment != null)
+            {
+                createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
+            }
+
             return createdAppointment;
         }
 
