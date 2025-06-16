@@ -35,7 +35,7 @@ namespace Services
         }
 
 
-        public Appointment ReserveAppointment(ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<CheckoutRequest> ReserveAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
             if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
@@ -56,7 +56,7 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
            
-            Appointment createdAppointment = appointmentRepository.CreateAppoinment(app);
+            Appointment createdAppointment = await appointmentRepository.CreateAppoinment(app);
 
             createdAppointment.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
 
@@ -69,8 +69,14 @@ namespace Services
             {
                 createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
             }
+            CheckoutRequest checkoutRequest = new CheckoutRequest() {
+                AppointmentId=createdAppointment.AppointmentId,
+                ClientId =createdAppointment.UserId,
+                Amount =createdAppointment.Fees + createdAppointment.AdditionalFees,
+                StripeToken = ""
 
-            return createdAppointment;
+            };
+            return checkoutRequest;
         }
 
         public async Task<Charge> ProcessPayment(string stripeToken, decimal amount, string clientId, int appointmentId)
