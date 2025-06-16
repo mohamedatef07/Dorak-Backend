@@ -8,6 +8,7 @@ using Models.Enums;
 using Repositories;
 using Services;
 using Dorak.DataTransferObject.ProviderDTO;
+using System.Threading.Tasks;
 
 
 
@@ -106,18 +107,18 @@ namespace API.Controllers
         }
 
         [HttpPost("reserve-appointment")]
-        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<IActionResult> ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment data" });
             }
-            var appointment = appointmentServices.ReserveAppointment(reserveApointmentDTO);
-            if (appointment == null)
+            var checkoutReq = await appointmentServices.ReserveAppointment(reserveApointmentDTO);
+            if (checkoutReq == null)
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
-            return Ok(new ApiResponse<object> { Status = 200, Message = "Appointment reserved successfully" });
+            return Ok(new ApiResponse<CheckoutRequest> { Status = 200, Message = "Appointment reserved successfully" ,Data= checkoutReq });
         }
 
         [HttpPost("Checkout")]
@@ -322,21 +323,38 @@ namespace API.Controllers
 
 
         //live queue NT
-        [HttpGet("shift-queue/{shiftId}/user/{userId}")]
-        public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
-        {
-            var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
+        //[HttpGet("shift-queue/{shiftId}/user/{userId}")]
+        //public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
+        //{
+        //    var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
 
-            if (queue == null || !queue.Any())
-            {
-                return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
-            }
+        //    if (queue == null || !queue.Any())
+        //    {
+        //        return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
+        //    }
+
+        //    return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
+        //    {
+        //        Status = 200,
+        //        Message = "Queue retrieved successfully.",
+        //        Data = queue
+        //    });
+        //}
+
+
+
+        [HttpGet("queue/by-appointment/{appointmentId}")]
+        public IActionResult GetQueueByAppointment(int appointmentId)
+        {
+            var result =  liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
+            if (!result.Any())
+                return NotFound("No live queue found for this appointment.");
 
             return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
             {
                 Status = 200,
                 Message = "Queue retrieved successfully.",
-                Data = queue
+                Data = result
             });
         }
 

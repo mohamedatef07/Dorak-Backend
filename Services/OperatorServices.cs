@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
@@ -16,6 +17,7 @@ namespace Services
         private readonly OperatorRepository operatorRepository;
         private readonly ClientRepository clientRepository;
         private readonly AccountRepository accountRepository;
+        private readonly LiveQueueServices liveQueueServices;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
         private readonly LiveQueueRepository liveQueueRepository;
@@ -26,7 +28,8 @@ namespace Services
         private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
 
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager, LiveQueueServices liveQueueServices)
+       
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -39,6 +42,7 @@ namespace Services
             providerCenterServiceRepository = _providerCenterServiceRepository;
             temperoryClientRepository = _temperoryClientRepository;
             accountRepository = _accountRepository;
+            this.liveQueueServices = liveQueueServices;
             userManager = _userManager;
 
             hubContext = _hubContext;
@@ -84,6 +88,19 @@ namespace Services
         }
 
 
+        //public bool DeleteOperator(string operatorId)
+        //{
+        //    var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
+
+        //    if (SelectedOperator != null)
+        //    {
+        //        SelectedOperator.IsDeleted = true;
+        //        operatorRepository.Edit(SelectedOperator);
+        //        commitData.SaveChanges();
+        //        return true;
+        //    }
+        //    return false;
+        //}
         public bool RestoreOperator(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
@@ -116,7 +133,7 @@ namespace Services
             return null;
         }
 
-        public Appointment CreateAppointment(ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<Appointment> CreateAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
             if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
@@ -175,7 +192,7 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
 
-            var createdAppointment = appointmentRepository.CreateAppoinment(app);
+            var createdAppointment = await appointmentRepository.CreateAppoinment(app);
             createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
             commitData.SaveChanges();
@@ -270,7 +287,7 @@ namespace Services
             return true;
         }
 
-        public string UpdateQueueStatus(UpdateQueueStatusViewModel model)
+        public async Task<string> UpdateQueueStatusAsync(UpdateQueueStatusViewModel model)
         {
             
             if (string.IsNullOrWhiteSpace(model.SelectedStatus))
@@ -340,8 +357,10 @@ namespace Services
             appointment.UpdatedAt = now;
             commitData.SaveChanges();
 
-            hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
+            
 
+            await hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
+            await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);
             return "Queue status updated successfully";
         }
 
