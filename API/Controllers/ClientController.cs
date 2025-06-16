@@ -8,6 +8,7 @@ using Models.Enums;
 using Repositories;
 using Services;
 using Dorak.DataTransferObject.ProviderDTO;
+using System.Threading.Tasks;
 
 
 
@@ -106,18 +107,18 @@ namespace API.Controllers
         }
 
         [HttpPost("reserve-appointment")]
-        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<IActionResult> ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment data" });
             }
-            var appointment = appointmentServices.ReserveAppointment(reserveApointmentDTO);
-            if (appointment == null)
+            var checkoutReq = await appointmentServices.ReserveAppointment(reserveApointmentDTO);
+            if (checkoutReq == null)
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
-            return Ok(new ApiResponse<object> { Status = 200, Message = "Appointment reserved successfully" });
+            return Ok(new ApiResponse<CheckoutRequest> { Status = 200, Message = "Appointment reserved successfully" ,Data= checkoutReq });
         }
 
         [HttpPost("Checkout")]

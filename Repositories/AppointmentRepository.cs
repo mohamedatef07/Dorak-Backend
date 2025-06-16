@@ -36,9 +36,9 @@ namespace Repositories
             return Table.Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
         }
 
-        public Appointment CreateAppoinment(Appointment appointment)
+        public async Task<Appointment> CreateAppoinment(Appointment appointment)
         {
-            Table.Add(appointment);
+            await Table.AddAsync(appointment);
             
             return appointment;
         }
