@@ -89,10 +89,10 @@ namespace Services
                      {
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
                          ShiftId = shift.ShiftId,
+                         ShiftType = shift.ShiftType,
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
                          EndTime = shift.EndTime,
-                         ShiftType = shift.ShiftType,
                      })
                 ).ToList();
             return shifts;
@@ -113,6 +113,7 @@ namespace Services
                 foreach (var appointment in shift.Appointments)
                 {
                     appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                    appointment.User.Notifications.Add(new Notification { Title = "Appointment Cancellation", Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been canceled. We apologize for any inconvenience. Please contact us or reschedule your appointment at your earliest convenience." });
                 }
                 shiftRepository.Edit(shift);
                 commitData.SaveChanges();
