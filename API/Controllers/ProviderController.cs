@@ -217,7 +217,7 @@ namespace API.Controllers
         // [Authorize(Roles = "Admin, Operator")]
         [HttpGet]
         [Route("GetProviderLiveQueues")]
-        public IActionResult GetProviderLiveQueues(string providerId, int centerId, int pageNumber = 1, int pageSize = 16)
+        public IActionResult GetProviderLiveQueues(string providerId, int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
             try
             {
@@ -242,15 +242,14 @@ namespace API.Controllers
                     });
                 }
 
-                // Fetch paginated live queues for the provider and center
-                var liveQueues = liveQueueServices.GetLiveQueuesForProvider(providerId, centerId, pageNumber, pageSize);
+                // Fetch live queues for the specific provider, center, and shift
+                var liveQueues = liveQueueServices.GetLiveQueuesForProvider(providerId, centerId, shiftId, pageNumber, pageSize);
 
-                // Check if any live queues were found
                 if (liveQueues.Data == null || !liveQueues.Data.Any())
                 {
                     return NotFound(new ApiResponse<PaginationViewModel<ProviderLiveQueueViewModel>>
                     {
-                        Message = "No live queues found for the specified provider and center",
+                        Message = "No live queues found for the specified provider, center, and shift",
                         Status = 404,
                         Data = new PaginationViewModel<ProviderLiveQueueViewModel>
                         {
@@ -283,11 +282,11 @@ namespace API.Controllers
         // [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("UpdateLiveQueueStatus")]
-        public IActionResult UpdateLiveQueueStatus([FromBody] UpdateQueueStatusViewModel model)
+        public async Task<IActionResult> UpdateLiveQueueStatus([FromBody] UpdateQueueStatusViewModel model)
         {
             try
             {
-                var result = operatorServices.UpdateQueueStatus(model);
+                var result = await operatorServices.UpdateQueueStatusAsync(model);
                 if (result.StartsWith("Queue status updated successfully"))
                 {
                     return Ok(new ApiResponse<string>

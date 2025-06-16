@@ -151,16 +151,14 @@ namespace Services
         //    // return result.OrderBy(lq => lq.CurrentQueuePosition).ToList();
         //}
 
-        public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId, int pageNumber = 1, int pageSize = 16)
+        public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
-
             var providerAssignments = providerAssignmentRepository.GetAll()
                 .Where(pa => pa.ProviderId == providerId && pa.CenterId == centerId && !pa.IsDeleted)
                 .ToList();
 
             if (!providerAssignments.Any())
             {
-
                 return new PaginationViewModel<ProviderLiveQueueViewModel>
                 {
                     Data = new List<ProviderLiveQueueViewModel>(),
@@ -170,15 +168,14 @@ namespace Services
                 };
             }
 
-
-            List<Shift> shifts = providerAssignments.SelectMany(pa => pa.Shifts
-                .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
+            // Filter shifts by the specific shiftId
+            List<Shift> shifts = providerAssignments
+                .SelectMany(pa => pa.Shifts
+                    .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftId == shiftId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
                 .ToList();
-
 
             if (!shifts.Any())
             {
-
                 return new PaginationViewModel<ProviderLiveQueueViewModel>
                 {
                     Data = new List<ProviderLiveQueueViewModel>(),
@@ -187,7 +184,6 @@ namespace Services
                     Total = 0
                 };
             }
-
 
             var liveQueues = shifts.SelectMany(sh => sh.LiveQueues
                 .Where(lq => lq.ShiftId == sh.ShiftId))
@@ -200,7 +196,6 @@ namespace Services
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
-
 
             List<ProviderLiveQueueViewModel> result = new List<ProviderLiveQueueViewModel>();
             foreach (var liveQueue in paginatedLiveQueues)
@@ -237,8 +232,6 @@ namespace Services
                     });
                 }
             }
-
-
 
             return new PaginationViewModel<ProviderLiveQueueViewModel>
             {
