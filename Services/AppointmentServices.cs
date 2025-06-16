@@ -83,8 +83,7 @@ namespace Services
         {
             try
             {
-                using (var transaction = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-                {
+                
 
                     var res = await paymentServices.ProcessPayment(stripeToken, amount, clientId, appointmentId);
                     var app = appointmentRepository.GetById(a=>a.AppointmentId==appointmentId);
@@ -92,12 +91,9 @@ namespace Services
                     
                     commitData.SaveChanges();
 
-
-
-                    transaction.Complete();
                     return res;
 
-                }
+                
 
             }
             catch (StripeException ex)
