@@ -346,8 +346,9 @@ namespace API.Controllers
         [HttpGet("queue/by-appointment/{appointmentId}")]
         public IActionResult GetQueueByAppointment(int appointmentId)
         {
+
             var result =  liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
-            if (!result.Any())
+            if (result == null || !result.Any())
                 return NotFound("No live queue found for this appointment.");
 
             return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
