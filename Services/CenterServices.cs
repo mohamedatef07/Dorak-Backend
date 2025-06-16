@@ -251,7 +251,7 @@ namespace Services
             try
             {
 
-                
+
                 if (string.IsNullOrWhiteSpace(provider.UserName))
                 {
                     throw new ArgumentException("UserName is required.");
@@ -300,8 +300,8 @@ namespace Services
             }
         }
 
-        
-       
+
+
 
         //delete provider from center
         public string DeleteProviderfromCenter(String ProviderId)
