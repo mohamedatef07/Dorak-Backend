@@ -84,19 +84,6 @@ namespace Services
         }
 
 
-        public bool DeleteOperator(string operatorId)
-        {
-            var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
-
-            if (SelectedOperator != null)
-            {
-                SelectedOperator.IsDeleted = true;
-                operatorRepository.Edit(SelectedOperator);
-                commitData.SaveChanges();
-                return true;
-            }
-            return false;
-        }
         public bool RestoreOperator(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);

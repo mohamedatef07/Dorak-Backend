@@ -64,5 +64,25 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<List<GetAllCenterShiftsDTO>> { Message = "Get all center shifts successfully", Status = 200 , Data = allCenterShifts});
         }
+
+        [HttpGet("GetAllCenterShiftsAndServices")]
+        public IActionResult GetAllCenterShiftsAndServices([FromQuery]int centerId)
+        {
+            if (centerId <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid center ID provided", Status = 400 });
+            }
+            var center = centerServices.GetCenterById(centerId);
+            if (center == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Center not found", Status = 404 });
+            }
+            var allCenterShifts = shiftServices.GetAllCenterShiftsAndServices(center);
+            if (allCenterShifts == null || !allCenterShifts.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "No shifts found for this center", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetAllCenterShiftAndServicesDTO>> { Message = "Get all center shifts successfully", Status = 200, Data = allCenterShifts });
+        }
     }
 }
