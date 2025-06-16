@@ -33,15 +33,17 @@ namespace API.Controllers
             return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "No operators exist" });
         }
 
-        [HttpDelete("delete-operator")]
-        public IActionResult DeleteOperator(string operatorId)
+
+        [HttpDelete("Delete")]
+        public async Task<IActionResult> Delete(string operatorid)
         {
-            var result = operatorServices.DeleteOperator(operatorId);
-            if (result == true)
+            var result = await operatorServices.DeleteOperator(operatorid);
+            if (result)
             {
-                return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfully Deleted." });
+                return Ok(new ApiResponse<object> { Message = "Deleted successfully", Status = 200 });
             }
-            return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Something Wrong happened" });
+
+            return BadRequest(new ApiResponse<object> { Message = "Delete failed", Status = 400 });
         }
 
         [HttpGet("Restore")]
@@ -101,7 +103,7 @@ namespace API.Controllers
         }
 
         [HttpPost("reserve-appointment")]
-        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
+        public IActionResult ReserveAppointment([FromForm] ReserveApointmentDTO reserveApointmentDTO)
         {
             if (!ModelState.IsValid)
             {
