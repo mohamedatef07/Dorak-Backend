@@ -14,6 +14,7 @@ using Data;
 using Dorak.DataTransferObject;
 using Microsoft.AspNetCore.Hosting;
 using Dorak.DataTransferObject.AccountDTO;
+using System.Diagnostics;
 
 
 
@@ -41,6 +42,7 @@ namespace Services
                                AdminCenterManagement _adminCenterManagement,
                                CommitData _commitData,
                                UserManager<User> _userManager,
+                               OperatorRepository _operatorRepository,
                                IWebHostEnvironment env)
         {
             accountRepository = _AccountRepository;
@@ -53,6 +55,7 @@ namespace Services
             CommitData = _commitData;
             userManager = _userManager;
             _env = env;
+            operatorRepository = _operatorRepository;
         }
 
 
@@ -196,10 +199,20 @@ namespace Services
                 var roles = await accountRepository.GetUserRoles(user);
                 roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
 
+                if (roles.Contains("Operator"))
+                {
+                    Debug.WriteLine("Logged in UserId: " + user.Id);
+                    var Operator = operatorRepository.GetById(o=>o.OperatorId==user.Id);
+                    if (Operator.CenterId != null)
+                    {
+                        claims.Add(new Claim("CenterId", Operator.CenterId.ToString()));
+                    }
+                }
+
                 // Create JWT Token
                 var jwtToken = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(15),
+                    expires: DateTime.UtcNow.AddMinutes(100),
                     signingCredentials: new SigningCredentials(
                         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
                         SecurityAlgorithms.HmacSha256

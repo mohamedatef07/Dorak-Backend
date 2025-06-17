@@ -8,6 +8,7 @@ using Models.Enums;
 using Repositories;
 using Services;
 using Dorak.DataTransferObject.ProviderDTO;
+using System.Threading.Tasks;
 
 
 
@@ -106,18 +107,18 @@ namespace API.Controllers
         }
 
         [HttpPost("reserve-appointment")]
-        public IActionResult ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<IActionResult> ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment data" });
             }
-            var appointment = appointmentServices.ReserveAppointment(reserveApointmentDTO);
-            if (appointment == null)
+            var checkoutReq = await appointmentServices.ReserveAppointment(reserveApointmentDTO);
+            if (checkoutReq == null)
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
-            return Ok(new ApiResponse<object> { Status = 200, Message = "Appointment reserved successfully" });
+            return Ok(new ApiResponse<CheckoutRequest> { Status = 200, Message = "Appointment reserved successfully" ,Data= checkoutReq });
         }
 
         [HttpPost("Checkout")]
@@ -162,7 +163,7 @@ namespace API.Controllers
             var lastAppointment = appointmentServices.GetLastAppointment(userId);
 
             if (lastAppointment == null)
-                return Ok(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found." });
+                return NotFound(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found." });
 
 
             return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Last Appointment retrived.", Data = lastAppointment });
@@ -307,6 +308,18 @@ namespace API.Controllers
         }
 
 
+        [HttpGet("profile-for-livequeue/{userId}")]
+        public IActionResult ProfileForliveQueue(string userId)
+        {
+            var profile = clientServices.GetClientInfoToLiveQueue(userId);
+            if (profile == null)
+            {
+                return Ok(new ApiResponse<object> { Status = 404, Message = "Not found " });
+            }
+            return Ok(new ApiResponse<ClientInfoToLiveQueueDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
+        }
+
+
 
         [HttpGet("client-wallet/{userId}")]
         public IActionResult ClientWalletAndProfile(string userId)
@@ -345,8 +358,10 @@ namespace API.Controllers
         [HttpGet("queue/by-appointment/{appointmentId}")]
         public IActionResult GetQueueByAppointment(int appointmentId)
         {
+
+
             var result =  liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
-            if (!result.Any())
+            if (result == null || !result.Any())
                 return NotFound("No live queue found for this appointment.");
 
             return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
@@ -357,5 +372,49 @@ namespace API.Controllers
             });
         }
 
+
+        [HttpGet("appointment/{appointmentid}")]
+        public IActionResult GetAppointmentById(int appointmentid)
+        {
+
+            if (appointmentid <= 1)
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
+
+            var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
+
+            if (Appointment == null)
+                return NotFound(new ApiResponse<object> { Status = 400, Message = "No appointments found." });
+
+
+            return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Appointment retrived.", Data = Appointment });
+
+        }
+
+
+        [HttpGet("UpdateProfile/{userId}")]
+        public async Task<IActionResult> UpdateClientProfileAsync([FromForm] UpdateClientProfileDTO updateClientProfile,[FromRoute]string userId)
+        {
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "User id is required", Status = 400 });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Data", Status = 500 });
+            }
+
+            var result = await clientServices.UpdateClientProfile(userId, updateClientProfile);
+
+
+
+            if (!result)
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Not Updated" });
+
+
+            return Ok(new ApiResponse<bool> { Status = 200, Message = "Profile Update", Data = true });
+
+        }
     }
 }

@@ -59,7 +59,7 @@ namespace API.Controllers
             {
                 return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfully Restored." });
             }
-            return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Unsuccessfully Restored." });
+            return BadRequest(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Unsuccessfully Restored." });
         }
 
         [HttpGet("start-shift")]
@@ -85,7 +85,7 @@ namespace API.Controllers
             {
                 return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfully End Shift." });
             }
-            return Ok(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Failed to End Shift." });
+            return BadRequest(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Failed to End Shift." });
         }
         [HttpGet("cancel-shift")]
         public IActionResult CancelShift([FromQuery] int shiftId, [FromQuery] int centerId)
