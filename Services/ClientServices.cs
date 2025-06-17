@@ -5,8 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Repositories;
 
@@ -20,8 +23,10 @@ namespace Services
         public CommitData commitData;
         private readonly AppointmentServices appointmentServices;
         private readonly WalletRepository walletRepository;
+        private readonly IWebHostEnvironment _env;
+        private readonly AccountRepository accountRepository;
 
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository)
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
@@ -29,7 +34,8 @@ namespace Services
             commitData = _commitData;
             this.appointmentServices = appointmentServices;
             walletRepository = _walletRepository;
-
+            _env = env;
+            accountRepository = _accountRepository;
         }
 
         public async Task<IdentityResult> CreateClient(string userId, ClientRegisterViewModel model)
@@ -113,6 +119,74 @@ namespace Services
   
             };
             return clientProfile;
+        }
+
+
+        public async Task<bool> UpdateClientProfile(string userId, UpdateClientProfileDTO model)
+        {
+            var client = clientRepository.GetById(c => c.ClientId == userId && !c.IsDeleted);
+            if (client == null)
+                return false;
+
+            var user = client.User;
+            if (user == null)
+                return false;
+
+            if (!string.IsNullOrWhiteSpace(model.FirstName))
+                client.FirstName = model.FirstName;
+
+            if (!string.IsNullOrWhiteSpace(model.LastName))
+                client.LastName = model.LastName;
+
+            if (!string.IsNullOrWhiteSpace(model.Email))
+                user.Email = model.Email;
+
+            if (!string.IsNullOrWhiteSpace(model.Phone))
+                user.PhoneNumber = model.Phone;
+
+            if (model.BirthDate != null)
+                client.BirthDate = (DateOnly)model.BirthDate;
+
+            if (model.Image != null)
+            {
+                
+
+                var savedImagePath = await SaveImageAsync(model.Image, client.ClientId);  // Use client.ClientId here
+                client.Image = savedImagePath;  // Assuming the 'client' model has an Image property
+            }
+
+            clientRepository.Edit(client);
+            accountRepository.Edit(user);
+
+            commitData.SaveChanges();
+            //await context.SaveChangesAsync();
+
+            return true;
+        }
+
+
+        private async Task<string> SaveImageAsync(IFormFile userImage, string ClientId)
+        {
+            if (userImage != null && userImage.Length > 0)
+            {
+                // المسار يكون داخل wwwroot/image/Client/{ID}
+                var folderPath = Path.Combine(_env.WebRootPath, "image", "provider", ClientId);
+                Directory.CreateDirectory(folderPath);
+
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userImage.FileName);
+                var fullPath = Path.Combine(folderPath, fileName);
+
+                using (var stream = new FileStream(fullPath, FileMode.Create))
+                {
+                    await userImage.CopyToAsync(stream);
+                }
+
+                // هنا return path يكون من بعد wwwroot
+                string imagePath = $"/image/Client/{ClientId}/{fileName}";
+                return imagePath;
+            }
+
+            return null;
         }
 
     }
