@@ -163,7 +163,7 @@ namespace API.Controllers
             var lastAppointment = appointmentServices.GetLastAppointment(userId);
 
             if (lastAppointment == null)
-                return Ok(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found." });
+                return NotFound(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found." });
 
 
             return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Last Appointment retrived.", Data = lastAppointment });
@@ -359,6 +359,7 @@ namespace API.Controllers
         public IActionResult GetQueueByAppointment(int appointmentId)
         {
 
+
             var result =  liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
             if (result == null || !result.Any())
                 return NotFound("No live queue found for this appointment.");
@@ -377,17 +378,43 @@ namespace API.Controllers
         {
 
             if (appointmentid <= 1)
-                return Ok(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
 
             var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
 
             if (Appointment == null)
-                return Ok(new ApiResponse<object> { Status = 400, Message = "No appointments found." });
+                return NotFound(new ApiResponse<object> { Status = 400, Message = "No appointments found." });
 
 
             return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Appointment retrived.", Data = Appointment });
 
         }
 
+
+        [HttpGet("UpdateProfile/{userId}")]
+        public async Task<IActionResult> UpdateClientProfileAsync([FromForm] UpdateClientProfileDTO updateClientProfile,[FromRoute]string userId)
+        {
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "User id is required", Status = 400 });
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Data", Status = 500 });
+            }
+
+            var result = await clientServices.UpdateClientProfile(userId, updateClientProfile);
+
+
+
+            if (!result)
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Not Updated" });
+
+
+            return Ok(new ApiResponse<bool> { Status = 200, Message = "Profile Update", Data = true });
+
+        }
     }
 }
