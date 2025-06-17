@@ -105,17 +105,17 @@ namespace Services
                 return new List<GetAllCenterShiftAndServicesDTO>();
             }
             var proivderAssignments = center.ProviderAssignments;
-
+            DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
+            
             var shifts = proivderAssignments.SelectMany(
                 pa =>
-                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled).Select(shift => new GetAllCenterShiftAndServicesDTO
+                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled && sh.ShiftDate>= dateNow && sh.ShiftDate <= dateNow.AddDays(30) ).Select(shift => new GetAllCenterShiftAndServicesDTO
                      {
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
                          ShiftId = shift.ShiftId,
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
                          EndTime = shift.EndTime,
-                         ShiftType = shift.ShiftType,
                          Services = pa.Provider.ProviderCenterServices
                              .Where(pcs => pcs.CenterId == center.CenterId)
                              .Select(pcs => new ServicesDTO
