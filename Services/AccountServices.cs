@@ -199,7 +199,7 @@ namespace Services
                 // Create JWT Token
                 var jwtToken = new JwtSecurityToken(
                     claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(15),
+                    expires: DateTime.UtcNow.AddMinutes(100),
                     signingCredentials: new SigningCredentials(
                         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
                         SecurityAlgorithms.HmacSha256

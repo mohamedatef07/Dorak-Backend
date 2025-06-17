@@ -103,5 +103,17 @@ namespace Services
 
         }
 
+        public ClientInfoToLiveQueueDTO GetClientInfoToLiveQueue(string userId)
+        {
+            var Client = clientRepository.GetById(c => c.ClientId == userId);
+            var clientProfile = new ClientInfoToLiveQueueDTO()
+            {
+                Image = Client.Image,
+                Name = $"{Client.FirstName} {Client.LastName}"
+  
+            };
+            return clientProfile;
+        }
+
     }
 }

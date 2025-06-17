@@ -308,6 +308,18 @@ namespace API.Controllers
         }
 
 
+        [HttpGet("profile-for-livequeue/{userId}")]
+        public IActionResult ProfileForliveQueue(string userId)
+        {
+            var profile = clientServices.GetClientInfoToLiveQueue(userId);
+            if (profile == null)
+            {
+                return Ok(new ApiResponse<object> { Status = 404, Message = "Not found " });
+            }
+            return Ok(new ApiResponse<ClientInfoToLiveQueueDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
+        }
+
+
 
         [HttpGet("client-wallet/{userId}")]
         public IActionResult ClientWalletAndProfile(string userId)
@@ -357,6 +369,24 @@ namespace API.Controllers
                 Message = "Queue retrieved successfully.",
                 Data = result
             });
+        }
+
+
+        [HttpGet("appointment/{appointmentid}")]
+        public IActionResult GetAppointmentById(int appointmentid)
+        {
+
+            if (appointmentid <= 1)
+                return Ok(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
+
+            var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
+
+            if (Appointment == null)
+                return Ok(new ApiResponse<object> { Status = 400, Message = "No appointments found." });
+
+
+            return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Appointment retrived.", Data = Appointment });
+
         }
 
     }
