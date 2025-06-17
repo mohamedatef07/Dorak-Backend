@@ -6,11 +6,6 @@ using Hubs;
 using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -20,18 +15,22 @@ namespace Services
         private readonly AppointmentRepository appointmentRepository;
         private readonly LiveQueueRepository liveQueueRepository;
         private readonly CenterServices centerServices;
+        private readonly WalletRepository walletRepository;
         private readonly CommitData commitData;
         private readonly IHubContext<ShiftListHub> shiftListHubContext;
+        private readonly IHubContext<NotificationHub> notificationHubContext;
 
 
-        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, IHubContext<ShiftListHub> _shiftListHubContext, CenterServices _centerServices)
+        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData,  CenterServices _centerServices, WalletRepository _walletRepository, IHubContext<ShiftListHub> _shiftListHubContext, IHubContext<NotificationHub> _notificationHubContext)
         {
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
-            shiftListHubContext = _shiftListHubContext;
             centerServices = _centerServices;
+            shiftListHubContext = _shiftListHubContext;
+            notificationHubContext = _notificationHubContext;
+            walletRepository = _walletRepository;
         }
         public Shift GetShiftById(int shiftId)
         {
@@ -67,8 +66,6 @@ namespace Services
                         EstimatedTime = appointment.EstimatedTime,
                         CurrentQueuePosition = liveQueueRepository.GetCurrentPostion(appointment),
                         EstimatedDuration = appointment.ProviderCenterService.Duration,
-                        //Status = 
-
                     });
                 }
 
@@ -89,10 +86,10 @@ namespace Services
                      {
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
                          ShiftId = shift.ShiftId,
+                         ShiftType = shift.ShiftType,
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
                          EndTime = shift.EndTime,
-                         ShiftType = shift.ShiftType,
                      })
                 ).ToList();
             return shifts;
@@ -144,7 +141,28 @@ namespace Services
             {
                 foreach (var appointment in shift.Appointments)
                 {
+                    if(appointment.AppointmentStatus == AppointmentStatus.Confirmed)
+                    {
+                        var wallet = walletRepository.GetWalletByUserId(appointment.User.Id);
+                        if (wallet == null)
+                        {
+                            walletRepository.Add(new Wallet { ClientId = appointment.User.Id, Balance = appointment.Fees });
+                            commitData.SaveChanges();
+                        }
+                        else
+                        {
+                            appointment.User.Wallet.Balance += appointment.Fees;
+                            commitData.SaveChanges();
+                        }
+                    }
                     appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                    var newNotification = new Notification()
+                    { 
+                      Title = "Appointment Cancellation",
+                      Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been canceled. We apologize for any inconvenience. Please contact us or reschedule your appointment at your earliest convenience."
+                    };
+                    appointment.User.Notifications.Add(newNotification);
+                    await notificationHubContext.Clients.User(appointment.User.Id).SendAsync("latestNotification", newNotification);
                 }
                 shiftRepository.Edit(shift);
                 commitData.SaveChanges();

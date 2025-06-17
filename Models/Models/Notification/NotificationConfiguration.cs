@@ -22,15 +22,11 @@ namespace Dorak.Models
                 .IsRequired(true);
             builder.Property(notification => notification.Message)
                 .IsRequired(true);
-            builder.Property(notification => notification.Type)
-                .IsRequired(true);
             builder.Property(notification => notification.IsRead)
                 .IsRequired(true);
             builder.Property(notification => notification.CreatedAt)
                 .IsRequired(true);
             builder.Property(notification => notification.ExpiredAt)
-                .IsRequired(true);
-            builder.Property(notification => notification.DeliveryMethod)
                 .IsRequired(true);
         }
 
