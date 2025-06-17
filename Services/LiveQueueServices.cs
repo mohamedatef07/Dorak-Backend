@@ -22,6 +22,7 @@ namespace Services
         private readonly LiveQueueRepository liveQueueRepository;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
+        private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
 
         public LiveQueueServices(LiveQueueRepository _liveQueueRepository,
@@ -30,12 +31,14 @@ namespace Services
             ClientRepository _clientRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             OperatorRepository _operatorRepository,
-            IHubContext<QueueHub> hubContext)
+            IHubContext<QueueHub> hubContext, 
+            CommitData _commitData)
         {
             liveQueueRepository = _liveQueueRepository;
             this.appointmentRepository = appointmentRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
             this.hubContext = hubContext;
+            commitData = _commitData;
         }
 
         //Get Queue Entries for a provider
@@ -248,23 +251,23 @@ namespace Services
 
 
             var app = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
-            if (app==null)
+            if (app == null)
             {
                 return null;
             }
 
-           
+
 
             var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(app.ShiftId);
 
             var result = liveQueues.Select(lq => new ClientLiveQueueDTO
             {
-                
+
                 ArrivalTime = lq.ArrivalTime,
                 AppointmentDate = lq.Appointment.AppointmentDate,
                 Type = lq.Appointment.ClientType,
                 Status = lq.AppointmentStatus,
-               
+
                 CurrentQueuePosition = lq.CurrentQueuePosition,
                 IsCurrentClient = lq.Appointment.AppointmentId == appointmentId
             }).ToList();
@@ -287,7 +290,7 @@ namespace Services
                     AppointmentDate = appointment.AppointmentDate,
                     Type = appointment.ClientType,
                     Status = liveQueue.AppointmentStatus,
-                    
+
                     CurrentQueuePosition = liveQueue.CurrentQueuePosition,
 
                     // 🔥 This flag helps you identify the logged-in client's appointment
@@ -321,5 +324,51 @@ namespace Services
                 .SendAsync("QueueUpdated", liveQueueList);
         }
 
+        public async Task editTurn()
+        {
+
+            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().ToList();
+
+            foreach(LiveQueue lq in liveQueues)
+            {
+                LiveQueue previous = liveQueueRepository.GetAll().Where(l => l.ShiftId == lq.ShiftId && l.CurrentQueuePosition == lq.CurrentQueuePosition - 1).FirstOrDefault();
+
+                if (lq.EstimatedTime <= TimeOnly.FromDateTime(DateTime.Now) && lq.AppointmentStatus == QueueAppointmentStatus.NotChecked && previous.AppointmentStatus == QueueAppointmentStatus.Completed)
+                {
+
+                    var position = lq.CurrentQueuePosition ?? 0;
+
+
+                    reOrder(lq, lq.ShiftId, position);
+
+                  
+
+
+
+                }
+            }
+
+            
+
+
+        }
+
+        public void reOrder (LiveQueue liveQueue, int shiftId, int positionNumber)
+        {
+            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition > positionNumber).ToList();
+
+            foreach(LiveQueue lq in liveQueues)
+            {
+
+                lq.CurrentQueuePosition -= lq.CurrentQueuePosition;
+
+                liveQueueRepository.Edit(lq);
+
+                commitData.SaveChanges();
+
+            }
+
+
+        }
     }
 }
