@@ -285,5 +285,19 @@ namespace Services
             var shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
             return shift.StartTime.AddMinutes(TotalDuration);
         }
+
+
+        public AppointmentDTO GetAppointmentbyId(int AppointmentId)
+        {
+            var appointments = appointmentRepository.GetById(app => app.AppointmentId == AppointmentId && app.AppointmentStatus != AppointmentStatus.Cancelled);
+            
+            if (appointments == null)
+            {
+                return null;
+            }
+
+            return appointments.AppointmentToAppointmentDTO();
+        }
+
     }
 }
