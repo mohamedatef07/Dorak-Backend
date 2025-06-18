@@ -304,12 +304,16 @@ namespace Services
 
 
         //delete provider from center
-        public string DeleteProviderfromCenter(String ProviderId)
+        public string DeleteProviderfromCenter(String ProviderId) //int centerId)
         {
             var assignment = providerAssignmentRepository.GetAssignmentByProviderId(ProviderId);
             assignment.IsDeleted = true;
             providerAssignmentRepository.Edit(assignment);
             commitData.SaveChanges();
+
+
+            // shift status = cancelled - soft delete(true)
+            // appointment = cancelled
 
             return "Provider Deleted Succesfully!";
         }
