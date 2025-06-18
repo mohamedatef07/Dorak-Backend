@@ -42,7 +42,7 @@ namespace Services
             return shifts.Select(shift => shift.ShiftToShiftVM());
         }
 
-        public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
+        public IQueryable<AppointmentDTO> GetAppointmentsByShiftId(int ShiftId)
         {
             var appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
