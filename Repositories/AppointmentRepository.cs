@@ -18,7 +18,6 @@ namespace Repositories
         {
             CommitData = _commitData;
         }
-
         public IQueryable<Appointment> GetAppointmentsByClientId(string clientId)
         {
             return Table.Where(a => a.UserId == clientId);
@@ -27,29 +26,22 @@ namespace Repositories
         {
             return Table.Where(a => a.TemporaryClientId == tempId);
         }
-        public IEnumerable<Appointment> GetAppointmentsByProviderId(string providerId)
+        public IQueryable<Appointment> GetAppointmentsByProviderId(string providerId)
         {
-            return Table.Where(a => a.ProviderCenterService.ProviderId == providerId).ToList();
+            return Table.Where(a => a.ProviderCenterService.ProviderId == providerId);
         }
-        public IEnumerable<Appointment> GetUpcomingAppointments()
+        public IQueryable<Appointment> GetUpcomingAppointments()
         {
-            return Table.Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now)).ToList();
+            return Table.Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now));
         }
-
         public async Task<Appointment> CreateAppoinment(Appointment appointment)
         {
             await Table.AddAsync(appointment);
-            
             return appointment;
         }
-
-        //public void MakeAppointment(AppointmentViewModel appointmentViewModel);
-
         public IQueryable<Appointment> GetAllShiftAppointments(int ShiftId)
         {
             return GetAll().Where(a => a.ShiftId == ShiftId);
         }
-
-
     }
 }

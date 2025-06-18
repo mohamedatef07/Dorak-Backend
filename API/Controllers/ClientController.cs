@@ -9,6 +9,7 @@ using Repositories;
 using Services;
 using Dorak.DataTransferObject.ProviderDTO;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 
 
@@ -308,7 +309,7 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("profile-for-livequeue/{userId}")]
+        [HttpGet("profile-for-live-queue/{userId}")]
         public IActionResult ProfileForliveQueue(string userId)
         {
             var profile = clientServices.GetClientInfoToLiveQueue(userId);
@@ -391,11 +392,11 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("UpdateProfile/{userId}")]
-        public async Task<IActionResult> UpdateClientProfileAsync([FromForm] UpdateClientProfileDTO updateClientProfile,[FromRoute]string userId)
+        [HttpPost("UpdateProfile")]
+        public async Task<IActionResult> UpdateClientProfileAsync([FromForm] UpdateClientProfileDTO updateClientProfile)
         {
 
-            if (string.IsNullOrWhiteSpace(userId))
+            if (string.IsNullOrWhiteSpace(ClaimTypes.NameIdentifier))
             {
                 return BadRequest(new ApiResponse<object> { Message = "User id is required", Status = 400 });
             }
@@ -405,7 +406,7 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<object> { Message = "Invalid Data", Status = 500 });
             }
 
-            var result = await clientServices.UpdateClientProfile(userId, updateClientProfile);
+            var result = await clientServices.UpdateClientProfile(ClaimTypes.NameIdentifier, updateClientProfile);
 
 
 
@@ -415,6 +416,43 @@ namespace API.Controllers
 
             return Ok(new ApiResponse<bool> { Status = 200, Message = "Profile Update", Data = true });
 
+        }
+
+
+
+        [HttpGet("ClientProfile")]
+        public IActionResult GetMyClientProfile()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "User ID is required",
+                    Status = 400,
+                    Data = null
+                });
+            }
+
+            var profile = clientServices.GetCLientProfileForUpdate(userId);
+
+            if (profile == null)
+            {
+                return NotFound(new ApiResponse<string>
+                {
+                    Message = "Client not found",
+                    Status = 404,
+                    Data = null
+                });
+            }
+
+            return Ok(new ApiResponse<ClientDetailsDTO>
+            {
+                Message = "Client profile retrieved successfully",
+                Status = 200,
+                Data = profile
+            });
         }
     }
 }

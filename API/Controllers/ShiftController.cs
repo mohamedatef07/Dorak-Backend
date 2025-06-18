@@ -20,37 +20,50 @@ namespace API.Controllers
             centerServices = _centerServices;
         }
 
-
-        [HttpGet("GetShifts")]
-        public IActionResult GetShifts(DateOnly Date, int CenterId)
+        [HttpGet("get-shifts")]
+        public IActionResult GetShifts([FromQuery] DateOnly date, [FromQuery] int centerId)
         {
-            var shifts = shiftServices.GetShiftsWithDateAndCenterId(Date, CenterId);
-            if (shifts != null)
+            if (centerId <= 0)
             {
-                return Ok(new ApiResponse<IQueryable<ShiftDTO>> { Status = 200, Message = "Successfully retrive Data", Data = shifts });
-
+                return BadRequest(new ApiResponse<object> { Message = "Invalid center id provided", Status = 400 });
             }
-            return Ok(new ApiResponse<ShiftDTO> { Status = 400, Message = "Error on retriving Data" });
+            if (date == DateOnly.MinValue)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Date is required and must be a valid date.", Status = 400 });
+            }
+            var shifts = shiftServices.GetShiftsWithDateAndCenterId(date, centerId);
+            if (shifts == null || !shifts.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "center not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<IQueryable<ShiftDTO>> { Status = 200, Message = "Get shifts successfully", Data = shifts });
         }
 
-        [HttpGet("GetAppointment")]
-        public IActionResult GetAppointment(int ShiftId)
+        [HttpGet("get-shift-appointments")]
+        public IActionResult GetShiftAppointments([FromQuery] int ShiftId)
         {
-            var Appointments = shiftServices.GetAppointmentByShiftId(ShiftId);
-            if (Appointments != null)
+            if (ShiftId <= 0)
             {
-                return Ok(new ApiResponse<IQueryable<AppointmentDTO>> { Status = 200, Message = "Successfully retrive Data", Data = Appointments });
+                return BadRequest(new ApiResponse<object> { Message = "Invalid shift id provided", Status = 400 });
 
             }
-            return Ok(new ApiResponse<AppointmentDTO> { Status = 400, Message = "Error on retriving Data" });
-
+            var appointments = shiftServices.GetAppointmentsByShiftId(ShiftId);
+            if (appointments == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Shift not found" , Status = 404 });
+            }
+            if (!appointments.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "No appointments found", Status = 404 });
+            }
+            return Ok(new ApiResponse<IQueryable<AppointmentDTO>> { Message = "get shift appointments successfully", Status = 200, Data = appointments });
         }
         [HttpGet("get-all-center-shifts")]
-        public IActionResult GetAllCenterShifts([FromQuery]int centerId)
+        public IActionResult GetAllCenterShifts([FromQuery] int centerId)
         {
-            if(centerId <= 0)
+            if (centerId <= 0)
             {
-                return BadRequest(new ApiResponse<object> { Message = "Invalid center ID provided" ,Status=400});
+                return BadRequest(new ApiResponse<object> { Message = "Invalid center ID provided", Status = 400 });
             }
             var center = centerServices.GetCenterById(centerId);
             if (center == null)
@@ -58,15 +71,15 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<object> { Message = "Center not found", Status = 404 });
             }
             var allCenterShifts = shiftServices.GetAllCenterShifts(center);
-            if(allCenterShifts == null || !allCenterShifts.Any())
+            if (allCenterShifts == null || !allCenterShifts.Any())
             {
                 return NotFound(new ApiResponse<object> { Message = "No shifts found for this center", Status = 404 });
             }
-            return Ok(new ApiResponse<List<GetAllCenterShiftsDTO>> { Message = "Get all center shifts successfully", Status = 200 , Data = allCenterShifts});
+            return Ok(new ApiResponse<List<GetAllCenterShiftsDTO>> { Message = "Get all center shifts successfully", Status = 200, Data = allCenterShifts });
         }
 
-        [HttpGet("GetAllCenterShiftsAndServices")]
-        public IActionResult GetAllCenterShiftsAndServices([FromQuery]int centerId)
+        [HttpGet("get-all-centerShifts-and-services")]
+        public IActionResult GetAllCenterShiftsAndServices([FromQuery] int centerId)
         {
             if (centerId <= 0)
             {

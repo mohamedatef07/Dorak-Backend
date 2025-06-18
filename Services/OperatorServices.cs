@@ -288,7 +288,7 @@ namespace Services
             return true;
         }
 
-        public async Task<string> UpdateQueueStatusAsync(UpdateQueueStatusViewModel model)
+        public async Task<string> UpdateQueueStatusAsync(UpdateQueueStatusViewModel model, decimal additionalFees)
         {
             
             if (string.IsNullOrWhiteSpace(model.SelectedStatus))
@@ -349,6 +349,7 @@ namespace Services
                     liveQueue.AppointmentStatus = QueueAppointmentStatus.Completed;
                     appointment.IsChecked = true;
                     appointment.EndTime = TimeOnly.FromDateTime(now);
+                    appointment.AdditionalFees = additionalFees;
                     break;
 
                 default:

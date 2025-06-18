@@ -164,6 +164,31 @@ namespace Services
             return true;
         }
 
+        public ClientDetailsDTO GetCLientProfileForUpdate(string userId)
+        {
+            var client = clientRepository.GetById(p => p.ClientId == userId && !p.IsDeleted);
+
+            if (client == null || client.User == null)
+                return null;
+
+            return new ClientDetailsDTO
+            {
+                ID = client.ClientId,
+                
+                FirstName = client.FirstName,
+                LastName = client.LastName,
+
+                Email = client.User.Email,
+                Phone = client.User.PhoneNumber,
+                BirthDate = client.BirthDate,
+                Image = client.Image,
+                City = client.City,
+                Country = client.Country,
+                Street = client.Street,
+                Governorate = client.Governorate
+            };
+        }
+
 
         private async Task<string> SaveImageAsync(IFormFile userImage, string ClientId)
         {

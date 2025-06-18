@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Services;
+using System.Data.Entity.Core.Common;
 
 namespace API.Controllers
 {
@@ -16,12 +17,16 @@ namespace API.Controllers
         private readonly OperatorServices operatorServices;
         private readonly AppointmentServices appointmentServices;
         private readonly ShiftServices shiftServices;
+        private readonly ProviderServices providerServices;
+        private readonly LiveQueueServices liveQueueServices;
 
-        public OperatorController(OperatorServices _operatorServices, AppointmentServices _appointmentServices, ShiftServices _shiftServices)
+        public OperatorController(OperatorServices _operatorServices, AppointmentServices _appointmentServices, ShiftServices _shiftServices, ProviderServices _providerServices, LiveQueueServices _liveQueueServices)
         {
             operatorServices = _operatorServices;
             appointmentServices = _appointmentServices;
             shiftServices = _shiftServices;
+            providerServices = _providerServices;
+            liveQueueServices = _liveQueueServices;
         }
 
         [HttpGet("GetAll")]
@@ -148,5 +153,109 @@ namespace API.Controllers
                 });
             }
         }
+
+        // [Authorize(Roles = "Admin, Operator")]
+        [HttpGet]
+        [Route("GetProviderLiveQueues")]
+        public IActionResult GetProviderLiveQueues(string providerId, int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
+        {
+            try
+            {
+                // Validate providerId
+                if (string.IsNullOrEmpty(providerId))
+                {
+                    return BadRequest(new ApiResponse<ProviderLiveQueueViewModel>
+                    {
+                        Message = "Provider Id is required",
+                        Status = 400
+                    });
+                }
+
+                // Check if provider exists
+                var provider = providerServices.GetProviderById(providerId);
+                if (provider == null)
+                {
+                    return NotFound(new ApiResponse<ProviderLiveQueueViewModel>
+                    {
+                        Message = "Provider not found",
+                        Status = 404
+                    });
+                }
+
+                // Fetch live queues for the specific provider, center, and shift
+                var liveQueues = liveQueueServices.GetLiveQueuesForProvider(providerId, centerId, shiftId, pageNumber, pageSize);
+
+                if (liveQueues.Data == null || !liveQueues.Data.Any())
+                {
+                    return NotFound(new ApiResponse<PaginationViewModel<ProviderLiveQueueViewModel>>
+                    {
+                        Message = "No live queues found for the specified provider, center, and shift",
+                        Status = 404,
+                        Data = new PaginationViewModel<ProviderLiveQueueViewModel>
+                        {
+                            Data = new List<ProviderLiveQueueViewModel>(),
+                            PageNumber = pageNumber,
+                            PageSize = pageSize,
+                            Total = 0
+                        }
+                    });
+                }
+
+                return Ok(new ApiResponse<PaginationViewModel<ProviderLiveQueueViewModel>>
+                {
+                    Data = liveQueues,
+                    Message = "Live queues retrieved successfully",
+                    Status = 200
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Data = null,
+                    Message = $"Internal Server Error: {ex.Message}",
+                    Status = 500
+                });
+            }
+        }
+
+        // [Authorize(Roles = "Admin, Operator")]
+        [HttpPost]
+        [Route("UpdateLiveQueueStatus")]
+        public async Task<IActionResult> UpdateLiveQueueStatus([FromBody] UpdateQueueStatusViewModel model, decimal additionalFees)
+        {
+            try
+            {
+                var result = await operatorServices.UpdateQueueStatusAsync(model, additionalFees);
+                if (result.StartsWith("Queue status updated successfully"))
+                {
+                    return Ok(new ApiResponse<string>
+                    {
+                        Data = result,
+                        Message = "Success",
+                        Status = 200
+                    });
+                }
+                else
+                {
+                    return BadRequest(new ApiResponse<string>
+                    {
+                        Data = result,
+                        Message = "Failed",
+                        Status = 400
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string>
+                {
+                    Data = null,
+                    Message = $"Internal Server Error: {ex.Message}",
+                    Status = 500
+                });
+            }
+        }
+
     }
 }
