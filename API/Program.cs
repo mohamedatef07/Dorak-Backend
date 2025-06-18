@@ -243,10 +243,10 @@ namespace API
                     () => providerServices.RegenerateWeeklyAssignments(),
                     "0 */6 * * *");
 
-                recurringJobManager.AddOrUpdate(
-                    "editTurn", () => liveQueueServices.editTurn(), 
-                    "* * * * *"
-                    );
+                //recurringJobManager.AddOrUpdate(
+                //    "editTurn", () => liveQueueServices.editTurn(), 
+                //    "* * * * *"
+                //    );
 
                 recurringJobManager.AddOrUpdate(
                     "UpdatePendingPaymentsJob",
