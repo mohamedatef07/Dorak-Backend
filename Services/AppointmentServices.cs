@@ -21,16 +21,18 @@ namespace Services
         private readonly PaymentServices paymentServices;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
+        private readonly LiveQueueServices liveQueueServices;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly PaymentRepository paymentRepository;
 
-        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository)
+        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository, LiveQueueServices liveQueueServices)
         {
             commitData = _commitData;
             paymentRepository = _paymentRepository;
             paymentServices = _paymentServices;
             appointmentRepository = _appointmentRepository;
             shiftRepository = _shiftRepository;
+            this.liveQueueServices = liveQueueServices;
             providerCenterServiceRepository = _providerCenterServiceRepository;
         }
 
@@ -170,6 +172,7 @@ namespace Services
                     {
                         // Proceed to cancel the appointment
                         await CancelAppointment(appointment.AppointmentId);
+                        await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);
                     }
                     catch (Exception ex)
                     {
