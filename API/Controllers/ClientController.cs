@@ -392,7 +392,7 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("UpdateProfile")]
+        [HttpPost("UpdateProfile")]
         public async Task<IActionResult> UpdateClientProfileAsync([FromForm] UpdateClientProfileDTO updateClientProfile)
         {
 
