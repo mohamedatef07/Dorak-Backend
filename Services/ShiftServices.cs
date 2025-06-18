@@ -109,6 +109,7 @@ namespace Services
                      pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled && sh.ShiftDate>= dateNow && sh.ShiftDate <= dateNow.AddDays(30) ).Select(shift => new GetAllCenterShiftAndServicesDTO
                      {
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
+                         ProviderId = pa.Provider.ProviderId,
                          ShiftId = shift.ShiftId,
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
