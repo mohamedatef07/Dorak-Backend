@@ -309,7 +309,7 @@ namespace API.Controllers
         }
 
 
-        [HttpGet("profile-for-livequeue/{userId}")]
+        [HttpGet("profile-for-live-queue/{userId}")]
         public IActionResult ProfileForliveQueue(string userId)
         {
             var profile = clientServices.GetClientInfoToLiveQueue(userId);
