@@ -260,6 +260,10 @@ namespace Services
 
             var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(app.ShiftId);
 
+            var LqAppointment = liveQueueRepository.Get(app => app.AppointmentId == appointmentId).FirstOrDefault();
+            if (LqAppointment == null) {
+                return null;
+            }
             var result = liveQueues.Select(lq => new ClientLiveQueueDTO
             {
 
