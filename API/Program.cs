@@ -30,7 +30,7 @@ namespace API
 
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}"),LogLevel.Information));
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}"),LogLevel.Information).EnableSensitiveDataLogging());
             // logging
             Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(@"Logs\DorakLog.txt",
@@ -235,12 +235,19 @@ namespace API
             using (var scope = app.Services.CreateScope())
             {
                 var providerServices = scope.ServiceProvider.GetRequiredService<ProviderServices>();
+                var liveQueueServices = scope.ServiceProvider.GetRequiredService<LiveQueueServices>();
                 var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
                 var paymentServices = scope.ServiceProvider.GetRequiredService<PaymentServices>();
                 recurringJobManager.AddOrUpdate(
                     "RegenerateWeeklyAssignmentsJob",
                     () => providerServices.RegenerateWeeklyAssignments(),
                     "0 */6 * * *");
+
+                recurringJobManager.AddOrUpdate(
+                    "editTurn", () => liveQueueServices.editTurn(), 
+                    "* * * * *"
+                    );
+
                 recurringJobManager.AddOrUpdate(
                     "UpdatePendingPaymentsJob",
                     () => paymentServices.UpdatePendingPayments(),

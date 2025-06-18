@@ -94,6 +94,38 @@ namespace Services
                 ).ToList();
             return shifts;
         }
+
+        public List<GetAllCenterShiftAndServicesDTO> GetAllCenterShiftsAndServices(Center center)
+        {
+            if (center?.ProviderAssignments == null || !center.ProviderAssignments.Any())
+            {
+                return new List<GetAllCenterShiftAndServicesDTO>();
+            }
+            var proivderAssignments = center.ProviderAssignments;
+            DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
+            
+            var shifts = proivderAssignments.SelectMany(
+                pa =>
+                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled && sh.ShiftDate>= dateNow && sh.ShiftDate <= dateNow.AddDays(30) ).Select(shift => new GetAllCenterShiftAndServicesDTO
+                     {
+                         ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
+                         ShiftId = shift.ShiftId,
+                         ShiftDate = shift.ShiftDate,
+                         StartTime = shift.StartTime,
+                         EndTime = shift.EndTime,
+                         Services = pa.Provider.ProviderCenterServices
+                             .Where(pcs => pcs.CenterId == center.CenterId)
+                             .Select(pcs => new ServicesDTO
+                             {
+                                 ServiceId = pcs.Service.ServiceId,
+                                 ServiceName = pcs.Service.ServiceName,
+                                 BasePrice = pcs.Service.BasePrice
+                             }).ToList()
+                                 })
+                            ).ToList();
+
+            return shifts;
+        }
         public async Task<bool> ShiftCancelation(Shift shift, int centerId)
         {
             if (shift == null)
