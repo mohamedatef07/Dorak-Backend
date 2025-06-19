@@ -138,6 +138,16 @@ namespace Services
                 return false;
             }
             shift.ShiftType = ShiftType.Cancelled;
+            var shiftCancelNotification = new Notification()
+            {
+                Title = "Shift Cancellation",
+                Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n"+
+                $" Your shift scheduled for {shift.ShiftDate.ToShortDateString()} from {shift.StartTime.ToShortTimeString()} to {shift.EndTime.ToShortTimeString()} at {shift.ProviderAssignment.Center.CenterName} has been canceled.\n"+
+                " Further information will be provided shortly."
+            };
+            shift.ProviderAssignment.Provider.User.Notifications.Add(shiftCancelNotification);
+            commitData.SaveChanges();
+            await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("shiftCancelNotification", shiftCancelNotification);
             if (shift.Appointments != null && shift.Appointments.Any())
             {
                 foreach (var appointment in shift.Appointments)
@@ -157,13 +167,14 @@ namespace Services
                         }
                     }
                     appointment.AppointmentStatus = AppointmentStatus.Cancelled;
-                    var newNotification = new Notification()
+                    var appointmentCancelationNotification = new Notification()
                     { 
                       Title = "Appointment Cancellation",
                       Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been canceled. We apologize for any inconvenience. Please contact us or reschedule your appointment at your earliest convenience."
                     };
-                    appointment.User.Notifications.Add(newNotification);
-                    await notificationHubContext.Clients.User(appointment.User.Id).SendAsync("latestNotification", newNotification);
+                    appointment.User.Notifications.Add(appointmentCancelationNotification);
+                    commitData.SaveChanges();
+                    await notificationHubContext.Clients.User(appointment.User.Id).SendAsync("appointmentCancelationNotification", appointmentCancelationNotification);
                 }
                 shiftRepository.Edit(shift);
                 commitData.SaveChanges();

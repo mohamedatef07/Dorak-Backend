@@ -49,6 +49,7 @@
     <Folder Include="Logs\" />
     <Folder Include="wwwroot\" />
     <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\image\Provider\2293a1da-9c6c-4239-bde5-433abf0039f4\" />
   </ItemGroup>
 
 </Project>
