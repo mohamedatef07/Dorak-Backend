@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Data;
 using Dorak.DataTransferObject;
@@ -133,7 +133,7 @@ namespace Services
             return null;
         }
 
-        public async Task<Appointment> CreateAppointment(ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<AppointmentForOperator> CreateAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
             if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
                 throw new InvalidOperationException("Cannot reserve an appointment in the past.");
@@ -195,8 +195,9 @@ namespace Services
             var createdAppointment = await appointmentRepository.CreateAppoinment(app);
             createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
+            Console.WriteLine(" Saving to DB...");
             commitData.SaveChanges();
-
+            Console.WriteLine(" Done saving to DB");
             var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
             var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
@@ -205,7 +206,7 @@ namespace Services
                 createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
             }
 
-            return createdAppointment;
+            return createdAppointment.ToReserveAppointmentResultDTO();
         }
 
 

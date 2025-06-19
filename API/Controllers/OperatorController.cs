@@ -1,8 +1,10 @@
-﻿using Dorak.DataTransferObject;
+﻿using System.Threading.Tasks;
+using Dorak.DataTransferObject;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Services;
 using System.Data.Entity.Core.Common;
 
@@ -108,8 +110,12 @@ namespace API.Controllers
         }
 
         [HttpPost("reserve-appointment")]
-        public IActionResult ReserveAppointment([FromForm] ReserveApointmentDTO reserveApointmentDTO)
+        public async Task<IActionResult> ReserveAppointment([FromBody] ReserveApointmentDTO reserveApointmentDTO)
         {
+            Console.WriteLine(" Reached backend method");
+            Console.WriteLine(JsonConvert.SerializeObject(reserveApointmentDTO));
+
+
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ApiResponse<object>
@@ -120,13 +126,13 @@ namespace API.Controllers
             }
             try
             {
-                var appointment = operatorServices.CreateAppointment(reserveApointmentDTO);
+                var appointment = await operatorServices.CreateAppointment(reserveApointmentDTO);
 
-                return Ok(new ApiResponse<object>
+                return Ok(new ApiResponse<ReserveApointmentDTO>
                 {
                     Status = 200,
                     Message = "Appointment reserved successfully",
-                    Data = appointment
+                    Data = reserveApointmentDTO
                 });
             }
             catch (InvalidOperationException ex)

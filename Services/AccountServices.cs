@@ -201,7 +201,6 @@ namespace Services
 
                 if (roles.Contains("Operator"))
                 {
-                    Debug.WriteLine("Logged in UserId: " + user.Id);
                     var Operator = operatorRepository.GetById(o=>o.OperatorId==user.Id);
                     if (Operator.CenterId != null)
                     {

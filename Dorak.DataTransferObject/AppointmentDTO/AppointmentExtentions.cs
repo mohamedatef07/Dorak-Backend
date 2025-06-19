@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dorak.DataTransferObject;
-
 using Dorak.Models;
 
 namespace Dorak.ViewModels
@@ -112,6 +111,43 @@ namespace Dorak.ViewModels
                 Specialization = appointment.ProviderCenterService.Provider.Specialization
 
             };
+        }
+
+        public static AppointmentForOperator ToReserveAppointmentResultDTO(this Appointment appointment)
+        {
+            var appop = new AppointmentForOperator
+            {
+                AppointmentId = appointment.AppointmentId,
+                AppointmentDate = appointment.AppointmentDate,
+                AppointmentStatus = appointment.AppointmentStatus,
+                AppointmentType = appointment.AppointmentType,
+                CreatedAt = appointment.CreatedAt,
+                UpdatedAt = appointment.UpdatedAt,
+                ClientType = appointment.ClientType,
+                Fees = appointment.Fees,
+                AdditionalFees = appointment.AdditionalFees,
+                ArrivalTime = appointment.ArrivalTime,
+                EstimatedTime = appointment.EstimatedTime,
+                EstimatedDuration = appointment.EstimatedDuration,
+                ExactTime = appointment.ExactTime,
+                EndTime = appointment.EndTime,
+
+                FirstName = appointment.User?.Client?.FirstName ?? appointment.TemporaryClient?.FirstName,
+                LastName = appointment.User?.Client?.LastName ?? appointment.TemporaryClient?.LastName,
+                ContactInfo = appointment.User?.PhoneNumber ?? appointment.TemporaryClient?.ContactInfo,
+
+                OperatorId = appointment.OperatorId,
+                ProviderId = appointment.ProviderCenterService?.ProviderId,
+                ServiceId = appointment.ProviderCenterService?.ServiceId,
+                CenterId = appointment.ProviderCenterService?.CenterId,
+
+                ShiftId = appointment.ShiftId,
+                UserId = appointment.UserId,
+                TemporaryClientId = appointment.TemporaryClientId,
+                IsChecked = appointment.IsChecked
+            };
+            return appop;
+            ;
         }
     }
 }
