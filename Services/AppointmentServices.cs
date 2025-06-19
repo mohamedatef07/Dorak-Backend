@@ -121,8 +121,9 @@ namespace Services
             {
                 await paymentServices.RefundPayment(payment.TransactionId, appointmentId);
             }
+            appointment.AppointmentStatus = AppointmentStatus.Cancelled;
 
-            appointmentRepository.Delete(appointment);
+            appointmentRepository.Edit(appointment);
             commitData.SaveChanges();
         }
 

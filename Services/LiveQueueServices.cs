@@ -256,34 +256,31 @@ namespace Services
                 .SendAsync("QueueUpdated", liveQueueList);
         }
 
-        public async Task editTurn()
-        {
+        //public async Task editTurn()
+        //{
 
-            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().ToList();
+        //    List<LiveQueue> liveQueues = liveQueueRepository.GetAll().ToList();
 
-            foreach(LiveQueue lq in liveQueues)
-            {
-                LiveQueue previous = liveQueueRepository.GetAll().Where(l => l.ShiftId == lq.ShiftId && l.CurrentQueuePosition == lq.CurrentQueuePosition - 1).FirstOrDefault();
+        //    foreach(LiveQueue lq in liveQueues)
+        //    {
+        //        LiveQueue previous = liveQueueRepository.GetAll().Where(l => l.ShiftId == lq.ShiftId && l.CurrentQueuePosition == lq.CurrentQueuePosition - 1).FirstOrDefault();
 
-                if (lq.EstimatedTime <= TimeOnly.FromDateTime(DateTime.Now) && lq.AppointmentStatus == QueueAppointmentStatus.NotChecked && previous.AppointmentStatus == QueueAppointmentStatus.Completed)
-                {
+        //        if (lq.EstimatedTime <= TimeOnly.FromDateTime(DateTime.Now) && lq.AppointmentStatus == QueueAppointmentStatus.NotChecked && previous.AppointmentStatus == QueueAppointmentStatus.Completed)
+        //        {
 
-                    var position = lq.CurrentQueuePosition ?? 0;
+        //            var position = lq.CurrentQueuePosition ?? 0;
 
 
-                    reOrder(lq, lq.ShiftId, position);
+        //            reOrder(lq, lq.ShiftId, position);
 
                   
 
 
 
-                }
-            }
+        //        }
+        //    }
 
-            
-
-
-        }
+        //}
 
         public void reOrder (LiveQueue liveQueue, int shiftId, int positionNumber)
         {

@@ -33,6 +33,7 @@ namespace Dorak.ViewModels
                 ShiftId = appointment.ShiftId,
                 UserId = appointment.UserId,
                 TemporaryClientId = appointment.TemporaryClientId,
+                ProviderImage = $"{appointment.ProviderCenterService.Provider.Image}",
                 ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName} {appointment.ProviderCenterService.Provider.LastName}",
                 Rate = appointment.ProviderCenterService.Provider.Rate,
                 Specialization = appointment.ProviderCenterService.Provider.Specialization
@@ -104,8 +105,9 @@ namespace Dorak.ViewModels
                 AppointmentId = appointment.AppointmentId,
                 AppointmentDate = appointment.AppointmentDate,
                 ProviderId = appointment.ProviderCenterService.ProviderId,
-                ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName} {appointment.ProviderCenterService.Provider.LastName}",
-                Rate = appointment.ProviderCenterService.Provider.Rate,
+                ProviderIamge = $"{appointment.ProviderCenterService.Provider.Image}",
+                ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName } {appointment.ProviderCenterService.Provider.LastName}",
+                Rate =appointment.ProviderCenterService.Provider.Rate,
                 Specialization = appointment.ProviderCenterService.Provider.Specialization
 
             };
