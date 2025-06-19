@@ -173,6 +173,8 @@ namespace Services
 
             return new ClientDetailsDTO
             {
+                ID = client.ClientId,
+                
                 FirstName = client.FirstName,
                 LastName = client.LastName,
 
