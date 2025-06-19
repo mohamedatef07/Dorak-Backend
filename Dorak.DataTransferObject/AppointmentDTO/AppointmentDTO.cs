@@ -30,6 +30,7 @@ namespace Dorak.DataTransferObject
         public int ShiftId { get; set; }
         public string? UserId { get; set; }
         public int? TemporaryClientId { get; set; }
+        public string? ProviderImage { get; set; }
         public string ProviderName { get; set; }
         public decimal Rate { get; set; }
         public string Specialization { get; set; }

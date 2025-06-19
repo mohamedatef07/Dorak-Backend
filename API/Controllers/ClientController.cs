@@ -395,8 +395,9 @@ namespace API.Controllers
         [HttpPost("UpdateProfile")]
         public async Task<IActionResult> UpdateClientProfileAsync([FromForm] UpdateClientProfileDTO updateClientProfile)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (string.IsNullOrWhiteSpace(ClaimTypes.NameIdentifier))
+            if (string.IsNullOrWhiteSpace(userId))
             {
                 return BadRequest(new ApiResponse<object> { Message = "User id is required", Status = 400 });
             }
@@ -406,7 +407,7 @@ namespace API.Controllers
                 return BadRequest(new ApiResponse<object> { Message = "Invalid Data", Status = 500 });
             }
 
-            var result = await clientServices.UpdateClientProfile(ClaimTypes.NameIdentifier, updateClientProfile);
+            var result = await clientServices.UpdateClientProfile(userId, updateClientProfile);
 
 
 
