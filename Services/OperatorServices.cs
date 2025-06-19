@@ -26,10 +26,11 @@ namespace Services
         private readonly TemperoryClientRepository temperoryClientRepository;
         private readonly UserManager<User> userManager;
         private readonly CommitData commitData;
-        private readonly IHubContext<QueueHub> hubContext;
+        private readonly IHubContext<QueueHub> queueHubContext;
+        private readonly IHubContext<NotificationHub> notificationHubContext;
 
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _hubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager, LiveQueueServices liveQueueServices)
-       
+
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _queueHubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager, LiveQueueServices _liveQueueServices, IHubContext<NotificationHub> _notificationHubContext)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -37,16 +38,14 @@ namespace Services
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
-            
             appointmentServices = _appointmentServices;
             providerCenterServiceRepository = _providerCenterServiceRepository;
             temperoryClientRepository = _temperoryClientRepository;
             accountRepository = _accountRepository;
-            this.liveQueueServices = liveQueueServices;
+            liveQueueServices = _liveQueueServices;
             userManager = _userManager;
-
-            hubContext = _hubContext;
-
+            queueHubContext = _queueHubContext;
+            notificationHubContext = _notificationHubContext;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -215,7 +214,7 @@ namespace Services
             return $"TMP-{Guid.NewGuid().ToString().Substring(0, 6).ToUpper()}";
         }
         // we need the list from the algorithm
-        public bool StartShift(int ShiftId, string operatorId)
+        public async Task<bool> StartShift(int ShiftId, string operatorId)
         {
             DateTime currentTime = DateTime.Now;
             TimeOnly timeNow = TimeOnly.FromDateTime(currentTime);
@@ -229,6 +228,15 @@ namespace Services
                 shift.ShiftType = ShiftType.OnGoing;
                 shiftRepository.Edit(shift);
                 commitData.SaveChanges();
+                var startShiftNotification = new Notification()
+                {
+                    Title = "Start Shift",
+                    Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n"+
+                              $"Your shift at {shift.ProviderAssignment.Center.CenterName} has officially begun."
+                };
+                shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
+                commitData.SaveChanges();
+                await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("startShiftNotification", startShiftNotification);
             }
             else
             {
@@ -250,13 +258,10 @@ namespace Services
                     AppointmentId = appointment.AppointmentId,
                     ShiftId = appointment.ShiftId,
                     CurrentQueuePosition = ++count,
-                    
                 };
-
                 liveQueueRepository.Add(livequeue);
             }
             commitData.SaveChanges();
-
             return true;
         }
 
@@ -361,7 +366,7 @@ namespace Services
 
             
 
-            await hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
+            await queueHubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
             await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);
             return "Queue status updated successfully";
         }
