@@ -65,13 +65,13 @@ namespace API.Controllers
         }
 
         [HttpGet("start-shift")]
-        public IActionResult StartShift([FromQuery] int shiftId, [FromQuery] string operatorId)
+        public async Task<IActionResult> StartShift([FromQuery] int shiftId, [FromQuery] string operatorId)
         {
             if (shiftId <= 0 || operatorId.IsNullOrEmpty())
             {
                 return BadRequest(new ApiResponse<object> { Message = "Invalid Shift ID or Operator ID format provided", Status = 400 });
             }
-            var result = operatorServices.StartShift(shiftId, operatorId);
+            var result = await operatorServices.StartShift(shiftId, operatorId);
             if (!result)
             {
                 return NotFound(new ApiResponse<object> { Message = "Failed to start shift", Status = 400 });
@@ -90,7 +90,7 @@ namespace API.Controllers
             return BadRequest(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Failed to End Shift." });
         }
         [HttpGet("cancel-shift")]
-        public IActionResult CancelShift([FromQuery] int shiftId, [FromQuery] int centerId)
+        public async Task<IActionResult> CancelShift([FromQuery] int shiftId, [FromQuery] int centerId)
         {
             if (shiftId <= 0)
             {
@@ -101,8 +101,8 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<object> { Message = "Shift is not found", Status = 404 });
             }
-            var isCanceled = shiftServices.ShiftCancelation(shift, centerId);
-            if (!isCanceled.Result)
+            var isCanceled = await shiftServices.ShiftCancelation(shift, centerId);
+            if (!isCanceled)
             {
                 return BadRequest(new ApiResponse<object> { Message = "Failed to cancel shift", Status = 400 });
             }

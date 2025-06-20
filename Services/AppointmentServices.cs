@@ -25,14 +25,14 @@ namespace Services
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly PaymentRepository paymentRepository;
 
-        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository, LiveQueueServices liveQueueServices)
+        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository, LiveQueueServices _liveQueueServices)
         {
             commitData = _commitData;
             paymentRepository = _paymentRepository;
             paymentServices = _paymentServices;
             appointmentRepository = _appointmentRepository;
             shiftRepository = _shiftRepository;
-            this.liveQueueServices = liveQueueServices;
+            liveQueueServices = _liveQueueServices;
             providerCenterServiceRepository = _providerCenterServiceRepository;
         }
 
