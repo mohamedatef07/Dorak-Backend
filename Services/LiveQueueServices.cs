@@ -323,8 +323,8 @@ namespace Services
                     IsCurrentClient = false // سيتم تحديده بالفرونت
                 }).ToList();
 
-            await hubContext.Clients
-                .Group($"shift_{shiftId}")
+            await hubContext.Clients.All
+                //.Group($"shift_{shiftId}")
                 .SendAsync("QueueUpdated", liveQueueList);
         }
 
