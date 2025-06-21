@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,6 +152,19 @@ namespace Services
 
             if (model.BirthDate != null)
                 client.BirthDate = (DateOnly)model.BirthDate;
+
+            if (model.City != null)
+                client.City = model.City;
+
+            if (model.Country != null)
+                client.Country = model.Country;
+
+            if (model.Street != null)
+                client.Street = model.Street;
+
+            if (model.Governorate != null)
+                client.Governorate = model.Governorate;
+
 
             if (model.Image != null)
             {
