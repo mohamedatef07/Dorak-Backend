@@ -87,6 +87,10 @@ namespace Services
                 Name = $"{Client.FirstName} {Client.LastName}",
                 Phone = Client.User.PhoneNumber,
                 Email = Client.User.Email,
+                City = Client.City,
+                Country = Client.Country,
+                Governorate = Client.Governorate,
+                Street = Client.Street,
                 Appointments = appointmentServices.GetAppointmentsByUserId(userId)
             };
             return clientProfile;
@@ -151,7 +155,7 @@ namespace Services
             {
                 
 
-                var savedImagePath = await SaveImageAsync(model.Image, client.ClientId);  // Use client.ClientId here
+                var savedImagePath = await SaveImageAsync(model.Image, client.User.Id.ToString());  // Use client.ClientId here
                 client.Image = savedImagePath;  // Assuming the 'client' model has an Image property
             }
 
@@ -195,7 +199,7 @@ namespace Services
             if (userImage != null && userImage.Length > 0)
             {
                 // المسار يكون داخل wwwroot/image/Client/{ID}
-                var folderPath = Path.Combine(_env.WebRootPath, "image", "provider", ClientId);
+                var folderPath = Path.Combine(_env.WebRootPath, "image", "Client", ClientId);
                 Directory.CreateDirectory(folderPath);
 
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userImage.FileName);
