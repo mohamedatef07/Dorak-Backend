@@ -201,24 +201,33 @@ namespace Services
 
                 if (roles.Contains("Operator"))
                 {
-                    var Operator = operatorRepository.GetById(o=>o.OperatorId==user.Id);
-                    if (Operator.CenterId != null)
+                    var Operator = operatorRepository.GetById(o => o.OperatorId == user.Id);
+                    if (Operator != null && Operator.CenterId != null)
                     {
                         claims.Add(new Claim("CenterId", Operator.CenterId.ToString()));
-                        var Image = user.Operator.Image;
-                        claims.Add(new Claim("Image", Image));
+
+                        if (Operator.Image != null)
+                        {
+                            claims.Add(new Claim("Image", Operator.Image));
+                        }
                     }
                 }
 
                 if (roles.Contains("Client"))
                 {
                     var Image = user.Client.Image;
-                    claims.Add(new Claim("Image", Image));
+                    if (Image != null)
+                    {
+                        claims.Add(new Claim("Image", Image));
+                    }
                 }
                 else if (roles.Contains("Provider"))
                 {
                     var Image = user.Provider.Image;
-                    claims.Add(new Claim("Image", Image));
+                    if (Image != null)
+                    {
+                        claims.Add(new Claim("Image", Image));
+                    }
                 }
                 //else if (roles.Contains("Operator"))
                 //{
