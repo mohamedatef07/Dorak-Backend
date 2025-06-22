@@ -257,5 +257,20 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<GeneralStatisticsDTO> { Message = "Get general statistics successfully", Status = 200, Data = generalStatistics });
         }
+        [HttpGet("notifications")]
+        public IActionResult GetNotifications()
+        {
+            var providerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+            }
+            var notifications = providerServices.GetNotification(providerId);
+            if (notifications == null || !notifications.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<NotificationDTO>> { Message = "Get general statistics successfully", Status = 200, Data = notifications });
+        }
     }
 }

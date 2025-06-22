@@ -50,7 +50,7 @@ namespace API.Controllers
             var appointments = shiftServices.GetAppointmentsByShiftId(ShiftId);
             if (appointments == null)
             {
-                return NotFound(new ApiResponse<object> { Message = "Shift not found" , Status = 404 });
+                return NotFound(new ApiResponse<object> { Message = "Shift not found", Status = 404 });
             }
             if (!appointments.Any())
             {
