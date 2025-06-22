@@ -960,6 +960,22 @@ namespace Services
                 AverageEstimatedTime= AverageEstimatedTime,
             };
         }
+        public List<NotificationDTO> GetNotification(string providerId)
+        {
+            var provider = providerRepository.GetProviderById(providerId);
+            if (provider == null)
+            {
+                return null;
+            }
+            var notification = provider.User.Notifications.Select(no =>  new NotificationDTO
+            {
+               Title = no.Title,
+               Message = no.Message,
+               IsRead = no.IsRead,
+               CreatedAt = no.CreatedAt,
+            }).ToList();
+            return notification;
+        }
     }
 }
 
