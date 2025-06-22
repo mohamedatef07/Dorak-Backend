@@ -9,7 +9,7 @@ namespace Hubs
 
         public override Task OnConnectedAsync()
         {
-            var userId = Context.GetHttpContext()?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
                 _userConnections[userId] = Context.ConnectionId;
@@ -19,7 +19,7 @@ namespace Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
-            var userId = _userConnections.FirstOrDefault(x => x.Value == Context.ConnectionId).Key;
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId != null)
             {
                 _userConnections.Remove(userId);
