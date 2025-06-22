@@ -205,18 +205,35 @@ namespace Services
                     if (Operator.CenterId != null)
                     {
                         claims.Add(new Claim("CenterId", Operator.CenterId.ToString()));
+                        var Image = user.Operator.Image;
+                        claims.Add(new Claim("Image", Image));
                     }
                 }
 
-                // Create JWT Token
-                var jwtToken = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(100),
-                    signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
-                        SecurityAlgorithms.HmacSha256
-                    )
-                );
+                if (roles.Contains("Client"))
+                {
+                    var Image = user.Client.Image;
+                    claims.Add(new Claim("Image", Image));
+                }
+                else if (roles.Contains("Provider"))
+                {
+                    var Image = user.Provider.Image;
+                    claims.Add(new Claim("Image", Image));
+                }
+                //else if (roles.Contains("Operator"))
+                //{
+
+                //}
+
+                    // Create JWT Token
+                    var jwtToken = new JwtSecurityToken(
+                        claims: claims,
+                        expires: DateTime.UtcNow.AddMinutes(100),
+                        signingCredentials: new SigningCredentials(
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
+                            SecurityAlgorithms.HmacSha256
+                        )
+                    );
 
                 var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
