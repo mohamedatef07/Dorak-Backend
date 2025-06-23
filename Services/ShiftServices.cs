@@ -157,7 +157,7 @@ namespace Services
 
             if (shift.Appointments != null && shift.Appointments.Any())
             {
-                foreach (var appointment in shift.Appointments)
+                foreach (var appointment in shift.Appointments.ToList())
                 {
                     if (appointment.AppointmentStatus == AppointmentStatus.Confirmed)
                     {
@@ -195,9 +195,9 @@ namespace Services
 
                 var center = centerServices.GetCenterById(centerId);
                 var updatedShiftList = GetAllCenterShifts(center);
-                var OperatorCconnectionId = NotificationHub.GetConnectionId(shift.Operator.OperatorId);
+                var OperatorCconnectionId = ShiftListHub.GetConnectionId(shift.Operator.OperatorId);
 
-                if (connectionId != null)
+                if (OperatorCconnectionId != null)
                 {
                     await shiftListHubContext.Clients.Client(OperatorCconnectionId).SendAsync("updateShiftsList", updatedShiftList);
                 }

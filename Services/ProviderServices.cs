@@ -4,11 +4,9 @@ using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
 using Repositories;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 
 
@@ -934,8 +932,8 @@ namespace Services
 
         public GeneralStatisticsDTO GetGeneralStatistics(string providerId)
         {
-          var provider = providerRepository.GetProviderById(providerId);
-            if(provider == null)
+            var provider = providerRepository.GetProviderById(providerId);
+            if (provider == null)
             {
                 return null;
             }
@@ -950,14 +948,15 @@ namespace Services
                 TotalUrgentCases += pcs.Appointments.Where(app => app.AppointmentType == AppointmentType.Urgent).Count();
                 PatientsTreatedToday += pcs.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Confirmed && app.Shift.ShiftDate == DateOnly.FromDateTime(DateTime.Today)).Count();
                 //AverageEstimatedTime += TimeOnly.FromTimeSpan(pcs.Appointments.Select(app => app.EndTime)) - TimeOnly.FromTimeSpan(pcs.Appointments.Select(app => app.ExactTime));
-                PatientsInQueue += pcs.Appointments.Select(app => app.Shift).Where(sh =>sh.ShiftType == ShiftType.OnGoing).Select(sh => sh.LiveQueues).Count();
+                PatientsInQueue += pcs.Appointments.Select(app => app.Shift).Where(sh => sh.ShiftType == ShiftType.OnGoing).Select(sh => sh.LiveQueues).Count();
             }
-            return new GeneralStatisticsDTO {
+            return new GeneralStatisticsDTO
+            {
                 TotalAppointments = TotalAppointments,
                 TotalUrgentCases = TotalUrgentCases,
-                PatientsInQueue= PatientsInQueue,
-                PatientsTreatedToday= PatientsInQueue,
-                AverageEstimatedTime= AverageEstimatedTime,
+                PatientsInQueue = PatientsInQueue,
+                PatientsTreatedToday = PatientsInQueue,
+                AverageEstimatedTime = AverageEstimatedTime,
             };
         }
         public List<NotificationDTO> GetNotification(string providerId)
@@ -967,13 +966,13 @@ namespace Services
             {
                 return null;
             }
-            var notification = provider.User.Notifications.Select(no =>  new NotificationDTO
+            var notification = provider.User.Notifications.Select(no => new NotificationDTO
             {
-               Title = no.Title,
-               Message = no.Message,
-               IsRead = no.IsRead,
-               CreatedAt = no.CreatedAt,
-            }).ToList();
+                Title = no.Title,
+                Message = no.Message,
+                IsRead = no.IsRead,
+                CreatedAt = no.CreatedAt,
+            }).OrderByDescending(n => n.CreatedAt).ToList();
             return notification;
         }
     }

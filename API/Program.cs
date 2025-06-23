@@ -142,7 +142,7 @@ namespace API
                         // If the request is for our SignalR hub
                         var path = context.HttpContext.Request.Path;
                         if (!string.IsNullOrEmpty(accessToken) &&
-                            (path.StartsWithSegments("/notificationHub") || path.StartsWithSegments("/shiftListHub")))
+                            (path.StartsWithSegments("/notificationHub") || path.StartsWithSegments("/shiftListHub") || path.StartsWithSegments("/queueHub")))
                         {
                             context.Token = accessToken;
                         }
