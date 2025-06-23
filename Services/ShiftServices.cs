@@ -195,9 +195,11 @@ namespace Services
 
                 var center = centerServices.GetCenterById(centerId);
                 var updatedShiftList = GetAllCenterShifts(center);
+                var OperatorCconnectionId = NotificationHub.GetConnectionId(shift.Operator.OperatorId);
+
                 if (connectionId != null)
                 {
-                    await shiftListHubContext.Clients.Client(connectionId).SendAsync("updateShiftsList", updatedShiftList);
+                    await shiftListHubContext.Clients.Client(OperatorCconnectionId).SendAsync("updateShiftsList", updatedShiftList);
                 }
 
                 return true;
