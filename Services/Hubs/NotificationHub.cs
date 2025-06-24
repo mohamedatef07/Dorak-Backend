@@ -7,15 +7,22 @@ namespace Hubs
     public class NotificationHub : Hub
     {
         private static readonly Dictionary<string, string> _userConnections = new();
-        private readonly NotificationServices notificationHubService;
+        private readonly NotificationServices notificationService;
 
         public NotificationHub(NotificationServices notificationHubService)
         {
-            this.notificationHubService = notificationHubService;
+            this.notificationService = notificationHubService;
         }
         public override async Task OnConnectedAsync()
         {
-            await Clients.Caller.SendAsync("UserConnected", Context.ConnectionId);
+            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!string.IsNullOrEmpty(userId))
+            {
+                // Add the user connection to the service
+                notificationService.AddUserConnection(userId, Context.ConnectionId);
+                await Clients.Caller.SendAsync("UserConnected", Context.ConnectionId);
+            }
+
             await base.OnConnectedAsync();
         }
 
@@ -25,14 +32,18 @@ namespace Hubs
             if (!string.IsNullOrEmpty(userId))
             {
                 // Remove the connection from the service
-                await notificationHubService.RemoveConnectedUser(userId);
+                await notificationService.RemoveConnectedUser(userId);
             }
             await base.OnDisconnectedAsync(exception);
         }
 
         public string GetConnectionId(string userId)
         {
-            return notificationHubService.GetConnectionId(userId);
+            return notificationService.GetConnectionId(userId);
+        }
+        public async Task SendNotificationToUser(string userId, string message)
+        {
+            await notificationService.SendNotificationToUser(userId, message);
         }
     }
 }

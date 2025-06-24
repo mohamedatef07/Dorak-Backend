@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Hubs;
+using Microsoft.AspNetCore.SignalR;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,12 @@ namespace Services
     public class NotificationServices
     {
         private readonly ConcurrentDictionary<string, string> _userConnections = new();
+        private readonly IHubContext<NotificationHub> hubContext;
+        public NotificationServices(IHubContext<NotificationHub> hubContext)
+        {
+            this.hubContext = hubContext;
+        }
+        
 
         // Add user connection to the dictionary
         public void AddUserConnection(string userId, string connectionId)
@@ -28,6 +36,15 @@ namespace Services
         {
             _userConnections.TryGetValue(userId, out var connectionId);
             return connectionId;
+        }
+
+        public async Task SendNotificationToUser(string userId, string message)
+        {
+            var connectionId = GetConnectionId(userId);
+            if (!string.IsNullOrEmpty(connectionId))
+            {
+                await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", message);
+            }
         }
     }
 }
