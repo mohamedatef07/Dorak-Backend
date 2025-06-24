@@ -19,9 +19,9 @@ namespace Services
         private readonly CommitData commitData;
         private readonly IHubContext<ShiftListHub> shiftListHubContext;
         private readonly IHubContext<NotificationHub> notificationHubContext;
+        private readonly NotificationServices notificationServices;
 
-
-        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, CenterServices _centerServices, WalletRepository _walletRepository, IHubContext<ShiftListHub> _shiftListHubContext, IHubContext<NotificationHub> _notificationHubContext)
+        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, CenterServices _centerServices, WalletRepository _walletRepository, IHubContext<ShiftListHub> _shiftListHubContext, IHubContext<NotificationHub> _notificationHubContext, NotificationServices notificationServices)
         {
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
@@ -30,6 +30,7 @@ namespace Services
             centerServices = _centerServices;
             shiftListHubContext = _shiftListHubContext;
             notificationHubContext = _notificationHubContext;
+            this.notificationServices = notificationServices;
             walletRepository = _walletRepository;
         }
         public Shift GetShiftById(int shiftId)
@@ -147,12 +148,14 @@ namespace Services
             };
             shift.ProviderAssignment.Provider.User.Notifications.Add(shiftCancelNotification);
             commitData.SaveChanges();
-            var connectionId = NotificationHub.GetConnectionId(shift.ProviderAssignment.Provider.ProviderId);
-            if (connectionId != null)
+            var providerConnectionId = notificationServices.GetConnectionId(shift.ProviderAssignment.Provider.ProviderId);
+            if (!string.IsNullOrEmpty(providerConnectionId))
             {
-                await notificationHubContext.Clients.Client(connectionId).SendAsync("shiftCancellationNotification", shiftCancelNotification);
+                await notificationHubContext.Clients.Client(providerConnectionId).SendAsync("shiftCancellationNotification", shiftCancelNotification);
+
+                // Send the updated notifications list to the provider
                 var updatedNotificationsAfterCancellation = shift.ProviderAssignment.Provider.User.Notifications.OrderBy(no => no.CreatedAt).ToList();
-                await notificationHubContext.Clients.Client(connectionId).SendAsync("updatedNotifications", updatedNotificationsAfterCancellation);
+                await notificationHubContext.Clients.Client(providerConnectionId).SendAsync("updatedNotifications", updatedNotificationsAfterCancellation);
             }
 
             if (shift.Appointments != null && shift.Appointments.Any())
@@ -182,10 +185,12 @@ namespace Services
                     appointment.User.Notifications.Add(appointmentCancelationNotification);
                     commitData.SaveChanges();
 
-                    var clientConnectionId = NotificationHub.GetConnectionId(appointment.User.Id);
-                    if (clientConnectionId != null)
+                    var clientConnectionId = notificationServices.GetConnectionId(appointment.User.Id);
+                    if (!string.IsNullOrEmpty(clientConnectionId))
                     {
                         await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("appointmentCancellationNotification", appointmentCancelationNotification);
+
+                        // Send the updated notifications list to the client
                         var updatedNotificationsAfterAppointmentCancellation = appointment.User.Notifications.OrderBy(no => no.CreatedAt).ToList();
                         await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("updatedNotifications", updatedNotificationsAfterAppointmentCancellation);
                     }
