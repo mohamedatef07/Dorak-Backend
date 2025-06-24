@@ -110,6 +110,7 @@ namespace API
             builder.Services.AddScoped(typeof(ReviewRepository));
             builder.Services.AddScoped(typeof(ReviewServices));
             builder.Services.AddTransient<MailKitEmailSender>();
+            builder.Services.AddSingleton<NotificationServices>(); // Register NotificationServices as a singleton
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
