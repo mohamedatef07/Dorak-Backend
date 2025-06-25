@@ -26,8 +26,10 @@ namespace Services
         public ClientServices clientServices;
         public ProviderServices providerServices;
         public OperatorServices operatorServices;
+        public AdminCenterServices adminCenterServices;
         public ProviderRepository providerRepository;
         public OperatorRepository operatorRepository;
+        public AdminCenterRepository adminCenterRepository;
         public AdminCenterManagement adminCenterManagement;
         private UserManager<User> userManager;
         public CommitData CommitData;
@@ -37,7 +39,9 @@ namespace Services
                                ClientServices _clientServices,
                                ProviderServices _providerServices,
                                OperatorServices _operatorServices,
+                               AdminCenterServices _adminCenterServices,
                                ProviderRepository _ProviderRepository,
+                               AdminCenterRepository _adminCenterRepository,
                                IConfiguration _configuration,
                                AdminCenterManagement _adminCenterManagement,
                                CommitData _commitData,
@@ -49,7 +53,9 @@ namespace Services
             clientServices = _clientServices;
             providerServices = _providerServices;
             operatorServices = _operatorServices;
+            adminCenterServices = _adminCenterServices;
             providerRepository = _ProviderRepository;
+            adminCenterRepository = _adminCenterRepository;
             configuration = _configuration;
             adminCenterManagement = _adminCenterManagement;
             CommitData = _commitData;
@@ -101,9 +107,15 @@ namespace Services
                 // Our Roles:
                 //SuperAdmin / Admin (Center Admin) / Operator / Provider / Client
                 var currentUser = await accountRepository.FindByUserName(user.UserName);
-                if (user.Role == "Admin")
+                if (user.Role == "AdminCenter")
                 {
-                    //................
+                    var adminCenterres = await adminCenterServices.CreateAdminCenter(currentUser.Id, new AdminCenterViewModel
+                    {
+                        FirstName = user.UserName,
+                        LastName = user.UserName,
+                        Gender = user.Gender,
+                        Image = await SaveImageAsync(user)
+                    });
                 }
                 else if (user.Role == "Operator")
                 {
