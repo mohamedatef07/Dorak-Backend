@@ -34,6 +34,7 @@ namespace Dorak.DataTransferObject
         public string ProviderName { get; set; }
         public decimal Rate { get; set; }
         public string Specialization { get; set; }
+        public bool IsLive { get; set; }
 
     }
 }

@@ -299,8 +299,9 @@ namespace Services
             {
                 return null;
             }
-
-            return appointments.AppointmentToAppointmentDTO();
+            var resAppointment = appointments.AppointmentToAppointmentDTO();
+            resAppointment.IsLive = appointments.LiveQueue != null;
+            return resAppointment;
         }
 
     }

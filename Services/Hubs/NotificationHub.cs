@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Services;
 using System.Security.Claims;
 
 namespace Hubs
@@ -6,30 +7,43 @@ namespace Hubs
     public class NotificationHub : Hub
     {
         private static readonly Dictionary<string, string> _userConnections = new();
+        private readonly NotificationServices notificationService;
 
-        public override Task OnConnectedAsync()
+        public NotificationHub(NotificationServices notificationHubService)
+        {
+            this.notificationService = notificationHubService;
+        }
+        public override async Task OnConnectedAsync()
         {
             var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (!string.IsNullOrEmpty(userId))
             {
-                _userConnections[userId] = Context.ConnectionId;
+                // Add the user connection to the service
+                notificationService.AddUserConnection(userId, Context.ConnectionId);
+                await Clients.Caller.SendAsync("UserConnected", Context.ConnectionId);
             }
-            return base.OnConnectedAsync();
+
+            await base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(Exception exception)
+        public override async Task OnDisconnectedAsync(Exception exception)
         {
             var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId != null)
+            if (!string.IsNullOrEmpty(userId))
             {
-                _userConnections.Remove(userId);
+                // Remove the connection from the service
+                await notificationService.RemoveConnectedUser(userId);
             }
-            return base.OnDisconnectedAsync(exception);
+            await base.OnDisconnectedAsync(exception);
         }
 
-        public static string GetConnectionId(string userId)
+        public string GetConnectionId(string userId)
         {
-            return _userConnections.TryGetValue(userId, out var connId) ? connId : null;
+            return notificationService.GetConnectionId(userId);
+        }
+        public async Task SendNotificationToUser(string userId, string message)
+        {
+            await notificationService.SendNotificationToUser(userId, message);
         }
     }
 }
