@@ -259,12 +259,9 @@ namespace API
                 recurringJobManager.AddOrUpdate(
                     "RegenerateWeeklyAssignmentsJob",
                     () => providerServices.RegenerateWeeklyAssignments(),
-                    "0 */6 * * *");
+                    Cron.Monthly);
 
-                //recurringJobManager.AddOrUpdate(
-                //    "editTurn", () => liveQueueServices.editTurn(), 
-                //    "* * * * *"
-                //    );
+            
 
                 recurringJobManager.AddOrUpdate(
                     "UpdatePendingPaymentsJob",
