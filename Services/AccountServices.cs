@@ -201,23 +201,48 @@ namespace Services
 
                 if (roles.Contains("Operator"))
                 {
-                    Debug.WriteLine("Logged in UserId: " + user.Id);
-                    var Operator = operatorRepository.GetById(o=>o.OperatorId==user.Id);
-                    if (Operator.CenterId != null)
+                    var Operator = operatorRepository.GetById(o => o.OperatorId == user.Id);
+                    if (Operator != null && Operator.CenterId != null)
                     {
                         claims.Add(new Claim("CenterId", Operator.CenterId.ToString()));
+
+                        if (Operator.Image != null)
+                        {
+                            claims.Add(new Claim("Image", Operator.Image));
+                        }
                     }
                 }
 
-                // Create JWT Token
-                var jwtToken = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(100),
-                    signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
-                        SecurityAlgorithms.HmacSha256
-                    )
-                );
+                if (roles.Contains("Client"))
+                {
+                    var Image = user.Client.Image;
+                    if (Image != null)
+                    {
+                        claims.Add(new Claim("Image", Image));
+                    }
+                }
+                else if (roles.Contains("Provider"))
+                {
+                    var Image = user.Provider.Image;
+                    if (Image != null)
+                    {
+                        claims.Add(new Claim("Image", Image));
+                    }
+                }
+                //else if (roles.Contains("Operator"))
+                //{
+
+                //}
+
+                    // Create JWT Token
+                    var jwtToken = new JwtSecurityToken(
+                        claims: claims,
+                        expires: DateTime.UtcNow.AddMinutes(100),
+                        signingCredentials: new SigningCredentials(
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
+                            SecurityAlgorithms.HmacSha256
+                        )
+                    );
 
                 var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 

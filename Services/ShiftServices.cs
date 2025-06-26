@@ -19,9 +19,9 @@ namespace Services
         private readonly CommitData commitData;
         private readonly IHubContext<ShiftListHub> shiftListHubContext;
         private readonly IHubContext<NotificationHub> notificationHubContext;
+        private readonly NotificationServices notificationServices;
 
-
-        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData,  CenterServices _centerServices, WalletRepository _walletRepository, IHubContext<ShiftListHub> _shiftListHubContext, IHubContext<NotificationHub> _notificationHubContext)
+        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, CenterServices _centerServices, WalletRepository _walletRepository, IHubContext<ShiftListHub> _shiftListHubContext, IHubContext<NotificationHub> _notificationHubContext, NotificationServices notificationServices)
         {
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
@@ -30,6 +30,7 @@ namespace Services
             centerServices = _centerServices;
             shiftListHubContext = _shiftListHubContext;
             notificationHubContext = _notificationHubContext;
+            this.notificationServices = notificationServices;
             walletRepository = _walletRepository;
         }
         public Shift GetShiftById(int shiftId)
@@ -42,7 +43,7 @@ namespace Services
             return shifts.Select(shift => shift.ShiftToShiftVM());
         }
 
-        public IQueryable<AppointmentDTO> GetAppointmentByShiftId(int ShiftId)
+        public IQueryable<AppointmentDTO> GetAppointmentsByShiftId(int ShiftId)
         {
             var appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
             return appointments.Select(app => app.AppointmentToAppointmentDTO());
@@ -103,12 +104,13 @@ namespace Services
             }
             var proivderAssignments = center.ProviderAssignments;
             DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
-            
+
             var shifts = proivderAssignments.SelectMany(
                 pa =>
-                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled && sh.ShiftDate>= dateNow && sh.ShiftDate <= dateNow.AddDays(30) ).Select(shift => new GetAllCenterShiftAndServicesDTO
+                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled && sh.ShiftDate >= dateNow && sh.ShiftDate <= dateNow.AddDays(30)).Select(shift => new GetAllCenterShiftAndServicesDTO
                      {
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
+                         ProviderId = pa.Provider.ProviderId,
                          ShiftId = shift.ShiftId,
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
@@ -121,7 +123,7 @@ namespace Services
                                  ServiceName = pcs.Service.ServiceName,
                                  BasePrice = pcs.Service.BasePrice
                              }).ToList()
-                                 })
+                     })
                             ).ToList();
 
             return shifts;
@@ -137,11 +139,30 @@ namespace Services
                 return false;
             }
             shift.ShiftType = ShiftType.Cancelled;
+            var shiftCancelNotification = new Notification()
+            {
+                Title = "Shift Cancellation",
+                Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName}," +
+                $" Your shift scheduled for {shift.ShiftDate.ToShortDateString()} from {shift.StartTime.ToShortTimeString()} to {shift.EndTime.ToShortTimeString()} at {shift.ProviderAssignment.Center.CenterName} Center has been canceled.\n" +
+                " Further information will be provided shortly."
+            };
+            shift.ProviderAssignment.Provider.User.Notifications.Add(shiftCancelNotification);
+            commitData.SaveChanges();
+            var providerConnectionId = notificationServices.GetConnectionId(shift.ProviderAssignment.Provider.ProviderId);
+            if (!string.IsNullOrEmpty(providerConnectionId))
+            {
+                await notificationHubContext.Clients.Client(providerConnectionId).SendAsync("shiftCancellationNotification", shiftCancelNotification);
+
+                // Send the updated notifications list to the provider
+                var updatedNotificationsAfterCancellation = shift.ProviderAssignment.Provider.User.Notifications.OrderBy(no => no.CreatedAt).ToList();
+                await notificationHubContext.Clients.Client(providerConnectionId).SendAsync("updatedNotifications", updatedNotificationsAfterCancellation);
+            }
+
             if (shift.Appointments != null && shift.Appointments.Any())
             {
-                foreach (var appointment in shift.Appointments)
+                foreach (var appointment in shift.Appointments.ToList())
                 {
-                    if(appointment.AppointmentStatus == AppointmentStatus.Confirmed)
+                    if (appointment.AppointmentStatus == AppointmentStatus.Confirmed)
                     {
                         var wallet = walletRepository.GetWalletByUserId(appointment.User.Id);
                         if (wallet == null)
@@ -156,19 +177,36 @@ namespace Services
                         }
                     }
                     appointment.AppointmentStatus = AppointmentStatus.Cancelled;
-                    var newNotification = new Notification()
-                    { 
-                      Title = "Appointment Cancellation",
-                      Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been canceled. We apologize for any inconvenience. Please contact us or reschedule your appointment at your earliest convenience."
+                    var appointmentCancelationNotification = new Notification()
+                    {
+                        Title = "Appointment Cancellation",
+                        Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been canceled. We apologize for any inconvenience. Please contact us or reschedule your appointment at your earliest convenience."
                     };
-                    appointment.User.Notifications.Add(newNotification);
-                    await notificationHubContext.Clients.User(appointment.User.Id).SendAsync("latestNotification", newNotification);
+                    appointment.User.Notifications.Add(appointmentCancelationNotification);
+                    commitData.SaveChanges();
+
+                    var clientConnectionId = notificationServices.GetConnectionId(appointment.User.Id);
+                    if (!string.IsNullOrEmpty(clientConnectionId))
+                    {
+                        await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("appointmentCancellationNotification", appointmentCancelationNotification);
+
+                        // Send the updated notifications list to the client
+                        var updatedNotificationsAfterAppointmentCancellation = appointment.User.Notifications.OrderBy(no => no.CreatedAt).ToList();
+                        await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("updatedNotifications", updatedNotificationsAfterAppointmentCancellation);
+                    }
                 }
                 shiftRepository.Edit(shift);
                 commitData.SaveChanges();
+
                 var center = centerServices.GetCenterById(centerId);
                 var updatedShiftList = GetAllCenterShifts(center);
-                await shiftListHubContext.Clients.All.SendAsync("updateShiftsList", updatedShiftList);
+                var OperatorCconnectionId = ShiftListHub.GetConnectionId(shift.Operator.OperatorId);
+
+                if (OperatorCconnectionId != null)
+                {
+                    await shiftListHubContext.Clients.Client(OperatorCconnectionId).SendAsync("updateShiftsList", updatedShiftList);
+                }
+
                 return true;
             }
             return false;

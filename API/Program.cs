@@ -9,12 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Repositories;
+using Serilog;
 using Services;
 using Stripe;
+using System.Diagnostics;
 using System.Text;
 using System.Text.Json.Serialization;
-using Serilog;
-using System.Diagnostics;
 
 namespace API
 {
@@ -30,7 +30,7 @@ namespace API
 
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log=> Debug.WriteLine($"=========\n{log}"),LogLevel.Information).EnableSensitiveDataLogging());
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log => Debug.WriteLine($"=========\n{log}"), LogLevel.Information).EnableSensitiveDataLogging());
             // logging
             Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(@"Logs\DorakLog.txt",
@@ -110,6 +110,7 @@ namespace API
             builder.Services.AddScoped(typeof(ReviewRepository));
             builder.Services.AddScoped(typeof(ReviewServices));
             builder.Services.AddTransient<MailKitEmailSender>();
+            builder.Services.AddSingleton<NotificationServices>(); // Register NotificationServices as a singleton
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
@@ -132,6 +133,23 @@ namespace API
                     ValidateAudience = false,
                     ValidateIssuer = false,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(builder.Configuration["JWT:PrivateKey"]))
+                };
+                option.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+
+                        // If the request is for our SignalR hub
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/notificationHub") || path.StartsWithSegments("/shiftListHub") || path.StartsWithSegments("/queueHub")))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
                 };
             });
 

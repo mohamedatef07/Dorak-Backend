@@ -7,11 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
-using System.Data.Entity.Core.Common;
 
 namespace API.Controllers
 {
-    // [Authorize(Roles = "Provider")]
+    [Authorize(Roles = "Provider")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
@@ -142,24 +141,21 @@ namespace API.Controllers
             });
         }
 
-        [Authorize(Roles = "Provider")]
-        [HttpPut("UpdateProfile")]
+        [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateProviderProfileDTO model)
         {
             if (!ModelState.IsValid) {
                 return BadRequest(new ApiResponse<object>() { Status = 500,Message= "Invalid Data"});
             }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
             if (string.IsNullOrWhiteSpace(userId))
+            {
                 return Unauthorized("User not authorized.");
-
+            }
             var result = await providerServices.UpdateDoctorProfile(userId, model);
             return Ok(new { message = result });
         }
 
-
-        [Authorize(Roles = "Provider")]
         [HttpPut("update-professional-info")]
         public IActionResult UpdateProfessionalInfo([FromForm] UpdateProviderProfessionalInfoDTO model)
         {
@@ -192,60 +188,53 @@ namespace API.Controllers
                 Status = 200,
             });
         }
-        //[HttpGet("queue-entries")]
-        //public IActionResult GetQueueEntries([FromQuery]string providerId)
-        //{
-        //    if (string.IsNullOrEmpty(providerId))
-        //    {
-        //        return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
-        //    }
-        //    Provider provider = providerServices.GetProviderById(providerId);
-        //    if (provider == null)
-        //    {
-        //        return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
-        //    }
-        //    List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
-        //    if (queueEntries == null || !queueEntries.Any())
-        //    {
-        //        return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
-        //    }
-        //    return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
-        //    {
-        //        Message = "Get queue entries successfully",
-        //        Status = 200,
-        //        Data = queueEntries
-        //    });
-        //}
+        [HttpGet("queue-entries")]
+        public IActionResult GetQueueEntries([FromQuery] string providerId)
+        {
+            if (string.IsNullOrEmpty(providerId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Provider Id is required", Status = 400 });
+            }
+            Provider provider = providerServices.GetProviderById(providerId);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Provider not found", Status = 404 });
+            }
+            List<GetQueueEntriesDTO> queueEntries = liveQueueServices.GetQueueEntries(provider);
+            if (queueEntries == null || !queueEntries.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "Queue entries not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<GetQueueEntriesDTO>>
+            {
+                Message = "Get queue entries successfully",
+                Status = 200,
+                Data = queueEntries
+            });
+        }
 
-       
-        [HttpGet("ProviderProfile")]
-        [Authorize(Roles = "Provider")]
+        [HttpGet("provider-profile")]
         public IActionResult GetMyProviderProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (string.IsNullOrWhiteSpace(userId))
             {
-                return BadRequest(new ApiResponse<string>
+                return Unauthorized(new ApiResponse<object>
                 {
-                    Message = "User ID is required",
-                    Status = 400,
-                    Data = null
+                    Message = "You are not authorized to perform this action",
+                    Status = 401,
                 });
             }
-
             var profile = providerServices.GetProviderProfile(userId);
-
             if (profile == null)
             {
-                return NotFound(new ApiResponse<string>
+                return NotFound(new ApiResponse<object>
                 {
                     Message = "Provider not found",
                     Status = 404,
-                    Data = null
                 });
             }
-
             return Ok(new ApiResponse<ProviderProfileDTO>
             {
                 Message = "Provider profile retrieved successfully",
@@ -253,7 +242,35 @@ namespace API.Controllers
                 Data = profile
             });
         }
-
-
+        [HttpGet("general-statistics")]
+        public IActionResult GetGeneralStatistics()
+        {
+            var providerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+            }
+            var generalStatistics = providerServices.GetGeneralStatistics(providerId);
+            if (generalStatistics == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "General statistics not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<GeneralStatisticsDTO> { Message = "Get general statistics successfully", Status = 200, Data = generalStatistics });
+        }
+        [HttpGet("notifications")]
+        public IActionResult GetNotifications()
+        {
+            var providerId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+            }
+            var notifications = providerServices.GetNotification(providerId);
+            if (notifications == null || !notifications.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<NotificationDTO>> { Message = "Get general statistics successfully", Status = 200, Data = notifications });
+        }
     }
 }

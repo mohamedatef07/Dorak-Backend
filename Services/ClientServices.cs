@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -87,6 +89,10 @@ namespace Services
                 Name = $"{Client.FirstName} {Client.LastName}",
                 Phone = Client.User.PhoneNumber,
                 Email = Client.User.Email,
+                City = Client.City,
+                Country = Client.Country,
+                Governorate = Client.Governorate,
+                Street = Client.Street,
                 Appointments = appointmentServices.GetAppointmentsByUserId(userId)
             };
             return clientProfile;
@@ -147,11 +153,24 @@ namespace Services
             if (model.BirthDate != null)
                 client.BirthDate = (DateOnly)model.BirthDate;
 
+            if (model.City != null)
+                client.City = model.City;
+
+            if (model.Country != null)
+                client.Country = model.Country;
+
+            if (model.Street != null)
+                client.Street = model.Street;
+
+            if (model.Governorate != null)
+                client.Governorate = model.Governorate;
+
+
             if (model.Image != null)
             {
                 
 
-                var savedImagePath = await SaveImageAsync(model.Image, client.ClientId);  // Use client.ClientId here
+                var savedImagePath = await SaveImageAsync(model.Image, client.User.Id.ToString());  // Use client.ClientId here
                 client.Image = savedImagePath;  // Assuming the 'client' model has an Image property
             }
 
@@ -164,13 +183,38 @@ namespace Services
             return true;
         }
 
+        public ClientDetailsDTO GetCLientProfileForUpdate(string userId)
+        {
+            var client = clientRepository.GetById(p => p.ClientId == userId && !p.IsDeleted);
+
+            if (client == null || client.User == null)
+                return null;
+
+            return new ClientDetailsDTO
+            {
+                ID = client.ClientId,
+                
+                FirstName = client.FirstName,
+                LastName = client.LastName,
+
+                Email = client.User.Email,
+                Phone = client.User.PhoneNumber,
+                BirthDate = client.BirthDate,
+                Image = client.Image,
+                City = client.City,
+                Country = client.Country,
+                Street = client.Street,
+                Governorate = client.Governorate
+            };
+        }
+
 
         private async Task<string> SaveImageAsync(IFormFile userImage, string ClientId)
         {
             if (userImage != null && userImage.Length > 0)
             {
                 // المسار يكون داخل wwwroot/image/Client/{ID}
-                var folderPath = Path.Combine(_env.WebRootPath, "image", "provider", ClientId);
+                var folderPath = Path.Combine(_env.WebRootPath, "image", "Client", ClientId);
                 Directory.CreateDirectory(folderPath);
 
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(userImage.FileName);

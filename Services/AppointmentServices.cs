@@ -21,16 +21,18 @@ namespace Services
         private readonly PaymentServices paymentServices;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ShiftRepository shiftRepository;
+        private readonly LiveQueueServices liveQueueServices;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly PaymentRepository paymentRepository;
 
-        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository)
+        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository, LiveQueueServices _liveQueueServices)
         {
             commitData = _commitData;
             paymentRepository = _paymentRepository;
             paymentServices = _paymentServices;
             appointmentRepository = _appointmentRepository;
             shiftRepository = _shiftRepository;
+            liveQueueServices = _liveQueueServices;
             providerCenterServiceRepository = _providerCenterServiceRepository;
         }
 
@@ -119,8 +121,9 @@ namespace Services
             {
                 await paymentServices.RefundPayment(payment.TransactionId, appointmentId);
             }
+            appointment.AppointmentStatus = AppointmentStatus.Cancelled;
 
-            appointmentRepository.Delete(appointment);
+            appointmentRepository.Edit(appointment);
             commitData.SaveChanges();
         }
 
@@ -170,6 +173,7 @@ namespace Services
                     {
                         // Proceed to cancel the appointment
                         await CancelAppointment(appointment.AppointmentId);
+                        await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);
                     }
                     catch (Exception ex)
                     {
@@ -295,8 +299,9 @@ namespace Services
             {
                 return null;
             }
-
-            return appointments.AppointmentToAppointmentDTO();
+            var resAppointment = appointments.AppointmentToAppointmentDTO();
+            resAppointment.IsLive = appointments.LiveQueue != null;
+            return resAppointment;
         }
 
     }
