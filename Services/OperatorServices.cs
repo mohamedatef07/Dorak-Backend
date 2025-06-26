@@ -277,19 +277,20 @@ namespace Services
             {
                 return false;
             }
+
             IQueryable<LiveQueue> liveQueues = liveQueueRepository.GetAllShiftLiveQueues(ShiftId);
 
             foreach (var liveQueue in liveQueues)
             {
                 liveQueueRepository.Delete(liveQueue);
+
             }
             commitData.SaveChanges();
             return true;
         }
 
-        public async Task<string> UpdateQueueStatusAsync(UpdateQueueStatusViewModel model, decimal additionalFees)
+        public async Task<string> UpdateQueueStatusAsync(UpdateQueueStatusViewModel model)
         {
-            
             if (string.IsNullOrWhiteSpace(model.SelectedStatus))
                 return "Selected status cannot be null or empty.";
 
@@ -302,11 +303,9 @@ namespace Services
             var now = DateTime.Now;
             var today = DateOnly.FromDateTime(now);
 
-            
             switch (model.SelectedStatus)
             {
                 case "NotChecked":
-                    
                     if (liveQueue.AppointmentStatus != QueueAppointmentStatus.Waiting &&
                         liveQueue.AppointmentStatus != QueueAppointmentStatus.NotChecked)
                         return "Cannot transition to NotChecked from current status.";
@@ -317,7 +316,6 @@ namespace Services
                     break;
 
                 case "Waiting":
-                    
                     if (liveQueue.AppointmentStatus != QueueAppointmentStatus.NotChecked)
                         return "Can only transition to Waiting from NotChecked status.";
                     liveQueue.AppointmentStatus = QueueAppointmentStatus.Waiting;
@@ -327,10 +325,8 @@ namespace Services
                     break;
 
                 case "InProgress":
-                    
                     if (liveQueue.AppointmentStatus != QueueAppointmentStatus.Waiting)
                         return "Can only transition to InProgress from Waiting status.";
-                    
                     if (!liveQueue.ArrivalTime.HasValue)
                         return "Arrival time must be set before transitioning to InProgress.";
                     liveQueue.AppointmentStatus = QueueAppointmentStatus.InProgress;
@@ -339,16 +335,17 @@ namespace Services
                     break;
 
                 case "Completed":
-                    
                     if (liveQueue.AppointmentStatus != QueueAppointmentStatus.InProgress)
                         return "Can only transition to Completed from InProgress status.";
-                    
                     if (appointment.ExactTime == TimeOnly.MinValue)
                         return "Exact time must be set before transitioning to Completed.";
                     liveQueue.AppointmentStatus = QueueAppointmentStatus.Completed;
                     appointment.IsChecked = true;
                     appointment.EndTime = TimeOnly.FromDateTime(now);
-                    appointment.AdditionalFees = additionalFees;
+                    appointment.AdditionalFees = model.AdditionalFees ?? 0m; 
+
+                    int position = liveQueue.CurrentQueuePosition ?? 0;
+                    liveQueueServices.editTurn(liveQueue.ShiftId, position);
                     break;
 
                 default:
@@ -357,8 +354,6 @@ namespace Services
 
             appointment.UpdatedAt = now;
             commitData.SaveChanges();
-
-            
 
             await hubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
             await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);

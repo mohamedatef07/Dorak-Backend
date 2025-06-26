@@ -22,6 +22,7 @@ namespace Services
         private readonly LiveQueueRepository liveQueueRepository;
         private readonly AppointmentRepository appointmentRepository;
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
+        private readonly ShiftRepository shiftRepository;
         private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
 
@@ -31,12 +32,14 @@ namespace Services
             ClientRepository _clientRepository,
             ProviderAssignmentRepository _providerAssignmentRepository,
             OperatorRepository _operatorRepository,
+            ShiftRepository _shiftRepository,
             IHubContext<QueueHub> hubContext, 
             CommitData _commitData)
         {
             liveQueueRepository = _liveQueueRepository;
             this.appointmentRepository = appointmentRepository;
             providerAssignmentRepository = _providerAssignmentRepository;
+            shiftRepository = _shiftRepository;
             this.hubContext = hubContext;
             commitData = _commitData;
         }
@@ -82,78 +85,6 @@ namespace Services
         //    return result;
         //}
 
-        //public List<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId)
-        //{
-
-        //    var providerAssignments = providerAssignmentRepository.GetAll()
-        //        .Where(pa => pa.ProviderId == providerId && pa.CenterId == centerId && !pa.IsDeleted)
-        //        .ToList();
-
-        //    if (!providerAssignments.Any())
-        //    {
-
-        //        return new List<ProviderLiveQueueViewModel>();
-        //    }
-
-
-        //    List<Shift> shifts = providerAssignments.SelectMany(pa => pa.Shifts
-        //        .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
-        //        .ToList();
-
-
-        //    if (!shifts.Any())
-        //    {
-
-        //        return new List<ProviderLiveQueueViewModel>();
-        //    }
-
-
-        //    List<LiveQueue> liveQueues = shifts.SelectMany(sh => sh.LiveQueues
-        //        .Where(lq => lq.ShiftId == sh.ShiftId))
-        //        .ToList();
-
-
-
-        //    List<ProviderLiveQueueViewModel> result = new List<ProviderLiveQueueViewModel>();
-        //    foreach (var liveQueue in liveQueues)
-        //    {
-        //        var appointment = liveQueue.Appointment;
-        //        if (appointment.User == null)
-        //        {
-        //            result.Add(new ProviderLiveQueueViewModel
-        //            {
-        //                LiveQueueId = liveQueue.LiveQueueId,
-        //                ClientFullName = $"{appointment.TemporaryClient.FirstName} {appointment.TemporaryClient.LastName}",
-        //                ArrivalTime = liveQueue.ArrivalTime,
-        //                EstimatedTime = liveQueue.EstimatedTime,
-        //                ClientType = appointment.ClientType,
-        //                Status = liveQueue.AppointmentStatus,
-        //                PhoneNumber = appointment.TemporaryClient.ContactInfo,
-        //                CurrentQueuePosition = liveQueue.CurrentQueuePosition,
-        //                AvailableStatuses = Enum.GetValues(typeof(QueueAppointmentStatus)).Cast<QueueAppointmentStatus>()
-        //            });
-        //        }
-        //        else
-        //        {
-        //            result.Add(new ProviderLiveQueueViewModel
-        //            {
-        //                LiveQueueId = liveQueue.LiveQueueId,
-        //                ClientFullName = $"{appointment.User.Client.FirstName} {appointment.User.Client.LastName}",
-        //                ArrivalTime = liveQueue.ArrivalTime,
-        //                EstimatedTime = liveQueue.EstimatedTime,
-        //                ClientType = appointment.ClientType,
-        //                Status = liveQueue.AppointmentStatus,
-        //                PhoneNumber = appointment.User.PhoneNumber,
-        //                CurrentQueuePosition = liveQueue.CurrentQueuePosition,
-        //                AvailableStatuses = Enum.GetValues(typeof(QueueAppointmentStatus)).Cast<QueueAppointmentStatus>()
-        //            });
-        //        }
-        //    }
-
-        //    return result;
-        //    // return result.OrderBy(lq => lq.CurrentQueuePosition).ToList();
-        //}
-
         public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
             var providerAssignments = providerAssignmentRepository.GetAll()
@@ -171,7 +102,7 @@ namespace Services
                 };
             }
 
-            // Filter shifts by the specific shiftId
+            
             List<Shift> shifts = providerAssignments
                 .SelectMany(pa => pa.Shifts
                     .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftId == shiftId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
@@ -324,50 +255,86 @@ namespace Services
                 .SendAsync("QueueUpdated", liveQueueList);
         }
 
-        public async Task editTurn()
-        {
+        public PaginationViewModel<ProviderLiveQueueViewModel> editTurn(int shiftId, int currentQueuePosition) {
 
-            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().ToList();
+            var shift = shiftRepository.GetShiftById(shiftId);
+            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition > currentQueuePosition).ToList();
 
-            foreach(LiveQueue lq in liveQueues)
+            LiveQueue next = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition + 1).FirstOrDefault();
+
+            bool flag = true;
+
+            // case 1: waiting 
+            // case 2: not checked -> shift 1 turn - replace with the first waiting turn
+            // 1 2 3 4 -> 1 4 3 2
+            // special case 1: if it last turn -> pause live queue & connect with the patient
+            // sepcial case 2: if there is not cheked & no waiting turns -> pause live queue & connect with the first patient
+
+            if (next != null)
             {
-                LiveQueue previous = liveQueueRepository.GetAll().Where(l => l.ShiftId == lq.ShiftId && l.CurrentQueuePosition == lq.CurrentQueuePosition - 1).FirstOrDefault();
 
-                if (lq.EstimatedTime <= TimeOnly.FromDateTime(DateTime.Now) && lq.AppointmentStatus == QueueAppointmentStatus.NotChecked && previous.AppointmentStatus == QueueAppointmentStatus.Completed)
+                if (next.AppointmentStatus == QueueAppointmentStatus.Waiting)
                 {
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                }
 
-                    var position = lq.CurrentQueuePosition ?? 0;
+                else
+                {
+                    foreach (LiveQueue lq in liveQueues)
+                    {
+
+                        if (lq.AppointmentStatus == QueueAppointmentStatus.Waiting)
+                        {
+                            flag = false;
+
+                            var position = lq.CurrentQueuePosition ?? 0;
+
+                            reOrder(lq, lq.ShiftId, position, currentQueuePosition + 1);
+
+                            return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+
+                        }
+
+                    }
 
 
-                    reOrder(lq, lq.ShiftId, position);
+                    if (flag)
+                    {
+                        // send notification to user
+                        return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                    }
 
-                  
-
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
 
                 }
+
             }
 
-            
+            else
+            {
+                    // send notification to user
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                
+            }
 
 
         }
 
-        public void reOrder (LiveQueue liveQueue, int shiftId, int positionNumber)
+        public void reOrder(LiveQueue lq, int shiftId, int positionNumber, int currentQueuePosition)
         {
-            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition > positionNumber).ToList();
+            LiveQueue late = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
 
-            foreach(LiveQueue lq in liveQueues)
-            {
+            late.CurrentQueuePosition = positionNumber;
 
-                lq.CurrentQueuePosition -= lq.CurrentQueuePosition;
+            lq.CurrentQueuePosition = currentQueuePosition;
 
-                liveQueueRepository.Edit(lq);
+            liveQueueRepository.Edit(late);
 
-                commitData.SaveChanges();
+            liveQueueRepository.Edit(lq);
 
-            }
-
+            commitData.SaveChanges();
+             
 
         }
     }
