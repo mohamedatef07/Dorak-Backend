@@ -89,6 +89,7 @@ namespace API.Controllers
             }
             return BadRequest(new ApiResponse<OperatorViewModel> { Status = 400, Message = "Failed to End Shift." });
         }
+
         [HttpGet("cancel-shift")]
         public async Task<IActionResult> CancelShift([FromQuery] int shiftId, [FromQuery] int centerId)
         {
@@ -222,11 +223,11 @@ namespace API.Controllers
         // [Authorize(Roles = "Admin, Operator")]
         [HttpPost]
         [Route("UpdateLiveQueueStatus")]
-        public async Task<IActionResult> UpdateLiveQueueStatus([FromBody] UpdateQueueStatusViewModel model, decimal additionalFees)
+        public async Task<IActionResult> UpdateLiveQueueStatus([FromBody] UpdateQueueStatusViewModel model)
         {
             try
             {
-                var result = await operatorServices.UpdateQueueStatusAsync(model, additionalFees);
+                var result = await operatorServices.UpdateQueueStatusAsync(model);
                 if (result.StartsWith("Queue status updated successfully"))
                 {
                     return Ok(new ApiResponse<string>
