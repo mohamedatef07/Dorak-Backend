@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Dorak.DataTransferObject;
+﻿using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
@@ -7,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
@@ -144,8 +144,9 @@ namespace API.Controllers
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateProviderProfileDTO model)
         {
-            if (!ModelState.IsValid) {
-                return BadRequest(new ApiResponse<object>() { Status = 500,Message= "Invalid Data"});
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>() { Status = 500, Message = "Invalid Data" });
             }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId))
