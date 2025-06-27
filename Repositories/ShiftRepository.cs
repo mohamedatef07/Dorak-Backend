@@ -37,6 +37,11 @@ namespace Repositories
             return GetAll().Where(s => s.ShiftDate == _date).Where(s => s.ProviderAssignment.CenterId == _centerId);
         }
 
+        public IQueryable<Shift> GetShiftsWithDateAndProvider(DateOnly _date, string providerId)
+        {
+            return GetAll().Where(s => s.ShiftDate == _date && s.ProviderAssignment.ProviderId == providerId);
+        }
+
         public List<Shift> GetAllShiftsByAssignmentId(int ProviderAssignmentId)
         {
             return Table.Where(s => s.ProviderAssignmentId == ProviderAssignmentId).ToList();
