@@ -128,6 +128,8 @@ namespace Services
 
             return shifts;
         }
+
+
         public async Task<bool> ShiftCancelation(Shift shift, int centerId)
         {
             if (shift == null)
@@ -182,17 +184,21 @@ namespace Services
                         Title = "Appointment Cancellation",
                         Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been canceled. We apologize for any inconvenience. Please contact us or reschedule your appointment at your earliest convenience."
                     };
-                    appointment.User.Notifications.Add(appointmentCancelationNotification);
-                    commitData.SaveChanges();
-
-                    var clientConnectionId = notificationServices.GetConnectionId(appointment.User.Id);
-                    if (!string.IsNullOrEmpty(clientConnectionId))
+                    if (appointment.User != null)
                     {
-                        await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("appointmentCancellationNotification", appointmentCancelationNotification);
 
-                        // Send the updated notifications list to the client
-                        var updatedNotificationsAfterAppointmentCancellation = appointment.User.Notifications.OrderBy(no => no.CreatedAt).ToList();
-                        await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("updatedNotifications", updatedNotificationsAfterAppointmentCancellation);
+                        appointment.User.Notifications.Add(appointmentCancelationNotification);
+                        commitData.SaveChanges();
+
+                        var clientConnectionId = notificationServices.GetConnectionId(appointment.User.Id);
+                        if (!string.IsNullOrEmpty(clientConnectionId))
+                        {
+                            await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("appointmentCancellationNotification", appointmentCancelationNotification);
+
+                            // Send the updated notifications list to the client
+                            var updatedNotificationsAfterAppointmentCancellation = appointment.User.Notifications.OrderBy(no => no.CreatedAt).ToList();
+                            await notificationHubContext.Clients.Client(clientConnectionId).SendAsync("updatedNotifications", updatedNotificationsAfterAppointmentCancellation);
+                        }
                     }
                 }
                 shiftRepository.Edit(shift);
