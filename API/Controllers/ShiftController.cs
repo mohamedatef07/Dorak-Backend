@@ -39,6 +39,34 @@ namespace API.Controllers
             return Ok(new ApiResponse<IQueryable<ShiftDTO>> { Status = 200, Message = "Get shifts successfully", Data = shifts });
         }
 
+        [HttpGet("get-all-shifts")]
+        public IActionResult GetAllShifts([FromQuery] DateOnly date, [FromQuery] string providerId)
+        {
+            if (date == DateOnly.MinValue)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Date is required and must be a valid date.", Status = 400 });
+            }
+
+            if (string.IsNullOrEmpty(providerId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Provider ID is required.", Status = 400 });
+            }
+
+            var shifts = shiftServices.GetShiftsWithDateAndProvider(date, providerId);
+
+            if (shifts == null || !shifts.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "No shifts found for the given date and provider.", Status = 404 });
+            }
+
+            return Ok(new ApiResponse<IQueryable<ShiftDTO>>
+            {
+                Status = 200,
+                Message = "Get shifts successfully",
+                Data = shifts
+            });
+        }
+
         [HttpGet("get-shift-appointments")]
         public IActionResult GetShiftAppointments([FromQuery] int ShiftId)
         {
