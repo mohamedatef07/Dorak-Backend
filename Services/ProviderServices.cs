@@ -159,6 +159,25 @@ namespace Services
                 .ToList();
             return assignments;
         }
+
+        public IEnumerable<object> GetAllProviderAssignments(string providerId)
+        {
+            if (string.IsNullOrEmpty(providerId))
+            {
+                return Enumerable.Empty<object>();
+            }
+
+            var assignments = providerAssignmentRepository
+                .GetList(pa => pa.ProviderId == providerId && !pa.IsDeleted && pa.StartDate.HasValue && pa.EndDate.HasValue)
+                .Select(pa => new
+                {
+                    startDate = pa.StartDate.Value.ToString("yyyy-MM-dd"),
+                    endDate = pa.EndDate.Value.ToString("yyyy-MM-dd")
+                })
+                .Distinct()
+                .ToList();
+            return assignments;
+        }
         public string AssignProviderToCenter(ProviderAssignmentViewModel model)
         {
             if (string.IsNullOrEmpty(model.ProviderId) || !providerRepository.GetAll().Any(p => p.ProviderId == model.ProviderId))
