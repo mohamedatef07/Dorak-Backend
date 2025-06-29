@@ -43,6 +43,12 @@ namespace Services
             return shifts.Select(shift => shift.ShiftToShiftVM());
         }
 
+        public IQueryable<ShiftDTO> GetShiftsWithDateAndProvider(DateOnly _shiftDate, string providerId)
+        {
+            var shifts = shiftRepository.GetShiftsWithDateAndProvider(_shiftDate, providerId);
+            return shifts.Select(shift => shift.ShiftToShiftVM());
+        }
+
         public IQueryable<AppointmentDTO> GetAppointmentsByShiftId(int ShiftId)
         {
             var appointments = appointmentRepository.GetAllShiftAppointments(ShiftId);
