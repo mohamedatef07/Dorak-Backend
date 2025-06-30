@@ -1,20 +1,14 @@
 ﻿using Models.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Dorak.DataTransferObject
 {
     public class AppointmentDTO
     {
-        public int appointmentId {  get; set; }
+        public int appointmentId { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public DateOnly AppointmentDate { get; set; }
-        public AppointmentStatus AppointmentStatus { get; set; }= AppointmentStatus.Pending;
+        public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
         public ClientType clientType { get; set; }
         public decimal Fees { get; set; }
         public decimal AdditionalFees { get; set; } = decimal.Zero;
@@ -32,7 +26,7 @@ namespace Dorak.DataTransferObject
         public int? TemporaryClientId { get; set; }
         public string? ProviderImage { get; set; }
         public string ProviderName { get; set; }
-        public decimal Rate { get; set; }
+        public decimal ProviderRate { get; set; }
         public string Specialization { get; set; }
         public bool IsLive { get; set; }
 

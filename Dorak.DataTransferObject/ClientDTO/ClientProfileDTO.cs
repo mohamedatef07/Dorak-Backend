@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dorak.DataTransferObject
+﻿namespace Dorak.DataTransferObject
 {
     public class ClientProfileDTO
     {
         public string ID { get; set; }
         public string Name { get; set; }
-
         public string? Image { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
@@ -18,7 +11,5 @@ namespace Dorak.DataTransferObject
         public string City { get; set; }
         public string Governorate { get; set; }
         public string Country { get; set; }
-
-        public ICollection<AppointmentForClientProfileDTO> Appointments { get; set; }
     }
 }
