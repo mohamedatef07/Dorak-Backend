@@ -25,7 +25,7 @@ namespace API.Controllers
         
         [HttpPost]
         [Route("AddProviderAndAssignIt")]
-        public async Task<IActionResult> AddProviderAndAssignIt([FromBody] RegisterationViewModel provider)
+        public async Task<IActionResult> AddProviderAndAssignIt([FromForm] RegisterationViewModel provider)
         {
             var res = await centerServices.AddProviderAsync(provider);
             return Ok(new ApiResponse<string>
@@ -77,11 +77,22 @@ namespace API.Controllers
 
 
 
+        
+
         [HttpPost]
-        [Route("DeleteProvider")]
-        public IActionResult DeleteProviderFromCenter(string ProviderId)
+        [Route("DeleteProviderFromCenter")]
+        public IActionResult DeleteProviderFromCenter([FromBody] DeleteProviderFromCenterViewModel model)
         {
-            var res = centerServices.DeleteProviderfromCenter(ProviderId);
+            if (model == null || string.IsNullOrEmpty(model.ProviderId))
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "ProviderId is required.",
+                    Status = 400
+                });
+            }
+
+            var res = centerServices.DeleteProviderfromCenter(model.ProviderId, model.CenterId);
             return Ok(new ApiResponse<string>
             {
                 Data = res,
@@ -136,7 +147,7 @@ namespace API.Controllers
             });
         }
 
-        [Authorize(Roles = "Operator")]
+        //[Authorize(Roles = "Operator")]
         [HttpPost]
         [Route("RescheduleAssignment")]
         public IActionResult RescheduleAssignment([FromBody] RescheduleAssignmentViewModel model)

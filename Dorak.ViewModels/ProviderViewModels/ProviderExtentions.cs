@@ -41,6 +41,7 @@ namespace Dorak.ViewModels
                 LastName = provider.LastName,
                 Specialization = provider.Specialization,
                 Bio = provider.Bio,
+                PhoneNumber = provider.User?.PhoneNumber,
                 ExperienceYears = provider.ExperienceYears,
                 LicenseNumber = provider.LicenseNumber,
                 Gender = provider.Gender,
