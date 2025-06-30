@@ -2,6 +2,7 @@
 using Dorak.DataTransferObject.AccountDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -59,6 +60,7 @@ namespace API.Controllers
             return BadRequest(new ApiResponse<object> { Message = "Account creation failed", Status = 400 });
         }
 
+
         #region Creating Users
         [HttpPost("CreateClient")]
         public async Task<IActionResult> CreateClient(string id, ClientRegisterViewModel client)
@@ -71,6 +73,25 @@ namespace API.Controllers
             }
 
             var result = await _clientServices.CreateClient(id, client);
+            if (result.Succeeded)
+            {
+                return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });
+            }
+
+            return BadRequest(new ApiResponse<object> { Message = "Client creation failed", Status = 400 });
+        }
+
+        [HttpPost("ClientRegister")]
+        public async Task<IActionResult> ClientRegister(NewClientViewModel client)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage);
+                return BadRequest(new ApiResponse<object> { Message = string.Join(" ", errors), Status = 400 });
+            }
+
+            var result = await _clientServices.ClientRegister(client);
             if (result.Succeeded)
             {
                 return Ok(new ApiResponse<object> { Message = "Your Account Added Successfully, Go to Login", Status = 200 });

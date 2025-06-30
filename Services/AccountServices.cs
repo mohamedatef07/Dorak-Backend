@@ -63,7 +63,7 @@ namespace Services
         #region Helper
         private async Task<string> SaveImageAsync(RegisterationViewModel user)
         {
-            var currentUser = accountRepository.FindByUserName(user.UserName);
+            var currentUser = await accountRepository.FindByUserName(user.UserName);
             if (user.Image != null && user.Image.Length > 0)
             {
                 var folderPath = Path.Combine(_env.WebRootPath, "image", $"{user.Role}", currentUser.Id.ToString());

@@ -10,6 +10,7 @@ using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -27,8 +28,9 @@ namespace Services
         private readonly WalletRepository walletRepository;
         private readonly IWebHostEnvironment _env;
         private readonly AccountRepository accountRepository;
+        private readonly UserManager<User> userManager;
 
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository)
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository, UserManager<User> _userManager)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
@@ -38,6 +40,9 @@ namespace Services
             walletRepository = _walletRepository;
             _env = env;
             accountRepository = _accountRepository;
+            userManager = _userManager;
+
+
         }
 
         public async Task<IdentityResult> CreateClient(string userId, ClientRegisterViewModel model)
@@ -78,6 +83,79 @@ namespace Services
             }
             return IdentityResult.Success;
         }
+
+        //public async Task<IdentityResult> ClientRegister(NewClientViewModel model)
+        //{
+
+        //    var client = new Client
+        //    {
+
+        //        FirstName = model.FirstName,
+        //        LastName = model.LastName,
+        //        Gender = model.Gender,
+        //        BirthDate = model.BirthDate,
+        //        Street = model.Street,
+        //        City = model.City,
+        //        Governorate = model.Governorate,
+        //        Country = model.Country,
+        //        Image = model.Image
+        //    };
+
+        //    clientRepository.Add(client);
+        //    commitData.SaveChanges();
+        //    return IdentityResult.Success;
+        //}
+
+        public async Task<IdentityResult> ClientRegister(NewClientViewModel model)
+        {
+            // Create Identity User
+            var user = new User
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber
+            };
+
+            // Create user with password
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+
+            // Assign role to user
+            var roleResult = await userManager.AddToRoleAsync(user, model.Role);
+            if (!roleResult.Succeeded)
+            {
+                // Optionally, delete the user if role assignment fails
+                await userManager.DeleteAsync(user);
+                return roleResult;
+            }
+
+            // Create Client entity
+            var client = new Client
+            {
+                ClientId = user.Id, 
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Gender = model.Gender,
+                BirthDate = model.BirthDate,
+                Street = model.Street,
+                City = model.City,
+                Governorate = model.Governorate,
+                Country = model.Country,
+                Image = model.Image,
+                User = user
+            };
+
+            
+            clientRepository.Add(client);
+            commitData.SaveChanges();
+
+            return IdentityResult.Success;
+        }
+   
+
 
         public ClientProfileDTO GetProfile(string userId)
         {

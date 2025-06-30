@@ -20,12 +20,14 @@ namespace Services
         private readonly ProviderRepository providerRepository;
         private readonly AccountServices accountServices;
         private readonly ProviderServices providerServices;
+        private readonly ShiftRepository shiftRepository;
+        private readonly AppointmentRepository appointmentRepository;
 
         public CenterServices(CenterRepository _centerRepository,
             CommitData _commitData,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ProviderRepository _providerRepository,
-            AccountServices _accountServices, ProviderServices _providerServices)
+            AccountServices _accountServices, ProviderServices _providerServices, ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository)
         {
             centerRepository = _centerRepository;
             commitData = _commitData;
@@ -33,6 +35,8 @@ namespace Services
             providerRepository = _providerRepository;
             accountServices = _accountServices;
             providerServices = _providerServices;
+            shiftRepository = _shiftRepository;
+            appointmentRepository = _appointmentRepository;
         }
         public List<Center> GetAll()
         {
@@ -157,6 +161,7 @@ namespace Services
                 LastName = pa.Provider.LastName,
                 Specialization = pa.Provider.Specialization,
                 Bio = pa.Provider.Bio,
+                PhoneNumber = pa.Provider.User.PhoneNumber,
                 ExperienceYears = pa.Provider.ExperienceYears,
                 LicenseNumber = pa.Provider.LicenseNumber,
                 Gender = (GenderType)pa.Provider.Gender,
@@ -304,20 +309,51 @@ namespace Services
 
 
         //delete provider from center
-        public string DeleteProviderfromCenter(String ProviderId) //int centerId)
+        public string DeleteProviderfromCenter(string providerId, int centerId)
         {
-            var assignment = providerAssignmentRepository.GetAssignmentByProviderId(ProviderId);
-            assignment.IsDeleted = true;
-            providerAssignmentRepository.Edit(assignment);
+            var assignments = providerAssignmentRepository.GetAll()
+                .Where(pa => pa.ProviderId == providerId && pa.CenterId == centerId && !pa.IsDeleted)
+                .ToList();
+
+            if (!assignments.Any())
+            {
+                return "No assignments found for the provider and center.";
+            }
+
+            foreach (var assignment in assignments)
+            {
+                assignment.IsDeleted = true;
+
+                var shifts = shiftRepository.GetAll()
+                    .Where(s => s.ProviderAssignmentId == assignment.AssignmentId && !s.IsDeleted)
+                    .ToList();
+
+                foreach (var shift in shifts)
+                {
+                    shift.IsDeleted = true;
+                    shift.ShiftType = ShiftType.Cancelled;
+
+                    var appointments = appointmentRepository.GetAll()
+                        .Where(a => a.ShiftId == shift.ShiftId)
+                        .ToList();
+
+                    foreach (var appointment in appointments)
+                    {
+                        
+                        appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+                        appointmentRepository.Edit(appointment); 
+                    }
+
+                    shiftRepository.Edit(shift); 
+                }
+
+                providerAssignmentRepository.Edit(assignment);
+            }
+
             commitData.SaveChanges();
 
-
-            // shift status = cancelled - soft delete(true)
-            // appointment = cancelled
-
-            return "Provider Deleted Succesfully!";
+            return "Provider deleted from center successfully, including assignments, shifts, and appointments.";
         }
-
 
 
         public PaginationViewModel<ProviderViewModel> ProviderSearch(string searchText = "", int pageNumber = 1, int pageSize = 9, string specializationFilter = "", int centerId = 0)

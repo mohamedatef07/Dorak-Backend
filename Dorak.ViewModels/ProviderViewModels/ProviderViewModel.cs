@@ -1,14 +1,20 @@
-﻿using Models.Enums;
+﻿using Dorak.Models;
+using Microsoft.AspNetCore.Http;
+using Models.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Dorak.ViewModels
 {
+    
     public class ProviderViewModel
     {
+       
         public string ProviderId { get; set; }
         public int AssignmentId { get; set; }
         public string FirstName { get; set; }
@@ -27,7 +33,12 @@ namespace Dorak.ViewModels
         public int EstimatedDuration { get; set; }
         public ProviderStatus Status { get; set; } = ProviderStatus.Offline;
         public DateOnly? AddDate { get; set; }
-        public string? PhoneNumber { get; set; }
+        public string? PhoneNumber { get; set; } 
         public string? Email { get; set; }
+
+        //public ProviderViewModel(Provider provider)
+        //{
+        //    PhoneNumber = provider.User?.PhoneNumber;
+        //}
     }
 }
