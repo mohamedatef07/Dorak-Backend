@@ -12,5 +12,6 @@ namespace Models.Enums
         Confirmed,
         Pending,
         Cancelled,
+        Completed
     }
 }

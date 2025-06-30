@@ -1,21 +1,19 @@
-﻿using Data;
-using Dorak.DataTransferObject;
+﻿using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ClientDTO;
+using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
-using Repositories;
 using Services;
-using Dorak.DataTransferObject.ProviderDTO;
-using System.Threading.Tasks;
 using System.Security.Claims;
 
 
 
 namespace API.Controllers
 {
-    [Authorize(Roles ="Client")]
+    [Authorize(Roles = "Client")]
     [Route("api/[controller]")]
     [ApiController]
     public class ClientController : ControllerBase
@@ -27,7 +25,7 @@ namespace API.Controllers
         private readonly ClientServices clientServices;
         private readonly LiveQueueServices liveQueueServices;
 
-        public ClientController(AppointmentServices _appointmentServices,LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices,ClientServices _clientServices)
+        public ClientController(AppointmentServices _appointmentServices, LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices, ClientServices _clientServices)
         {
             providerServices = _providerServices;
             shiftServices = _shiftServices;
@@ -119,7 +117,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "Appointment not found or already reserved" });
             }
-            return Ok(new ApiResponse<CheckoutRequest> { Status = 200, Message = "Appointment reserved successfully" ,Data= checkoutReq });
+            return Ok(new ApiResponse<CheckoutRequest> { Status = 200, Message = "Appointment reserved successfully", Data = checkoutReq });
         }
 
         [HttpPost("Checkout")]
@@ -145,7 +143,6 @@ namespace API.Controllers
                 // Validate amount
                 if (checkoutRequest.Amount <= 0)
                     return BadRequest(new ApiResponse<string> { Status = 400, Message = "Amount must be greater than 0." });
-
 
                 // Process the payment
                 await appointmentServices.ProcessPayment(checkoutRequest.StripeToken, checkoutRequest.Amount, checkoutRequest.ClientId, checkoutRequest.AppointmentId);
@@ -179,7 +176,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentForClientProfileDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
+            return Ok(new ApiResponse<List<AppointmentCardDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
         }
 
         [HttpGet("cards")]
@@ -361,7 +358,7 @@ namespace API.Controllers
         {
 
 
-            var result =  liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
+            var result = liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
             if (result == null || !result.Any())
                 return NotFound("No live queue found for this appointment.");
 
@@ -409,17 +406,12 @@ namespace API.Controllers
 
             var result = await clientServices.UpdateClientProfile(userId, updateClientProfile);
 
-
-
             if (!result)
+            {
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Not Updated" });
-
-
+            }
             return Ok(new ApiResponse<bool> { Status = 200, Message = "Profile Update", Data = true });
-
         }
-
-
 
         [HttpGet("ClientProfile")]
         public IActionResult GetMyClientProfile()
@@ -454,6 +446,22 @@ namespace API.Controllers
                 Status = 200,
                 Data = profile
             });
+        }
+
+        [HttpGet("client-general-appointment-statistics")]
+        public IActionResult GeneralAppointmentStatistics()
+        {
+            var clientId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(clientId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "User id is required", Status = 400 });
+            }
+            var appoinmentStatistics = clientServices.GetGeneralAppoinmentStatistics(clientId);
+            if (appoinmentStatistics == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "General appoinment statistics not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<GetClientAppointmentStatisticsDTO> { Message = "Get general appoinment statistics successfully", Status = 200, Data = appoinmentStatistics });
         }
     }
 }

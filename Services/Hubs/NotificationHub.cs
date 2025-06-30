@@ -22,7 +22,6 @@ namespace Hubs
                 notificationService.AddUserConnection(userId, Context.ConnectionId);
                 await Clients.Caller.SendAsync("UserConnected", Context.ConnectionId);
             }
-
             await base.OnConnectedAsync();
         }
 
