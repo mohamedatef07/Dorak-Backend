@@ -1273,13 +1273,11 @@ namespace Services
             int TotalUrgentCases = 0;
             int PatientsTreatedToday = 0;
             int PatientsInQueue = 0;
-            decimal AverageEstimatedTime = 0;
             foreach (var pcs in provider.ProviderCenterServices)
             {
                 TotalAppointments += pcs.Appointments.Count();
                 TotalUrgentCases += pcs.Appointments.Where(app => app.AppointmentType == AppointmentType.Urgent).Count();
                 PatientsTreatedToday += pcs.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Confirmed && app.Shift.ShiftDate == DateOnly.FromDateTime(DateTime.Today)).Count();
-                //AverageEstimatedTime += TimeOnly.FromTimeSpan(pcs.Appointments.Select(app => app.EndTime)) - TimeOnly.FromTimeSpan(pcs.Appointments.Select(app => app.ExactTime));
                 PatientsInQueue += pcs.Appointments.Select(app => app.Shift).Where(sh => sh.ShiftType == ShiftType.OnGoing).Select(sh => sh.LiveQueues).Count();
             }
             return new GeneralStatisticsDTO
@@ -1288,7 +1286,7 @@ namespace Services
                 TotalUrgentCases = TotalUrgentCases,
                 PatientsInQueue = PatientsInQueue,
                 PatientsTreatedToday = PatientsInQueue,
-                AverageEstimatedTime = AverageEstimatedTime,
+                AverageEstimatedTime = provider.EstimatedDuration,
             };
         }
         public List<NotificationDTO> GetNotification(string providerId)
