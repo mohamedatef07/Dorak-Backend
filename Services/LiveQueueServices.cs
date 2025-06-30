@@ -195,7 +195,7 @@ namespace Services
             if (LqAppointment == null) {
                 return null;
             }
-            var result = liveQueues.Select(lq => new ClientLiveQueueDTO
+            var result = liveQueues.Where(lq=>lq.AppointmentStatus!=QueueAppointmentStatus.Completed).Select(lq => new ClientLiveQueueDTO
             {
 
                 ArrivalTime = lq.ArrivalTime,
@@ -241,7 +241,7 @@ namespace Services
         public async Task NotifyShiftQueueUpdate(int shiftId)
         {
             var liveQueueList = liveQueueRepository
-                .GetLiveQueueDetailsForShift(shiftId)
+                .GetLiveQueueDetailsForShift(shiftId).Where(lq=>lq.AppointmentStatus!=QueueAppointmentStatus.Completed)//we dont get the completed lq from db 
                 .Select(lq => new ClientLiveQueueDTO
                 {
 
@@ -254,8 +254,8 @@ namespace Services
                     IsCurrentClient = false // سيتم تحديده بالفرونت
                 }).ToList();
 
-            await hubContext.Clients.All
-                //.Group($"shift_{shiftId}")
+            await hubContext.Clients//.All
+                .Group($"shift_{shiftId}")
                 .SendAsync("QueueUpdated", liveQueueList);
         }
 
