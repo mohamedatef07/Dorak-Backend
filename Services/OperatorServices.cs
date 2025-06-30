@@ -1,6 +1,4 @@
-﻿using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Data;
+﻿using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
@@ -9,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
+using System.Linq.Expressions;
 
 namespace Services
 {
@@ -30,7 +29,7 @@ namespace Services
         private readonly IHubContext<NotificationHub> notificationHubContext;
 
 
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _queueHubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository,UserManager<User> _userManager, LiveQueueServices _liveQueueServices, IHubContext<NotificationHub> _notificationHubContext)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _queueHubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository, UserManager<User> _userManager, LiveQueueServices _liveQueueServices, IHubContext<NotificationHub> _notificationHubContext)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -173,7 +172,7 @@ namespace Services
                         IsDeleted = false
                     };
                     temperoryClientRepository.Add(newTempClient);
-                    commitData.SaveChanges(); 
+                    commitData.SaveChanges();
 
                     app.TemporaryClientId = newTempClient.TempClientId;
                 }
@@ -231,7 +230,7 @@ namespace Services
                 var startShiftNotification = new Notification()
                 {
                     Title = "Start Shift",
-                    Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n"+
+                    Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n" +
                               $"Your shift at {shift.ProviderAssignment.Center.CenterName} has officially begun."
                 };
                 shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
@@ -242,7 +241,7 @@ namespace Services
             {
                 return false;
             }
-            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app=>app.EstimatedTime);
+            IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app => app.EstimatedTime);
             int count = 0;
             foreach (var appointment in appointments)
             {
@@ -253,7 +252,7 @@ namespace Services
                     EstimatedTime = appointment.EstimatedTime,
                     EstimatedDuration = appointment.ProviderCenterService.Duration,
                     AppointmentStatus = QueueAppointmentStatus.NotChecked,
-                    Capacity =  appointment.Shift.MaxPatientsPerDay,
+                    Capacity = appointment.Shift.MaxPatientsPerDay,
                     OperatorId = appointment.OperatorId,
                     AppointmentId = appointment.AppointmentId,
                     ShiftId = appointment.ShiftId,
@@ -348,8 +347,8 @@ namespace Services
                     liveQueue.AppointmentStatus = QueueAppointmentStatus.Completed;
                     appointment.IsChecked = true;
                     appointment.EndTime = TimeOnly.FromDateTime(now);
-                    appointment.AdditionalFees = model.AdditionalFees ?? 0m; 
-
+                    appointment.AdditionalFees = model.AdditionalFees ?? 0m;
+                    appointment.AppointmentStatus = AppointmentStatus.Completed;
                     int position = liveQueue.CurrentQueuePosition ?? 0;
                     liveQueueServices.editTurn(liveQueue.ShiftId, position);
                     break;
@@ -361,7 +360,7 @@ namespace Services
             appointment.UpdatedAt = now;
             commitData.SaveChanges();
 
-            
+
 
             await queueHubContext.Clients.All.SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
             await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);

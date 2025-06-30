@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data;
+﻿using Data;
 using Dorak.DataTransferObject;
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject.ClientDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Models.Enums;
 using Repositories;
 
 namespace Services
@@ -28,7 +22,7 @@ namespace Services
         private readonly IWebHostEnvironment _env;
         private readonly AccountRepository accountRepository;
 
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository)
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData, AppointmentServices appointmentServices, WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
@@ -93,7 +87,6 @@ namespace Services
                 Country = Client.Country,
                 Governorate = Client.Governorate,
                 Street = Client.Street,
-                Appointments = appointmentServices.GetAppointmentsByUserId(userId)
             };
             return clientProfile;
         }
@@ -122,7 +115,7 @@ namespace Services
             {
                 Image = Client.Image,
                 Name = $"{Client.FirstName} {Client.LastName}"
-  
+
             };
             return clientProfile;
         }
@@ -168,8 +161,6 @@ namespace Services
 
             if (model.Image != null)
             {
-                
-
                 var savedImagePath = await SaveImageAsync(model.Image, client.User.Id.ToString());  // Use client.ClientId here
                 client.Image = savedImagePath;  // Assuming the 'client' model has an Image property
             }
@@ -193,10 +184,8 @@ namespace Services
             return new ClientDetailsDTO
             {
                 ID = client.ClientId,
-                
                 FirstName = client.FirstName,
                 LastName = client.LastName,
-
                 Email = client.User.Email,
                 Phone = client.User.PhoneNumber,
                 BirthDate = client.BirthDate,
@@ -207,7 +196,6 @@ namespace Services
                 Governorate = client.Governorate
             };
         }
-
 
         private async Task<string> SaveImageAsync(IFormFile userImage, string ClientId)
         {
@@ -229,8 +217,18 @@ namespace Services
                 string imagePath = $"/image/Client/{ClientId}/{fileName}";
                 return imagePath;
             }
-
             return null;
+        }
+        public GetClientAppointmentStatisticsDTO GetGeneralAppoinmentStatistics(string userId)
+        {
+            var client = clientRepository.GetById(cl => cl.ClientId == userId && !cl.IsDeleted);
+            var appoinmentStatistics = new GetClientAppointmentStatisticsDTO
+            {
+                TotalAppointments = client.User.Appointments.Count(),
+                CompletedAppointments = client.User.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Completed).Count(),
+                PendingAppointments = client.User.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Pending).Count(),
+            };
+            return appoinmentStatistics;
         }
 
     }
