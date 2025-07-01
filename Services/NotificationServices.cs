@@ -35,11 +35,7 @@ namespace Services
                 _userConnections.TryAdd(userConnectionId, userInfo);
             }
 
-            // If the user is of type Agent, publish the notification to the agent (You can customize the condition)
-            if (userInfo.Role.ToLower() == "Provider" && userInfo != null)
-            {
-                await NewAgentUserAddedPublisher(userInfo.UserId, userInfo); // Adjust this as needed
-            }
+        
 
             return true;
         }
@@ -60,47 +56,41 @@ namespace Services
             }
         }
 
-        private async Task NewAgentUserAddedPublisher(string userId, AddUserToNotificationHubDTO userInfo)
+        public async Task SendMessage(string userId, NotificationDTO message)
         {
-            var userConnectionIds = _userConnections.Where(x => userId.Contains(x.Value.UserId)).Select(x => x.Key).ToList();
+            
+            var userConnectionId = _userConnections.Where(x => userId.Contains(x.Value.UserId)).Select(x => x.Key).FirstOrDefault();
+
+            if (userConnectionId!=null)
+            {
+                await hubContext.Clients.Client(userConnectionId)
+                .SendAsync("NewMessagePublished", message);
+            }
+
+        }
+        public async Task SendMessageToMulitubleUsers(List<string> userIds, NotificationDTO message)
+        {
+            var userConnectionIds = _userConnections.Where(x => userIds.Contains(x.Value.UserId)).Select(x => x.Key).ToList();
 
             // Create the tasks to send the notification to all relevant users
             var tasks = userConnectionIds.Select(connection => hubContext.Clients.Client(connection)
-                .SendAsync("NewOnlineUser", new
-                {
-                    UserId = userId,
-                    Role = userInfo.Role,
-                    Name = userInfo.Name
-
-                })).ToList();
-
+                .SendAsync("NewMessagePublished", message)).ToList();
             // Execute all tasks concurrently
             await Task.WhenAll(tasks);
         }
 
-        // Add user connection to the dictionary
-        
-
-        // Remove user connection from the dictionary
         public async Task RemoveConnectedUser(string userId)
         {
             _userConnections.TryRemove(userId, out _);
         }
 
-        // Get the connection ID for a given user
-        public string GetConnectionId(string userId)
-        {
-            _userConnections.TryGetValue(userId, out var connectionId);
-            return connectionId.ConnectionId;
-        }
+        //// Get the connection ID for a given user
+        //public string GetConnectionId(string userId)
+        //{
+        //    _userConnections.TryGetValue(userId, out var connectionId);
+        //    return connectionId.ConnectionId;
+        //}
 
-        public async Task SendNotificationToUser(string userId, string message)
-        {
-            var connectionId = GetConnectionId(userId);
-            if (!string.IsNullOrEmpty(connectionId))
-            {
-                await hubContext.Clients.Client(connectionId).SendAsync("ReceiveNotification", message);
-            }
-        }
+
     }
 }

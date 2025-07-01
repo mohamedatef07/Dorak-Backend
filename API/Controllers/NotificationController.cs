@@ -8,6 +8,12 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
+    public class Amgad
+    {
+        public string ConnectionId { get; set; }
+    }
+
+
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -21,9 +27,10 @@ namespace API.Controllers
             this.notificationServices = notificationServices;
             this.userManager = userManager;
         }
+
         [HttpPost]
         [Route("RegisterUserToNotificationHub")]
-        public async Task<IActionResult> RegisterUserToNotificationHub([FromBody]string ConnectionId)
+        public async Task<IActionResult> RegisterUserToNotificationHub(Amgad request)
         {
 
             var userInfo = await userManager.GetUserAsync(HttpContext.User);
@@ -32,11 +39,11 @@ namespace API.Controllers
                 var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
                 var userId = userInfo.Id;
 
-                await notificationServices.AddToUserNotificationHub(ConnectionId,
+                await notificationServices.AddToUserNotificationHub(request.ConnectionId,
                               new AddUserToNotificationHubDTO()
                               {
                                   UserId = userId,
-                                  ConnectionId = ConnectionId,
+                                  ConnectionId = request.ConnectionId,
                                   Role = userRole,
                                   Name = userInfo.UserName,
 
