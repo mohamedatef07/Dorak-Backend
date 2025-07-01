@@ -10,7 +10,7 @@ namespace Dorak.ViewModels
         // From UserRegisterViewModel 
         //UPDATED
         [Required(ErrorMessage = "This field is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Value must be at least 8 characters")]
         public string UserName { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
@@ -19,7 +19,7 @@ namespace Dorak.ViewModels
         public string Email { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Value must be at least 8 characters")]
         [Phone(ErrorMessage = "Invalid phone number")]
         public string PhoneNumber { get; set; }
 
@@ -30,7 +30,7 @@ namespace Dorak.ViewModels
         public string Password { get; set; }
 
         [Required(ErrorMessage = "This field is required")]
-        [StringLength(100, MinimumLength = 6, ErrorMessage = "Value must be at least 6 characters")]
+        [StringLength(100, MinimumLength = 8, ErrorMessage = "Value must be at least 8 characters")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 

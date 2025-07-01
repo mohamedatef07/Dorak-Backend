@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.Metrics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data;
+﻿using Data;
 using Dorak.DataTransferObject;
-using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject.ClientDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Dorak.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Models.Enums;
 using Repositories;
 
 namespace Services
@@ -27,8 +22,9 @@ namespace Services
         private readonly WalletRepository walletRepository;
         private readonly IWebHostEnvironment _env;
         private readonly AccountRepository accountRepository;
+        private readonly UserManager<User> userManager;
 
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository)
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository, UserManager<User> _userManager)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
@@ -38,6 +34,9 @@ namespace Services
             walletRepository = _walletRepository;
             _env = env;
             accountRepository = _accountRepository;
+            userManager = _userManager;
+
+
         }
 
         public async Task<IdentityResult> CreateClient(string userId, ClientRegisterViewModel model)
@@ -79,6 +78,79 @@ namespace Services
             return IdentityResult.Success;
         }
 
+        //public async Task<IdentityResult> ClientRegister(NewClientViewModel model)
+        //{
+
+        //    var client = new Client
+        //    {
+
+        //        FirstName = model.FirstName,
+        //        LastName = model.LastName,
+        //        Gender = model.Gender,
+        //        BirthDate = model.BirthDate,
+        //        Street = model.Street,
+        //        City = model.City,
+        //        Governorate = model.Governorate,
+        //        Country = model.Country,
+        //        Image = model.Image
+        //    };
+
+        //    clientRepository.Add(client);
+        //    commitData.SaveChanges();
+        //    return IdentityResult.Success;
+        //}
+
+        public async Task<IdentityResult> ClientRegister(NewClientViewModel model)
+        {
+            // Create Identity User
+            var user = new User
+            {
+                UserName = model.UserName,
+                Email = model.Email,
+                PhoneNumber = model.PhoneNumber
+            };
+
+            // Create user with password
+            var result = await userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                return result;
+            }
+
+            // Assign role to user
+            var roleResult = await userManager.AddToRoleAsync(user, model.Role);
+            if (!roleResult.Succeeded)
+            {
+                // Optionally, delete the user if role assignment fails
+                await userManager.DeleteAsync(user);
+                return roleResult;
+            }
+
+            // Create Client entity
+            var client = new Client
+            {
+                ClientId = user.Id, 
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                Gender = model.Gender,
+                BirthDate = model.BirthDate,
+                Street = model.Street,
+                City = model.City,
+                Governorate = model.Governorate,
+                Country = model.Country,
+                Image = model.Image,
+                User = user
+            };
+
+            
+            clientRepository.Add(client);
+            commitData.SaveChanges();
+
+            return IdentityResult.Success;
+        }
+   
+
+
         public ClientProfileDTO GetProfile(string userId)
         {
             var Client = clientRepository.GetById(c => c.ClientId == userId);
@@ -93,7 +165,6 @@ namespace Services
                 Country = Client.Country,
                 Governorate = Client.Governorate,
                 Street = Client.Street,
-                Appointments = appointmentServices.GetAppointmentsByUserId(userId)
             };
             return clientProfile;
         }
@@ -122,7 +193,7 @@ namespace Services
             {
                 Image = Client.Image,
                 Name = $"{Client.FirstName} {Client.LastName}"
-  
+
             };
             return clientProfile;
         }
@@ -168,8 +239,6 @@ namespace Services
 
             if (model.Image != null)
             {
-                
-
                 var savedImagePath = await SaveImageAsync(model.Image, client.User.Id.ToString());  // Use client.ClientId here
                 client.Image = savedImagePath;  // Assuming the 'client' model has an Image property
             }
@@ -193,10 +262,8 @@ namespace Services
             return new ClientDetailsDTO
             {
                 ID = client.ClientId,
-                
                 FirstName = client.FirstName,
                 LastName = client.LastName,
-
                 Email = client.User.Email,
                 Phone = client.User.PhoneNumber,
                 BirthDate = client.BirthDate,
@@ -207,7 +274,6 @@ namespace Services
                 Governorate = client.Governorate
             };
         }
-
 
         private async Task<string> SaveImageAsync(IFormFile userImage, string ClientId)
         {
@@ -229,8 +295,18 @@ namespace Services
                 string imagePath = $"/image/Client/{ClientId}/{fileName}";
                 return imagePath;
             }
-
             return null;
+        }
+        public GetClientAppointmentStatisticsDTO GetGeneralAppoinmentStatistics(string userId)
+        {
+            var client = clientRepository.GetById(cl => cl.ClientId == userId && !cl.IsDeleted);
+            var appoinmentStatistics = new GetClientAppointmentStatisticsDTO
+            {
+                TotalAppointments = client.User.Appointments.Count(),
+                CompletedAppointments = client.User.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Completed).Count(),
+                PendingAppointments = client.User.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Pending).Count(),
+            };
+            return appoinmentStatistics;
         }
 
     }

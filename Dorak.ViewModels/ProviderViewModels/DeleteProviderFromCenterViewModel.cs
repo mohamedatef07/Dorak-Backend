@@ -1,0 +1,14 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dorak.ViewModels
+{
+    public class DeleteProviderFromCenterViewModel
+    {
+        public string ProviderId { get; set; }
+        public int CenterId { get; set; }
+    }
+}
