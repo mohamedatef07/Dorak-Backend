@@ -477,5 +477,16 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<object> { Message = "Appointment cancelled successfully", Status = 200 });
         }
+
+        [HttpGet("appointments-history/{userId}")]
+        public IActionResult GetAppointmentsHistory(string userId)
+        {
+            var appointmentsHistory = appointmentServices.GetAppointmentsHistory(userId);
+            if (appointmentsHistory == null || !appointmentsHistory.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found History appointments" });
+            }
+            return Ok(new ApiResponse<List<AppointmentCardDTO>> { Status = 200, Message = "History Appointments retrived.", Data = appointmentsHistory });
+        }
     }
 }
