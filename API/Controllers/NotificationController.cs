@@ -1,0 +1,57 @@
+﻿using Dorak.DataTransferObject;
+using Dorak.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Services;
+using System.Security.Claims;
+
+namespace API.Controllers
+{
+    public class Amgad
+    {
+        public string ConnectionId { get; set; }
+    }
+
+
+    [Route("api/[controller]")]
+    [ApiController]
+    public class NotificationController : ControllerBase
+    {
+        private readonly NotificationServices notificationServices;
+  
+        private readonly UserManager<User> userManager;
+
+        public NotificationController(NotificationServices notificationServices,  UserManager<User> userManager)
+        {
+            this.notificationServices = notificationServices;
+            this.userManager = userManager;
+        }
+
+        [HttpPost]
+        [Route("RegisterUserToNotificationHub")]
+        public async Task<IActionResult> RegisterUserToNotificationHub(Amgad request)
+        {
+
+            var userInfo = await userManager.GetUserAsync(HttpContext.User);
+            if (userInfo != null)
+            {
+                var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
+                var userId = userInfo.Id;
+
+                await notificationServices.AddToUserNotificationHub(request.ConnectionId,
+                              new AddUserToNotificationHubDTO()
+                              {
+                                  UserId = userId,
+                                  ConnectionId = request.ConnectionId,
+                                  Role = userRole,
+                                  Name = userInfo.UserName,
+
+
+                              });
+            }
+            return Ok();
+
+        }
+    }
+}

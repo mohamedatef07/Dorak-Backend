@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dorak.DataTransferObject;
+﻿using Dorak.DataTransferObject;
 using Dorak.Models;
 
 namespace Dorak.ViewModels
@@ -35,15 +30,13 @@ namespace Dorak.ViewModels
                 TemporaryClientId = appointment.TemporaryClientId,
                 ProviderImage = $"{appointment.ProviderCenterService.Provider.Image}",
                 ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName} {appointment.ProviderCenterService.Provider.LastName}",
-                Rate = appointment.ProviderCenterService.Provider.Rate,
+                ProviderRate = appointment.ProviderCenterService.Provider.Rate,
                 Specialization = appointment.ProviderCenterService.Provider.Specialization
 
             };
         }
         public static Appointment AppointmentDTOToAppointment(this AppointmentDTO appointmentDTO)
         {
-
-
             return new Appointment
             {
                 AppointmentId = appointmentDTO.appointmentId,
@@ -97,19 +90,20 @@ namespace Dorak.ViewModels
             };
         }
 
-        public static AppointmentForClientProfileDTO AppointmentToAppointmentForClientProfileDTO(this Appointment appointment)
+        public static AppointmentCardDTO AppointmentToAppointmentCardDTO(this Appointment appointment)
         {
 
-            return new AppointmentForClientProfileDTO
+            return new AppointmentCardDTO
             {
                 AppointmentId = appointment.AppointmentId,
                 AppointmentDate = appointment.AppointmentDate,
+                AppointmentStatus = appointment.AppointmentStatus,
+                EstimatedTime = appointment.EstimatedTime,
                 ProviderId = appointment.ProviderCenterService.ProviderId,
                 ProviderIamge = $"{appointment.ProviderCenterService.Provider.Image}",
-                ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName } {appointment.ProviderCenterService.Provider.LastName}",
-                Rate =appointment.ProviderCenterService.Provider.Rate,
+                ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName} {appointment.ProviderCenterService.Provider.LastName}",
+                ProviderRate = appointment.ProviderCenterService.Provider.Rate,
                 Specialization = appointment.ProviderCenterService.Provider.Specialization
-
             };
         }
 

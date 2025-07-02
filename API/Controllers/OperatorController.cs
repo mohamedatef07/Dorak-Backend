@@ -162,7 +162,6 @@ namespace API.Controllers
         {
             try
             {
-                // Validate providerId
                 if (string.IsNullOrEmpty(providerId))
                 {
                     return BadRequest(new ApiResponse<ProviderLiveQueueViewModel>
@@ -172,7 +171,6 @@ namespace API.Controllers
                     });
                 }
 
-                // Check if provider exists
                 var provider = providerServices.GetProviderById(providerId);
                 if (provider == null)
                 {
@@ -183,7 +181,6 @@ namespace API.Controllers
                     });
                 }
 
-                // Fetch live queues for the specific provider, center, and shift
                 var liveQueues = liveQueueServices.GetLiveQueuesForProvider(providerId, centerId, shiftId, pageNumber, pageSize);
 
                 if (liveQueues.Data == null || !liveQueues.Data.Any())

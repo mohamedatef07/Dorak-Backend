@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Dorak.DataTransferObject;
+﻿using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
@@ -7,10 +6,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
+using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Authorize(Roles = "Provider")]
+    //[Authorize(Roles = "Provider")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
@@ -93,6 +93,40 @@ namespace API.Controllers
                 });
             }
         }
+
+        [HttpGet("{providerId}/all-assignments")]
+        public IActionResult GetAllProviderAssignments(string providerId)
+        {
+            try
+            {
+                var assignments = providerServices.GetAllProviderAssignments(providerId);
+
+                if (!assignments.Any() || assignments == null)
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Message = "No assignments found for the given criteria.",
+                        Status = 404
+                    });
+                }
+
+                return Ok(new ApiResponse<object>
+                {
+                    Message = "Assignments retrieved successfully",
+                    Status = 200,
+                    Data = assignments.ToArray()
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Message = "Internal server error",
+                    Status = 500
+                });
+            }
+        }
+
         [HttpGet("schedule-details")]
         public IActionResult ScheduleDetails([FromQuery] string providerId)
         {
@@ -144,8 +178,9 @@ namespace API.Controllers
         [HttpPut("update-profile")]
         public async Task<IActionResult> UpdateMyProfile([FromForm] UpdateProviderProfileDTO model)
         {
-            if (!ModelState.IsValid) {
-                return BadRequest(new ApiResponse<object>() { Status = 500,Message= "Invalid Data"});
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>() { Status = 500, Message = "Invalid Data" });
             }
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId))

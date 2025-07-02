@@ -127,9 +127,9 @@ namespace Services
             commitData.SaveChanges();
         }
 
-        public List<AppointmentForClientProfileDTO> GetAppointmentsByUserId(string userId)
+        public List<AppointmentCardDTO> GetAppointmentsByUserId(string userId)
         {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p=>p.AppointmentToAppointmentForClientProfileDTO());
+            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p=>p.AppointmentToAppointmentCardDTO());
             return appointments.ToList();
         }
 
@@ -143,10 +143,10 @@ namespace Services
             return appointments?.AppointmentToAppointmentDTO();
         }
 
-        public List<AppointmentForClientProfileDTO> GetUpcomingAppointments(string userId)
+        public List<AppointmentCardDTO> GetUpcomingAppointments(string userId)
         {
             var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
-                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentForClientProfileDTO());
+                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentCardDTO());
             return upcoming.ToList();
         }
 
