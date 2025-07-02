@@ -168,6 +168,12 @@ namespace Services
                            .Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) && a.AppointmentStatus != AppointmentStatus.Cancelled).Select(a => a.AppointmentToAppointmentCardDTO());
             return upcoming.ToList();
         }
+        public List<AppointmentCardDTO> GetAppointmentsHistory(string userId)
+        {
+            var AppointmentsHistory = appointmentRepository.GetAppointmentsByClientId(userId)
+                           .Select(a => a.AppointmentToAppointmentCardDTO());
+            return AppointmentsHistory.ToList();
+        }
 
         public Appointment GetAppointmentById(int AppointmentId)
         {
