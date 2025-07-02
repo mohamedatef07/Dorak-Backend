@@ -363,7 +363,7 @@ namespace Services
 
 
             await queueHubContext.Clients.Group($"shift_{appointment.ShiftId}").SendAsync("ReceiveQueueStatusUpdate", model.LiveQueueId, model.SelectedStatus);
-            await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);
+            await liveQueueServices.NotifyShiftQueueUpdate(appointment.AppointmentId);
             return "Queue status updated successfully";
         }
 

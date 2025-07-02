@@ -33,7 +33,7 @@ namespace Services
             ProviderAssignmentRepository _providerAssignmentRepository,
             OperatorRepository _operatorRepository,
             ShiftRepository _shiftRepository,
-            IHubContext<QueueHub> hubContext, 
+            IHubContext<QueueHub> hubContext,
             CommitData _commitData)
         {
             liveQueueRepository = _liveQueueRepository;
@@ -102,7 +102,7 @@ namespace Services
                 };
             }
 
-            
+
             List<Shift> shifts = providerAssignments
                 .SelectMany(pa => pa.Shifts
                     .Where(sh => sh.ProviderAssignmentId == pa.AssignmentId && sh.ShiftId == shiftId && sh.ShiftType == ShiftType.OnGoing && !sh.IsDeleted))
@@ -179,23 +179,19 @@ namespace Services
 
         public List<ClientLiveQueueDTO> GetQueueEntryByAppointmentId(int appointmentId)
         {
-
-
             var app = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
             if (app == null)
             {
                 return null;
             }
-
-
-
             var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(app.ShiftId);
 
             var LqAppointment = liveQueueRepository.Get(app => app.AppointmentId == appointmentId).FirstOrDefault();
-            if (LqAppointment == null) {
+            if (LqAppointment == null)
+            {
                 return null;
             }
-            var result = liveQueues.Where(lq=>lq.AppointmentStatus!=QueueAppointmentStatus.Completed).Select(lq => new ClientLiveQueueDTO
+            var result = liveQueues.Where(lq => lq.AppointmentStatus != QueueAppointmentStatus.Completed).Select(lq => new ClientLiveQueueDTO
             {
 
                 ArrivalTime = lq.ArrivalTime,
@@ -238,28 +234,40 @@ namespace Services
             return result;
         }
 
-        public async Task NotifyShiftQueueUpdate(int shiftId)
+        public async Task NotifyShiftQueueUpdate(int appointmentId)
         {
-            var liveQueueList = liveQueueRepository
-                .GetLiveQueueDetailsForShift(shiftId).Where(lq=>lq.AppointmentStatus!=QueueAppointmentStatus.Completed)//we dont get the completed lq from db 
-                .Select(lq => new ClientLiveQueueDTO
+            var app = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
+            if (app != null)
+            {
+
+                var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(app.ShiftId);
+                var LqAppointment = liveQueueRepository.Get(app => app.AppointmentId == appointmentId).FirstOrDefault();
+                if (LqAppointment != null)
                 {
 
-                    ArrivalTime = lq.ArrivalTime,
-                    AppointmentDate = lq.Appointment.AppointmentDate,
-                    Type = lq.Appointment.ClientType,
-                    Status = lq.AppointmentStatus,
+                    var result = liveQueues.Where(lq => lq.AppointmentStatus != QueueAppointmentStatus.Completed).Select(lq => new ClientLiveQueueDTO
+                    {
 
-                    CurrentQueuePosition = lq.CurrentQueuePosition,
-                    IsCurrentClient = false // سيتم تحديده بالفرونت
-                }).ToList();
+                        ArrivalTime = lq.ArrivalTime,
+                        AppointmentDate = lq.Appointment.AppointmentDate,
+                        Type = lq.Appointment.ClientType,
+                        Status = lq.AppointmentStatus,
 
-            await hubContext.Clients//.All
-                .Group($"shift_{shiftId}")
-                .SendAsync("QueueUpdated", liveQueueList);
+                        CurrentQueuePosition = lq.CurrentQueuePosition,
+                        IsCurrentClient = lq.Appointment.AppointmentId == appointmentId
+                    }).ToList();
+                    await hubContext.Clients//.All
+                        .Group($"shift_{app.Shift}")
+                        .SendAsync("QueueUpdated", result);
+                }
+
+            }
+
+
         }
 
-        public PaginationViewModel<ProviderLiveQueueViewModel> editTurn(int shiftId, int currentQueuePosition) {
+        public PaginationViewModel<ProviderLiveQueueViewModel> editTurn(int shiftId, int currentQueuePosition)
+        {
 
             var shift = shiftRepository.GetShiftById(shiftId);
             List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition > currentQueuePosition).ToList();
@@ -317,9 +325,9 @@ namespace Services
 
             else
             {
-                    // send notification to user
-                    return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
-                
+                // send notification to user
+                return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+
             }
 
 
@@ -338,7 +346,7 @@ namespace Services
             liveQueueRepository.Edit(lq);
 
             commitData.SaveChanges();
-             
+
 
         }
     }

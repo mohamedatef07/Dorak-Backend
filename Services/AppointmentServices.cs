@@ -173,7 +173,7 @@ namespace Services
                     {
                         // Proceed to cancel the appointment
                         await CancelAppointment(appointment.AppointmentId);
-                        await liveQueueServices.NotifyShiftQueueUpdate(appointment.ShiftId);
+                        await liveQueueServices.NotifyShiftQueueUpdate(appointment.AppointmentId);
                     }
                     catch (Exception ex)
                     {
