@@ -101,7 +101,7 @@ namespace API
             builder.Services.AddScoped<UserManager<User>>();
             builder.Services.AddScoped<SignInManager<User>>();
             builder.Services.AddScoped(typeof(ProviderServices));
-            builder.Services.AddScoped<ShiftServices>();
+            builder.Services.AddScoped(typeof(ShiftServices));
             builder.Services.AddScoped(typeof(AppointmentRepository));
             builder.Services.AddScoped(typeof(AppointmentServices));
             builder.Services.AddScoped(typeof(TemperoryClientRepository));
@@ -110,7 +110,7 @@ namespace API
             builder.Services.AddScoped(typeof(ReviewRepository));
             builder.Services.AddScoped(typeof(ReviewServices));
             builder.Services.AddTransient<MailKitEmailSender>();
-            builder.Services.AddSingleton<NotificationServices>(); // Register NotificationServices as a singleton
+            builder.Services.AddScoped(typeof(NotificationServices)); // Register NotificationServices as a singleton
             builder.Services.AddScoped(typeof(NotificationRepository));
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
@@ -262,7 +262,7 @@ namespace API
                     () => providerServices.RegenerateWeeklyAssignments(),
                     Cron.Monthly);
 
-            
+
 
                 recurringJobManager.AddOrUpdate(
                     "UpdatePendingPaymentsJob",

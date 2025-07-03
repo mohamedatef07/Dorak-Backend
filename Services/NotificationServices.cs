@@ -9,12 +9,12 @@ namespace Services
     public class NotificationServices
     {
         private readonly ConcurrentDictionary<string, AddUserToNotificationHubDTO> _userConnections = new();
-        private readonly IHubContext<NotificationHub> hubContext;
+        private readonly IHubContext<NotificationHub> _hubContext;
         private readonly NotificationRepository _notificationRepository;
 
         public NotificationServices(IHubContext<NotificationHub> hubContext, NotificationRepository notificationRepository)
         {
-            this.hubContext = hubContext;
+            _hubContext = hubContext;
             _notificationRepository = notificationRepository;
         }
 
@@ -62,7 +62,7 @@ namespace Services
 
             if (userConnectionId != null)
             {
-                await hubContext.Clients.Client(userConnectionId)
+                await _hubContext.Clients.Client(userConnectionId)
                 .SendAsync("NewMessagePublished", message);
             }
 
@@ -72,7 +72,7 @@ namespace Services
             var userConnectionIds = _userConnections.Where(x => userIds.Contains(x.Value.UserId)).Select(x => x.Key).ToList();
 
             // Create the tasks to send the notification to all relevant users
-            var tasks = userConnectionIds.Select(connection => hubContext.Clients.Client(connection)
+            var tasks = userConnectionIds.Select(connection => _hubContext.Clients.Client(connection)
                 .SendAsync("NewMessagePublished", message)).ToList();
             // Execute all tasks concurrently
             await Task.WhenAll(tasks);
@@ -90,9 +90,9 @@ namespace Services
         //    return connectionId.ConnectionId;
         //}
 
-        public List<NotificationDTO> GetNotification(string userId, int pageNumber= 1, int pageSize = 10)
+        public PaginationApiResponse<List<NotificationDTO>> GetNotification(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var notification = _notificationRepository.Get(no => no.UserId == userId,pageSize,pageNumber).Select(no => new NotificationDTO
+            var notification = _notificationRepository.Get(no => no.UserId == userId, pageSize, pageNumber).Select(no => new NotificationDTO
             {
                 Title = no.Title,
                 Message = no.Message,
@@ -100,8 +100,17 @@ namespace Services
                 CreatedAt = no.CreatedAt,
             }).OrderByDescending(n => n.CreatedAt).ToList();
 
+            var totalRecords = _notificationRepository.GetList(no => no.UserId == userId).Count();
 
-            return notification;
+            var paginationResponse = new PaginationApiResponse<List<NotificationDTO>>(
+            success: true,
+            message: "notifications retrived successfully.",
+            status: 200,
+            data: notification,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
     }
 }

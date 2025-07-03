@@ -7,18 +7,17 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
- 
+
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
     {
-        private readonly NotificationServices notificationServices;
-
+        private readonly NotificationServices _notificationServices;
         private readonly UserManager<User> userManager;
 
         public NotificationController(NotificationServices notificationServices, UserManager<User> userManager)
         {
-            this.notificationServices = notificationServices;
+            _notificationServices = notificationServices;
             this.userManager = userManager;
         }
 
@@ -33,7 +32,7 @@ namespace API.Controllers
                 var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
                 var userId = userInfo.Id;
 
-                await notificationServices.AddToUserNotificationHub(request.ConnectionId,
+                await _notificationServices.AddToUserNotificationHub(request.ConnectionId,
                               new AddUserToNotificationHubDTO()
                               {
                                   UserId = userId,
@@ -48,19 +47,19 @@ namespace API.Controllers
 
         }
         [HttpGet("notifications")]
-        public IActionResult GetNotifications([FromQuery] int pageNumber=1,[FromQuery] int pageSize=10)
+        public IActionResult GetNotifications([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId))
             {
-                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+                return Unauthorized(new PaginationApiResponse<object>(false, "You are not authorized to perform this action", 401, null, 0, pageNumber, pageSize));
             }
-            var notifications = notificationServices.GetNotification(userId,pageNumber,pageSize);
-            if (notifications == null || !notifications.Any())
+            var paginationResponse = _notificationServices.GetNotification(userId, pageNumber, pageSize);
+            if (paginationResponse.Data == null || !paginationResponse.Data.Any())
             {
-                return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
+                return NotFound(new PaginationApiResponse<object>(false, "notifications not found", 404, null, 0, pageNumber, pageSize));
             }
-            return Ok(new ApiResponse<List<NotificationDTO>> { Message = "Get general statistics successfully", Status = 200, Data = notifications });
+            return Ok(paginationResponse);
         }
     }
 }
