@@ -1,6 +1,12 @@
-﻿namespace Dorak.DataTransferObject
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Dorak.DataTransferObject
 {
-    public class PaginationApiResponse<T>
+    public class PaginationApiResponse<T> where T : class
     {
         public bool Success { get; set; }
         public string Message { get; set; }

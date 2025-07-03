@@ -157,15 +157,24 @@ namespace Services
             return appointments?.AppointmentToAppointmentDTO();
         }
 
-        public List<AppointmentCardDTO> GetUpcomingAppointments(string userId, int pageNumber = 1, int pageSize = 10)
+        public PaginationApiResponse<List<AppointmentCardDTO>> GetUpcomingAppointments(string userId, int pageNumber = 1, int pageSize = 10)
         {
             Expression<Func<Appointment, bool>> filter = app => app.UserId == userId &&
                         app.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) &&
                         app.AppointmentStatus != AppointmentStatus.Cancelled;
-
             var upcoming = appointmentRepository.Get(filter, pageSize, pageNumber)
                            .Select(a => a.AppointmentToAppointmentCardDTO());
-            return upcoming.ToList();
+
+            var totalRecords = appointmentRepository.GetList(filter).Count() ;
+            var paginationResponse = new PaginationApiResponse<List<AppointmentCardDTO>>(
+            success: true,
+            message: "Upcoming appointments retrieved successfully.",
+            status: 200,
+            data: upcoming.ToList(),
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
 
         public List<AppointmentCardDTO> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
@@ -314,7 +323,6 @@ namespace Services
             var shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
             return shift.StartTime.AddMinutes(TotalDuration);
         }
-
 
         public AppointmentDTO GetAppointmentbyId(int AppointmentId)
         {
