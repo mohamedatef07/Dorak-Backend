@@ -171,12 +171,12 @@ namespace API.Controllers
         [HttpGet("upcoming-appointments/{userId}")]
         public IActionResult GetUpcomingAppointments(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var upcomings = appointmentServices.GetUpcomingAppointments(userId,pageNumber,pageSize);
+            var upcomings = appointmentServices.GetUpcomingAppointments(userId, pageNumber, pageSize);
             if (upcomings == null || !upcomings.Any())
             {
                 return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
             }
-            return Ok(new ApiResponse<List<AppointmentCardDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
+            return Ok(new PaginationApiResponse<List<AppointmentCardDTO>>(true, "Upcoming Appointments retrived.", 200, upcomings,, pageNumber, pageSize));
         }
 
         [HttpGet("cards")]
@@ -479,7 +479,7 @@ namespace API.Controllers
         }
 
         [HttpGet("appointments-history/{userId}")]
-        public IActionResult GetAppointmentsHistory(string userId, [FromQuery]int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public IActionResult GetAppointmentsHistory(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             var appointmentsHistory = appointmentServices.GetAppointmentsHistory(userId, pageNumber, pageSize);
             if (appointmentsHistory == null || !appointmentsHistory.Any())

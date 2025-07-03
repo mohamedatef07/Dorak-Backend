@@ -5,6 +5,7 @@ using Dorak.ViewModels;
 using Models.Enums;
 using Repositories;
 using Stripe;
+using System.Linq.Expressions;
 
 namespace Services
 {
@@ -158,14 +159,18 @@ namespace Services
 
         public List<AppointmentCardDTO> GetUpcomingAppointments(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var upcoming = appointmentRepository.Get(app=>app.UserId==userId, pageSize, pageNumber)
-                           .Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) && a.AppointmentStatus != AppointmentStatus.Cancelled).Select(a => a.AppointmentToAppointmentCardDTO());
+            Expression<Func<Appointment, bool>> filter = app => app.UserId == userId &&
+                        app.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) &&
+                        app.AppointmentStatus != AppointmentStatus.Cancelled;
+
+            var upcoming = appointmentRepository.Get(filter, pageSize, pageNumber)
+                           .Select(a => a.AppointmentToAppointmentCardDTO());
             return upcoming.ToList();
         }
 
         public List<AppointmentCardDTO> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var AppointmentsHistory = appointmentRepository.Get(app=>app.UserId==userId,pageSize,pageNumber)
+            var AppointmentsHistory = appointmentRepository.Get(app => app.UserId == userId, pageSize, pageNumber)
                            .Select(a => a.AppointmentToAppointmentCardDTO());
             return AppointmentsHistory.ToList();
         }
