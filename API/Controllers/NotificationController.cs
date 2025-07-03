@@ -47,14 +47,14 @@ namespace API.Controllers
 
         }
         [HttpGet("notifications")]
-        public IActionResult GetNotifications()
+        public IActionResult GetNotifications([FromQuery] int pageNumber=1,[FromQuery] int pageSize=10)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId))
             {
                 return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
             }
-            var notifications = _notificationServices.GetNotification(userId);
+            var notifications = notificationServices.GetNotification(userId,pageNumber,pageSize);
             if (notifications == null || !notifications.Any())
             {
                 return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
