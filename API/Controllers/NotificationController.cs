@@ -7,18 +7,17 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
- 
+
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
     {
-        private readonly NotificationServices notificationServices;
-
+        private readonly NotificationServices _notificationServices;
         private readonly UserManager<User> userManager;
 
         public NotificationController(NotificationServices notificationServices, UserManager<User> userManager)
         {
-            this.notificationServices = notificationServices;
+            _notificationServices = notificationServices;
             this.userManager = userManager;
         }
 
@@ -33,7 +32,7 @@ namespace API.Controllers
                 var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
                 var userId = userInfo.Id;
 
-                await notificationServices.AddToUserNotificationHub(request.ConnectionId,
+                await _notificationServices.AddToUserNotificationHub(request.ConnectionId,
                               new AddUserToNotificationHubDTO()
                               {
                                   UserId = userId,
@@ -55,7 +54,7 @@ namespace API.Controllers
             {
                 return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
             }
-            var notifications = notificationServices.GetNotification(userId);
+            var notifications = _notificationServices.GetNotification(userId);
             if (notifications == null || !notifications.Any())
             {
                 return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
