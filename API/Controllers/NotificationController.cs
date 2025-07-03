@@ -1,6 +1,5 @@
 ﻿using Dorak.DataTransferObject;
 using Dorak.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
@@ -19,10 +18,10 @@ namespace API.Controllers
     public class NotificationController : ControllerBase
     {
         private readonly NotificationServices notificationServices;
-  
+
         private readonly UserManager<User> userManager;
 
-        public NotificationController(NotificationServices notificationServices,  UserManager<User> userManager)
+        public NotificationController(NotificationServices notificationServices, UserManager<User> userManager)
         {
             this.notificationServices = notificationServices;
             this.userManager = userManager;
@@ -52,6 +51,21 @@ namespace API.Controllers
             }
             return Ok();
 
+        }
+        [HttpGet("notifications")]
+        public IActionResult GetNotifications()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+            }
+            var notifications = notificationServices.GetNotification(userId);
+            if (notifications == null || !notifications.Any())
+            {
+                return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<List<NotificationDTO>> { Message = "Get general statistics successfully", Status = 200, Data = notifications });
         }
     }
 }

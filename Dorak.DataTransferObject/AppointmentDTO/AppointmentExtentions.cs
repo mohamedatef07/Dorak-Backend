@@ -100,7 +100,7 @@ namespace Dorak.ViewModels
                 AppointmentStatus = appointment.AppointmentStatus,
                 EstimatedTime = appointment.EstimatedTime,
                 ProviderId = appointment.ProviderCenterService.ProviderId,
-                ProviderIamge = $"{appointment.ProviderCenterService.Provider.Image}",
+                ProviderImage = $"{appointment.ProviderCenterService.Provider.Image}",
                 ProviderName = $"{appointment.ProviderCenterService.Provider.FirstName} {appointment.ProviderCenterService.Provider.LastName}",
                 ProviderRate = appointment.ProviderCenterService.Provider.Rate,
                 Specialization = appointment.ProviderCenterService.Provider.Specialization

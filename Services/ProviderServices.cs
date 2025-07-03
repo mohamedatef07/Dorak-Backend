@@ -1038,7 +1038,7 @@ namespace Services
                 throw new Exception($"Failed to save shifts: {ex.Message}. Inner Exception: {ex.InnerException?.Message ?? "None"}");
             }
         }
-    
+
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
                                                             int pageSize = 2)
         {
@@ -1288,22 +1288,6 @@ namespace Services
                 PatientsTreatedToday = PatientsInQueue,
                 AverageEstimatedTime = provider.EstimatedDuration,
             };
-        }
-        public List<NotificationDTO> GetNotification(string providerId)
-        {
-            var provider = providerRepository.GetProviderById(providerId);
-            if (provider == null)
-            {
-                return null;
-            }
-            var notification = provider.User.Notifications.Select(no => new NotificationDTO
-            {
-                Title = no.Title,
-                Message = no.Message,
-                IsRead = no.IsRead,
-                CreatedAt = no.CreatedAt,
-            }).OrderByDescending(n => n.CreatedAt).ToList();
-            return notification;
         }
     }
 }
