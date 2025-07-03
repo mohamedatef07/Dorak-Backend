@@ -8,12 +8,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    public class Amgad
-    {
-        public string ConnectionId { get; set; }
-    }
-
-
+ 
     [Route("api/[controller]")]
     [ApiController]
     public class NotificationController : ControllerBase
@@ -30,7 +25,7 @@ namespace API.Controllers
 
         [HttpPost]
         [Route("RegisterUserToNotificationHub")]
-        public async Task<IActionResult> RegisterUserToNotificationHub(Amgad request)
+        public async Task<IActionResult> RegisterUserToNotificationHub(NotificationRequestDTO request)
         {
 
             var userInfo = await userManager.GetUserAsync(HttpContext.User);
