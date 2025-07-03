@@ -90,9 +90,9 @@ namespace Services
         //    return connectionId.ConnectionId;
         //}
 
-        public List<NotificationDTO> GetNotification(string userId, int pageNumber= 1, int pageSize = 10)
+        public PaginationApiResponse<List<NotificationDTO>> GetNotification(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var notification = _notificationRepository.Get(no => no.UserId == userId,pageSize,pageNumber).Select(no => new NotificationDTO
+            var notification = _notificationRepository.Get(no => no.UserId == userId, pageSize, pageNumber).Select(no => new NotificationDTO
             {
                 Title = no.Title,
                 Message = no.Message,
@@ -100,8 +100,17 @@ namespace Services
                 CreatedAt = no.CreatedAt,
             }).OrderByDescending(n => n.CreatedAt).ToList();
 
+            var totalRecords = _notificationRepository.GetList(no => no.UserId == userId).Count();
 
-            return notification;
+            var paginationResponse = new PaginationApiResponse<List<NotificationDTO>>(
+            success: true,
+            message: "notifications retrived successfully.",
+            status: 200,
+            data: notification,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
     }
 }

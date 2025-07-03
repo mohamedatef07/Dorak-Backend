@@ -162,26 +162,38 @@ namespace Services
             Expression<Func<Appointment, bool>> filter = app => app.UserId == userId &&
                         app.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) &&
                         app.AppointmentStatus != AppointmentStatus.Cancelled;
-            var upcoming = appointmentRepository.Get(filter, pageSize, pageNumber)
-                           .Select(a => a.AppointmentToAppointmentCardDTO());
 
-            var totalRecords = appointmentRepository.GetList(filter).Count() ;
+            var upcoming = appointmentRepository.Get(filter, pageSize, pageNumber)
+                           .Select(a => a.AppointmentToAppointmentCardDTO()).ToList();
+
+            var totalRecords = appointmentRepository.GetList(filter).Count();
             var paginationResponse = new PaginationApiResponse<List<AppointmentCardDTO>>(
             success: true,
             message: "Upcoming appointments retrieved successfully.",
             status: 200,
-            data: upcoming.ToList(),
+            data: upcoming,
             totalRecords: totalRecords,
             currentPage: pageNumber,
             pageSize: pageSize);
             return paginationResponse;
         }
 
-        public List<AppointmentCardDTO> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
+        public PaginationApiResponse<List<AppointmentCardDTO>> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
         {
             var AppointmentsHistory = appointmentRepository.Get(app => app.UserId == userId, pageSize, pageNumber)
-                           .Select(a => a.AppointmentToAppointmentCardDTO());
-            return AppointmentsHistory.ToList();
+                           .Select(a => a.AppointmentToAppointmentCardDTO()).ToList();
+
+
+            var totalRecords = appointmentRepository.GetList(app => app.UserId == userId).Count();
+            var paginationResponse = new PaginationApiResponse<List<AppointmentCardDTO>>(
+            success: true,
+            message: "Appointments History retrived successfully.",
+            status: 200,
+            data: AppointmentsHistory,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
 
         public Appointment GetAppointmentById(int AppointmentId)

@@ -52,14 +52,14 @@ namespace API.Controllers
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (string.IsNullOrWhiteSpace(userId))
             {
-                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+                return Unauthorized(new PaginationApiResponse<object>(false, "You are not authorized to perform this action", 401, null, 0, pageNumber, pageSize));
             }
-            var notifications = _notificationServices.GetNotification(userId, pageNumber, pageSize);
-            if (notifications == null || !notifications.Any())
+            var paginationResponse = _notificationServices.GetNotification(userId, pageNumber, pageSize);
+            if (paginationResponse.Data == null || !paginationResponse.Data.Any())
             {
-                return NotFound(new ApiResponse<object> { Message = "notifications not found", Status = 404 });
+                return NotFound(new PaginationApiResponse<object>(false, "notifications not found", 404, null, 0, pageNumber, pageSize));
             }
-            return Ok(new ApiResponse<List<NotificationDTO>> { Message = "Get general statistics successfully", Status = 200, Data = notifications });
+            return Ok(paginationResponse);
         }
     }
 }
