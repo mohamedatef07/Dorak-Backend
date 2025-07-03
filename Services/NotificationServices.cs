@@ -90,15 +90,17 @@ namespace Services
         //    return connectionId.ConnectionId;
         //}
 
-        public List<NotificationDTO> GetNotification(string userId)
+        public List<NotificationDTO> GetNotification(string userId, int pageNumber= 1, int pageSize = 10)
         {
-            var notification = _notificationRepository.GetAll().Where(no => no.UserId == userId).Select(no => new NotificationDTO
+            var notification = _notificationRepository.Get(no => no.UserId == userId,pageSize,pageNumber).Select(no => new NotificationDTO
             {
                 Title = no.Title,
                 Message = no.Message,
                 IsRead = no.IsRead,
                 CreatedAt = no.CreatedAt,
             }).OrderByDescending(n => n.CreatedAt).ToList();
+
+
             return notification;
         }
     }

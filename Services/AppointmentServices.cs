@@ -146,12 +146,6 @@ namespace Services
             commitData.SaveChanges();
             return true;
         }
-        public List<AppointmentCardDTO> GetAppointmentsByUserId(string userId)
-        {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p => p.AppointmentToAppointmentCardDTO());
-            return appointments.ToList();
-        }
-
 
         public AppointmentDTO GetLastAppointment(string userId)
         {
@@ -162,15 +156,16 @@ namespace Services
             return appointments?.AppointmentToAppointmentDTO();
         }
 
-        public List<AppointmentCardDTO> GetUpcomingAppointments(string userId)
+        public List<AppointmentCardDTO> GetUpcomingAppointments(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
+            var upcoming = appointmentRepository.Get(app=>app.UserId==userId, pageSize, pageNumber)
                            .Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) && a.AppointmentStatus != AppointmentStatus.Cancelled).Select(a => a.AppointmentToAppointmentCardDTO());
             return upcoming.ToList();
         }
-        public List<AppointmentCardDTO> GetAppointmentsHistory(string userId)
+
+        public List<AppointmentCardDTO> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var AppointmentsHistory = appointmentRepository.GetAppointmentsByClientId(userId)
+            var AppointmentsHistory = appointmentRepository.Get(app=>app.UserId==userId,pageSize,pageNumber)
                            .Select(a => a.AppointmentToAppointmentCardDTO());
             return AppointmentsHistory.ToList();
         }
