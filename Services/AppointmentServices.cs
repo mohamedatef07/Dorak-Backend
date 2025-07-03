@@ -2,16 +2,9 @@
 using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Models.Enums;
 using Repositories;
 using Stripe;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Transactions;
 
 namespace Services
 {
@@ -25,7 +18,7 @@ namespace Services
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
         private readonly PaymentRepository paymentRepository;
 
-        public AppointmentServices(CommitData _commitData,PaymentRepository _paymentRepository,PaymentServices _paymentServices, AppointmentRepository _appointmentRepository,ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository, LiveQueueServices _liveQueueServices)
+        public AppointmentServices(CommitData _commitData, PaymentRepository _paymentRepository, PaymentServices _paymentServices, AppointmentRepository _appointmentRepository, ProviderCenterServiceRepository _providerCenterServiceRepository, ShiftRepository _shiftRepository, LiveQueueServices _liveQueueServices)
         {
             commitData = _commitData;
             paymentRepository = _paymentRepository;
@@ -47,7 +40,7 @@ namespace Services
             var pcs = providerCenterServiceRepository
                 .GetAll()
                 .FirstOrDefault
-                (   p =>
+                (p =>
                     p.ProviderId == reserveApointmentDTO.ProviderId &&
                     p.CenterId == reserveApointmentDTO.CenterId &&
                     p.ServiceId == reserveApointmentDTO.ServiceId
@@ -57,7 +50,7 @@ namespace Services
                 throw new Exception("Invalid provider, center, or service combination.");
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
-           
+
             Appointment createdAppointment = await appointmentRepository.CreateAppoinment(app);
 
             createdAppointment.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
@@ -71,10 +64,11 @@ namespace Services
             {
                 createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
             }
-            CheckoutRequest checkoutRequest = new CheckoutRequest() {
-                AppointmentId=createdAppointment.AppointmentId,
-                ClientId =createdAppointment.UserId,
-                Amount =createdAppointment.Fees + createdAppointment.AdditionalFees,
+            CheckoutRequest checkoutRequest = new CheckoutRequest()
+            {
+                AppointmentId = createdAppointment.AppointmentId,
+                ClientId = createdAppointment.UserId,
+                Amount = createdAppointment.Fees + createdAppointment.AdditionalFees,
                 StripeToken = ""
 
             };
@@ -85,35 +79,38 @@ namespace Services
         {
             try
             {
-                
 
-                    var res = await paymentServices.ProcessPayment(stripeToken, amount, clientId, appointmentId);
-                    var app = appointmentRepository.GetById(a=>a.AppointmentId==appointmentId);
-                    app.AppointmentStatus = AppointmentStatus.Confirmed;
-                    
-                    commitData.SaveChanges();
 
-                    return res;
+                var res = await paymentServices.ProcessPayment(stripeToken, amount, clientId, appointmentId);
+                var app = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
+                app.AppointmentStatus = AppointmentStatus.Confirmed;
 
-                
+                commitData.SaveChanges();
+
+                return res;
+
+
 
             }
             catch (StripeException ex)
             {
                 throw new Exception($"Payment failed: {ex.Message}");
             }
-            catch(Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception($"{ex.Message}");
 
             }
 
         }
 
-        public async Task CancelAppointment(int appointmentId)
+        public async Task<bool> CancelAppointment(int appointmentId)
         {
             var appointment = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
             if (appointment == null)
-                throw new Exception("Appointment not found.");
+            {
+                return false;
+            }
 
             // Find the associated payment
             var payment = paymentRepository.GetById(p => p.AppointmentId == appointmentId);
@@ -122,22 +119,44 @@ namespace Services
                 await paymentServices.RefundPayment(payment.TransactionId, appointmentId);
             }
             appointment.AppointmentStatus = AppointmentStatus.Cancelled;
-
             appointmentRepository.Edit(appointment);
             commitData.SaveChanges();
+            return true;
         }
+        public async Task<bool> clientCancelAppointment(int appointmentId)
+        {
+            var appointment = appointmentRepository.GetById(a => a.AppointmentId == appointmentId);
+            if (appointment == null)
+            {
+                return false;
+            }
+            if (!(appointment.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now.AddDays(2))))
+            {
+                return false;
+            }
 
+            // Find the associated payment
+            var payment = paymentRepository.GetById(p => p.AppointmentId == appointmentId);
+            if (payment != null && payment.RefundStatus != "refunded")
+            {
+                await paymentServices.RefundPayment(payment.TransactionId, appointmentId);
+            }
+            appointment.AppointmentStatus = AppointmentStatus.Cancelled;
+            appointmentRepository.Edit(appointment);
+            commitData.SaveChanges();
+            return true;
+        }
         public List<AppointmentCardDTO> GetAppointmentsByUserId(string userId)
         {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p=>p.AppointmentToAppointmentCardDTO());
+            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p => p.AppointmentToAppointmentCardDTO());
             return appointments.ToList();
         }
 
 
         public AppointmentDTO GetLastAppointment(string userId)
         {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId)
-                                                    .OrderByDescending(a => a.AppointmentDate)
+            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Where(app => app.AppointmentStatus != AppointmentStatus.Cancelled)
+                                                    .OrderByDescending(app => app.AppointmentDate)
                                                     .FirstOrDefault();
 
             return appointments?.AppointmentToAppointmentDTO();
@@ -146,13 +165,19 @@ namespace Services
         public List<AppointmentCardDTO> GetUpcomingAppointments(string userId)
         {
             var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
-                           .Where(a=>a.AppointmentDate>=DateOnly.FromDateTime(DateTime.Now)).Select(a=>a.AppointmentToAppointmentCardDTO());
+                           .Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) && a.AppointmentStatus != AppointmentStatus.Cancelled).Select(a => a.AppointmentToAppointmentCardDTO());
             return upcoming.ToList();
+        }
+        public List<AppointmentCardDTO> GetAppointmentsHistory(string userId)
+        {
+            var AppointmentsHistory = appointmentRepository.GetAppointmentsByClientId(userId)
+                           .Select(a => a.AppointmentToAppointmentCardDTO());
+            return AppointmentsHistory.ToList();
         }
 
         public Appointment GetAppointmentById(int AppointmentId)
         {
-            return appointmentRepository.GetById(a=>a.AppointmentId==AppointmentId);
+            return appointmentRepository.GetById(a => a.AppointmentId == AppointmentId);
         }
 
 
@@ -167,7 +192,7 @@ namespace Services
             {
                 var payment = paymentRepository.GetById(p => p.AppointmentId == appointment.AppointmentId);
 
-                if (payment == null || payment.PaymentStatus != "succeeded") 
+                if (payment == null || payment.PaymentStatus != "succeeded")
                 {
                     try
                     {
@@ -280,7 +305,7 @@ namespace Services
 
         public TimeOnly CalculateEstimatedTime(int shiftId)
         {
-            var appointments = appointmentRepository.GetAll().Where(a=>a.ShiftId==shiftId);
+            var appointments = appointmentRepository.GetAll().Where(a => a.ShiftId == shiftId);
             int TotalDuration = 0;
             foreach (var appointment in appointments)
             {
@@ -294,7 +319,7 @@ namespace Services
         public AppointmentDTO GetAppointmentbyId(int AppointmentId)
         {
             var appointments = appointmentRepository.GetById(app => app.AppointmentId == AppointmentId && app.AppointmentStatus != AppointmentStatus.Cancelled);
-            
+
             if (appointments == null)
             {
                 return null;

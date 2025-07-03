@@ -375,7 +375,7 @@ namespace API.Controllers
         public IActionResult GetAppointmentById(int appointmentid)
         {
 
-            if (appointmentid <= 1)
+            if (appointmentid <= 0)
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
 
             var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
@@ -462,6 +462,31 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<object> { Message = "General appoinment statistics not found", Status = 404 });
             }
             return Ok(new ApiResponse<GetClientAppointmentStatisticsDTO> { Message = "Get general appoinment statistics successfully", Status = 200, Data = appoinmentStatistics });
+        }
+        [HttpPost("cancel-appointment")]
+        public async Task<IActionResult> CancelAppointment([FromQuery] int appointmentId)
+        {
+            if (appointmentId <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid appointment id", Status = 400 });
+            }
+            var isCancelled = await appointmentServices.clientCancelAppointment(appointmentId);
+            if (!isCancelled)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Can't cancel the appointment", Status = 400 });
+            }
+            return Ok(new ApiResponse<object> { Message = "Appointment cancelled successfully", Status = 200 });
+        }
+
+        [HttpGet("appointments-history/{userId}")]
+        public IActionResult GetAppointmentsHistory(string userId)
+        {
+            var appointmentsHistory = appointmentServices.GetAppointmentsHistory(userId);
+            if (appointmentsHistory == null || !appointmentsHistory.Any())
+            {
+                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found History appointments" });
+            }
+            return Ok(new ApiResponse<List<AppointmentCardDTO>> { Status = 200, Message = "History Appointments retrived.", Data = appointmentsHistory });
         }
     }
 }
