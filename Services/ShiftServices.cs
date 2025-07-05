@@ -18,8 +18,8 @@ namespace Services
         private readonly WalletRepository walletRepository;
         private readonly CommitData commitData;
         private readonly IHubContext<ShiftListHub> shiftListHubContext;
-
         private readonly NotificationSignalRService _notificationSignalRService;
+        private readonly NotificationServices notificationServices;
 
         public ShiftServices(ShiftRepository _shiftRepository,
             AppointmentRepository _appointmentRepository,
@@ -28,7 +28,9 @@ namespace Services
             CenterServices _centerServices,
             WalletRepository _walletRepository,
             IHubContext<ShiftListHub> _shiftListHubContext,
-            NotificationSignalRService notificationSignalRService)
+            NotificationSignalRService notificationSignalRService,
+            NotificationServices _notificationServices
+            )
         {
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
@@ -38,6 +40,7 @@ namespace Services
             shiftListHubContext = _shiftListHubContext;
             walletRepository = _walletRepository;
             _notificationSignalRService = notificationSignalRService;
+            notificationServices = _notificationServices;
         }
         public Shift GetShiftById(int shiftId)
         {
@@ -169,7 +172,8 @@ namespace Services
                 Message = shiftCancelNotification.Message,
                 IsRead = shiftCancelNotification.IsRead
             });
-
+            var paginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
+            await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, paginatedNotifications);
 
             if (shift.Appointments != null && shift.Appointments.Any())
             {
@@ -208,7 +212,6 @@ namespace Services
                             Message = appointmentCancelationNotification.Message,
                             IsRead = appointmentCancelationNotification.IsRead
                         });
-
                     }
                 }
                 shiftRepository.Edit(shift);
