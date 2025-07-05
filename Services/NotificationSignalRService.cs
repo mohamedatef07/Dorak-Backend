@@ -1,13 +1,7 @@
 ﻿using Dorak.DataTransferObject;
 using Hubs;
 using Microsoft.AspNetCore.SignalR;
-using Repositories;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -15,12 +9,10 @@ namespace Services
     {
         private readonly ConcurrentDictionary<string, AddUserToNotificationHubDTO> _userConnections = new();
         private readonly IHubContext<NotificationHub> _hubContext;
-        
 
         public NotificationSignalRService(IHubContext<NotificationHub> hubContext)
         {
             _hubContext = hubContext;
-            
         }
 
         public async Task<bool> AddToUserNotificationHub(string userConnectionId, AddUserToNotificationHubDTO userInfo)
@@ -34,13 +26,9 @@ namespace Services
                     if (connectedUser.Key.ToLower() == userConnectionId.ToLower())
                         return false; // Return false if the user is already in the dictionary
                 }
-
                 // Add the new user to the dictionary if they don't exist
                 _userConnections.TryAdd(userConnectionId, userInfo);
             }
-
-
-
             return true;
         }
 
@@ -62,7 +50,6 @@ namespace Services
 
         public async Task SendMessage(string userId, NotificationDTO message)
         {
-
             var userConnectionId = _userConnections.Where(x => userId.Contains(x.Value.UserId)).Select(x => x.Key).FirstOrDefault();
 
             if (userConnectionId != null)
@@ -70,17 +57,25 @@ namespace Services
                 await _hubContext.Clients.Client(userConnectionId)
                 .SendAsync("NewMessagePublished", message);
             }
-
         }
         public async Task SendMessageToMulitubleUsers(List<string> userIds, NotificationDTO message)
         {
             var userConnectionIds = _userConnections.Where(x => userIds.Contains(x.Value.UserId)).Select(x => x.Key).ToList();
-
             // Create the tasks to send the notification to all relevant users
             var tasks = userConnectionIds.Select(connection => _hubContext.Clients.Client(connection)
                 .SendAsync("NewMessagePublished", message)).ToList();
             // Execute all tasks concurrently
             await Task.WhenAll(tasks);
+        }
+        public async Task SendUpdatedNotificationList(string userId, PaginationApiResponse<List<NotificationDTO>> notifications)
+        {
+            var userConnectionId = _userConnections.Where(x => userId.Contains(x.Value.UserId)).Select(x => x.Key).FirstOrDefault();
+
+            if (userConnectionId != null)
+            {
+                await _hubContext.Clients.Client(userConnectionId)
+                .SendAsync("updatedNotifications", notifications);
+            }
         }
 
         public async Task RemoveConnectedUser(string userId)

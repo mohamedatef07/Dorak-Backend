@@ -1,18 +1,11 @@
-﻿using Dorak.DataTransferObject;
-using Microsoft.AspNetCore.SignalR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.AspNetCore.SignalR;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Hubs
 {
     public class ShiftListHub : Hub
     {
         private static readonly Dictionary<string, string> _userConnections = new();
-
         public override Task OnConnectedAsync()
         {
             var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -22,7 +15,6 @@ namespace Hubs
             }
             return base.OnConnectedAsync();
         }
-
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -37,6 +29,5 @@ namespace Hubs
         {
             return _userConnections.TryGetValue(userId, out var connId) ? connId : null;
         }
-
     }
 }
