@@ -63,5 +63,16 @@ namespace API.Controllers
             }
             return Ok(paginationResponse);
         }
+
+        [HttpPost("MarkAsRead/{Id}")]
+        public IActionResult MarkAsRead(int Id)
+        {
+            if (Id <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Notification id", Status = 400 });
+            }
+            _notificationServices.MarkNotificationAsRead(Id);
+            return Ok();
+        }
     }
 }
