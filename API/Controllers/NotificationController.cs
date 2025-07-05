@@ -13,12 +13,14 @@ namespace API.Controllers
     public class NotificationController : ControllerBase
     {
         private readonly NotificationServices _notificationServices;
+        private readonly NotificationSignalRService _notificationSignalRService;
         private readonly UserManager<User> userManager;
 
-        public NotificationController(NotificationServices notificationServices, UserManager<User> userManager)
+        public NotificationController(NotificationServices notificationServices, UserManager<User> userManager, NotificationSignalRService notificationSignalRService)
         {
             _notificationServices = notificationServices;
             this.userManager = userManager;
+            _notificationSignalRService = notificationSignalRService;
         }
 
         [HttpPost]
@@ -32,7 +34,7 @@ namespace API.Controllers
                 var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
                 var userId = userInfo.Id;
 
-                await _notificationServices.AddToUserNotificationHub(request.ConnectionId,
+                await _notificationSignalRService.AddToUserNotificationHub(request.ConnectionId,
                               new AddUserToNotificationHubDTO()
                               {
                                   UserId = userId,
