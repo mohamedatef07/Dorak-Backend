@@ -4,16 +4,10 @@ using Dorak.Models;
 using Dorak.ViewModels;
 using Hubs;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using Models.Enums;
 using Repositories;
-using System;
-using System.Collections.Generic;
 using System.Data.Entity;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services
 {
@@ -186,7 +180,7 @@ namespace Services
             }
             var liveQueues = liveQueueRepository.GetLiveQueueDetailsForShift(app.ShiftId);
 
-            var LqAppointment = liveQueueRepository.Get(app => app.AppointmentId == appointmentId).FirstOrDefault();
+            var LqAppointment = liveQueueRepository.GetById(app => app.AppointmentId == appointmentId);
             if (LqAppointment == null)
             {
                 return null;

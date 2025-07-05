@@ -92,13 +92,14 @@ namespace Services
 
         public PaginationApiResponse<List<NotificationDTO>> GetNotification(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var notification = _notificationRepository.Get(no => no.UserId == userId, pageSize, pageNumber).Select(no => new NotificationDTO
-            {
-                Title = no.Title,
-                Message = no.Message,
-                IsRead = no.IsRead,
-                CreatedAt = no.CreatedAt,
-            }).OrderByDescending(n => n.CreatedAt).ToList();
+            var notification = _notificationRepository.GetAllOrderedByExpression(no => no.UserId == userId, pageSize, pageNumber, query => query.OrderByDescending(n => n.CreatedAt))
+                                                        .Select(no => new NotificationDTO
+                                                        {
+                                                            Title = no.Title,
+                                                            Message = no.Message,
+                                                            IsRead = no.IsRead,
+                                                            CreatedAt = no.CreatedAt,
+                                                        }).ToList();
 
             var totalRecords = _notificationRepository.GetList(no => no.UserId == userId).Count();
 
