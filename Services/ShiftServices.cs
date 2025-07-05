@@ -167,13 +167,14 @@ namespace Services
             commitData.SaveChanges();
             var providerConnectionId = _notificationSignalRService.SendMessage(shift.ProviderAssignment.Provider.ProviderId, new NotificationDTO
             {
+                NotificationId = shiftCancelNotification.NotificationId,
                 Title = shiftCancelNotification.Title,
                 CreatedAt = shiftCancelNotification.CreatedAt,
                 Message = shiftCancelNotification.Message,
                 IsRead = shiftCancelNotification.IsRead
             });
-            var paginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
-            await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, paginatedNotifications);
+            var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
+            await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
 
             if (shift.Appointments != null && shift.Appointments.Any())
             {
@@ -207,11 +208,14 @@ namespace Services
 
                         var clientConnectionId = _notificationSignalRService.SendMessage(appointment.User.Id, new NotificationDTO
                         {
+                            NotificationId = appointmentCancelationNotification.NotificationId,
                             Title = appointmentCancelationNotification.Title,
                             CreatedAt = appointmentCancelationNotification.CreatedAt,
                             Message = appointmentCancelationNotification.Message,
                             IsRead = appointmentCancelationNotification.IsRead
                         });
+                        var ClientpaginatedNotifications = notificationServices.GetNotification(appointment.User.Id);
+                        await _notificationSignalRService.SendUpdatedNotificationList(appointment.User.Id, ClientpaginatedNotifications);
                     }
                 }
                 shiftRepository.Edit(shift);

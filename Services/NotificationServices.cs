@@ -1,25 +1,27 @@
-﻿using Dorak.DataTransferObject;
-using Hubs;
-using Microsoft.AspNetCore.SignalR;
+﻿using Data;
+using Dorak.DataTransferObject;
 using Repositories;
-using System.Collections.Concurrent;
 
 namespace Services
 {
     public class NotificationServices
     {
-        
-        private readonly NotificationRepository _notificationRepository;
 
-        public NotificationServices( NotificationRepository notificationRepository)
+        private readonly NotificationRepository _notificationRepository;
+        private readonly CommitData commitData;
+
+        public NotificationServices(NotificationRepository notificationRepository,
+            CommitData _commitData)
         {
             _notificationRepository = notificationRepository;
+            commitData = _commitData;
         }
         public PaginationApiResponse<List<NotificationDTO>> GetNotification(string userId, int pageNumber = 1, int pageSize = 10)
         {
             var notification = _notificationRepository.GetAllOrderedByExpression(no => no.UserId == userId, pageSize, pageNumber, query => query.OrderByDescending(n => n.CreatedAt))
                                                         .Select(no => new NotificationDTO
                                                         {
+                                                            NotificationId = no.NotificationId,
                                                             Title = no.Title,
                                                             Message = no.Message,
                                                             IsRead = no.IsRead,
@@ -37,6 +39,17 @@ namespace Services
             currentPage: pageNumber,
             pageSize: pageSize);
             return paginationResponse;
+        }
+        public void MarkNotificationAsRead(int notificationId)
+        {
+            var notification = _notificationRepository.GetById(n => n.NotificationId == notificationId);
+            if (notification != null)
+            {
+                notification.IsRead = true;
+                _notificationRepository.Edit(notification);
+                commitData.SaveChanges();
+
+            }
         }
     }
 }
