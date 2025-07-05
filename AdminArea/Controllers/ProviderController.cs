@@ -1,7 +1,5 @@
 using Dorak.Models;
-using Dorak.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Repositories;
 using Services;
 
 namespace AdminArea.Controllers
@@ -16,8 +14,6 @@ namespace AdminArea.Controllers
 
             this.providerService = providerService;
         }
-
-
 
         public IActionResult Index(string searchText = "", int pageNumber = 1,
             int pageSize = 2)
