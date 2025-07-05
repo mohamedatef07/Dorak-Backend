@@ -1,6 +1,6 @@
+using Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using Data;
 using System.Reflection;
 
 namespace Repositories
@@ -14,7 +14,7 @@ namespace Repositories
             dbContext = _dbContext;
             Table = dbContext.Set<T>();
         }
-      
+
         public void Add(T entity)
         {
             Table.Add(entity);
@@ -29,7 +29,7 @@ namespace Repositories
         }
         public T GetById(Expression<Func<T, bool>> predicate)
         {
-            return  Table.FirstOrDefault(predicate);
+            return Table.FirstOrDefault(predicate);
         }
         public IQueryable<T> GetAll()
         {
@@ -87,6 +87,44 @@ namespace Repositories
             if (pageNumber < 0)
                 pageNumber = 1;
 
+
+            int count = query.Count();
+
+            if (count < pageSize)
+            {
+                pageSize = count;
+                pageNumber = 1;
+            }
+
+            int ToSkip = (pageNumber - 1) * pageSize;
+
+            query = query.Skip(ToSkip).Take(pageSize);
+
+            return query;
+        }
+
+        public IQueryable<T> GetAllOrderedByExpression(Expression<Func<T, bool>> filter = null, int pageSize = 10, int pageNumber = 1, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null)
+        {
+            IQueryable<T> query = Table.AsQueryable();
+
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            if (orderBy != null)
+            {
+                query = orderBy(query);
+            }
+
+            if (pageSize < 0)
+            {
+                pageSize = 10;
+            }
+
+            if (pageNumber < 0)
+            {
+                pageNumber = 1;
+            }
 
             int count = query.Count();
 

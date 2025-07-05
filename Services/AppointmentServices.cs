@@ -5,6 +5,7 @@ using Dorak.ViewModels;
 using Models.Enums;
 using Repositories;
 using Stripe;
+using System.Linq.Expressions;
 
 namespace Services
 {
@@ -146,12 +147,6 @@ namespace Services
             commitData.SaveChanges();
             return true;
         }
-        public List<AppointmentCardDTO> GetAppointmentsByUserId(string userId)
-        {
-            var appointments = appointmentRepository.GetAppointmentsByClientId(userId).Select(p => p.AppointmentToAppointmentCardDTO());
-            return appointments.ToList();
-        }
-
 
         public AppointmentDTO GetLastAppointment(string userId)
         {
@@ -162,17 +157,43 @@ namespace Services
             return appointments?.AppointmentToAppointmentDTO();
         }
 
-        public List<AppointmentCardDTO> GetUpcomingAppointments(string userId)
+        public PaginationApiResponse<List<AppointmentCardDTO>> GetUpcomingAppointments(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var upcoming = appointmentRepository.GetAppointmentsByClientId(userId)
-                           .Where(a => a.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) && a.AppointmentStatus != AppointmentStatus.Cancelled).Select(a => a.AppointmentToAppointmentCardDTO());
-            return upcoming.ToList();
+            Expression<Func<Appointment, bool>> filter = app => app.UserId == userId &&
+                        app.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) &&
+                        app.AppointmentStatus != AppointmentStatus.Cancelled;
+
+            var upcoming = appointmentRepository.Get(filter, pageSize, pageNumber)
+                           .Select(a => a.AppointmentToAppointmentCardDTO()).ToList();
+
+            var totalRecords = appointmentRepository.GetList(filter).Count();
+            var paginationResponse = new PaginationApiResponse<List<AppointmentCardDTO>>(
+            success: true,
+            message: "Upcoming appointments retrieved successfully.",
+            status: 200,
+            data: upcoming,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
-        public List<AppointmentCardDTO> GetAppointmentsHistory(string userId)
+
+        public PaginationApiResponse<List<AppointmentCardDTO>> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var AppointmentsHistory = appointmentRepository.GetAppointmentsByClientId(userId)
-                           .Select(a => a.AppointmentToAppointmentCardDTO());
-            return AppointmentsHistory.ToList();
+            var AppointmentsHistory = appointmentRepository.Get(app => app.UserId == userId, pageSize, pageNumber)
+                           .Select(a => a.AppointmentToAppointmentCardDTO()).ToList();
+
+
+            var totalRecords = appointmentRepository.GetList(app => app.UserId == userId).Count();
+            var paginationResponse = new PaginationApiResponse<List<AppointmentCardDTO>>(
+            success: true,
+            message: "Appointments History retrived successfully.",
+            status: 200,
+            data: AppointmentsHistory,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
 
         public Appointment GetAppointmentById(int AppointmentId)
@@ -314,7 +335,6 @@ namespace Services
             var shift = shiftRepository.GetById(s => s.ShiftId == shiftId);
             return shift.StartTime.AddMinutes(TotalDuration);
         }
-
 
         public AppointmentDTO GetAppointmentbyId(int AppointmentId)
         {

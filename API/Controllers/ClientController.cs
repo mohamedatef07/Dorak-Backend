@@ -169,14 +169,14 @@ namespace API.Controllers
         }
 
         [HttpGet("upcoming-appointments/{userId}")]
-        public IActionResult GetUpcomingAppointments(string userId)
+        public IActionResult GetUpcomingAppointments(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var upcomings = appointmentServices.GetUpcomingAppointments(userId);
-            if (upcomings == null || !upcomings.Any())
+            var PaginationResponse = appointmentServices.GetUpcomingAppointments(userId, pageNumber, pageSize);
+            if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found upcoming appointments" });
+                return BadRequest(new PaginationApiResponse<object>(false, "No found upcoming appointments", 400, null, 0, pageNumber, pageSize));
             }
-            return Ok(new ApiResponse<List<AppointmentCardDTO>> { Status = 200, Message = "Upcoming Appointments retrived.", Data = upcomings });
+            return Ok(PaginationResponse);
         }
 
         [HttpGet("cards")]
@@ -479,14 +479,14 @@ namespace API.Controllers
         }
 
         [HttpGet("appointments-history/{userId}")]
-        public IActionResult GetAppointmentsHistory(string userId)
+        public IActionResult GetAppointmentsHistory(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var appointmentsHistory = appointmentServices.GetAppointmentsHistory(userId);
-            if (appointmentsHistory == null || !appointmentsHistory.Any())
+            var PaginationResponse = appointmentServices.GetAppointmentsHistory(userId, pageNumber, pageSize);
+            if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found History appointments" });
+                return BadRequest(new PaginationApiResponse<object>(false, "No found History appointments", 400, null, 0, pageNumber, pageSize));
             }
-            return Ok(new ApiResponse<List<AppointmentCardDTO>> { Status = 200, Message = "History Appointments retrived.", Data = appointmentsHistory });
+            return Ok(PaginationResponse);
         }
     }
 }
