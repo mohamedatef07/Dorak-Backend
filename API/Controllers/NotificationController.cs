@@ -14,12 +14,12 @@ namespace API.Controllers
     {
         private readonly NotificationServices _notificationServices;
         private readonly NotificationSignalRService _notificationSignalRService;
-        private readonly UserManager<User> userManager;
+        private readonly UserManager<User> _userManager;
 
         public NotificationController(NotificationServices notificationServices, UserManager<User> userManager, NotificationSignalRService notificationSignalRService)
         {
             _notificationServices = notificationServices;
-            this.userManager = userManager;
+            _userManager = userManager;
             _notificationSignalRService = notificationSignalRService;
         }
 
@@ -27,13 +27,11 @@ namespace API.Controllers
         [Route("RegisterUserToNotificationHub")]
         public async Task<IActionResult> RegisterUserToNotificationHub(NotificationRequestDTO request)
         {
-
-            var userInfo = await userManager.GetUserAsync(HttpContext.User);
+            var userInfo = await _userManager.GetUserAsync(HttpContext.User);
             if (userInfo != null)
             {
                 var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
                 var userId = userInfo.Id;
-
                 await _notificationSignalRService.AddToUserNotificationHub(request.ConnectionId,
                               new AddUserToNotificationHubDTO()
                               {
@@ -41,13 +39,11 @@ namespace API.Controllers
                                   ConnectionId = request.ConnectionId,
                                   Role = userRole,
                                   Name = userInfo.UserName,
-
-
                               });
             }
             return Ok();
-
         }
+
         [HttpGet("notifications")]
         public IActionResult GetNotifications([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
