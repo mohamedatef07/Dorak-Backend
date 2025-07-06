@@ -3,11 +3,13 @@ using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Hubs;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
 using System.Data.Entity;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Services
 {
@@ -19,6 +21,8 @@ namespace Services
         private readonly ShiftRepository shiftRepository;
         private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> hubContext;
+        private readonly NotificationSignalRService notificationSignalRService;
+        private readonly NotificationServices notificationServices;
 
         public LiveQueueServices(LiveQueueRepository _liveQueueRepository,
             AppointmentRepository appointmentRepository,
@@ -28,7 +32,9 @@ namespace Services
             OperatorRepository _operatorRepository,
             ShiftRepository _shiftRepository,
             IHubContext<QueueHub> hubContext,
-            CommitData _commitData)
+            CommitData _commitData,
+            NotificationSignalRService _notificationSignalRService,
+            NotificationServices _notificationServices)
         {
             liveQueueRepository = _liveQueueRepository;
             this.appointmentRepository = appointmentRepository;
@@ -36,6 +42,8 @@ namespace Services
             shiftRepository = _shiftRepository;
             this.hubContext = hubContext;
             commitData = _commitData;
+            notificationSignalRService = _notificationSignalRService;
+            notificationServices = _notificationServices;
         }
 
         //from provider side
@@ -218,7 +226,6 @@ namespace Services
 
                     CurrentQueuePosition = liveQueue.CurrentQueuePosition,
 
-                    // 🔥 This flag helps you identify the logged-in client's appointment
                     IsCurrentClient = appointment.UserId == userId
                 };
 
@@ -249,7 +256,53 @@ namespace Services
                 .SendAsync("QueueUpdated", liveQueueList);
         }
 
-        public PaginationViewModel<ProviderLiveQueueViewModel> editTurn(int shiftId, int currentQueuePosition)
+        public async Task<bool> NotifyTurnChange(int liveQueueId, int newQueuePosition)
+        {
+            var liveQueue = liveQueueRepository.GetById(lq => lq.LiveQueueId == liveQueueId);
+            if (liveQueue == null)
+            {
+                return false;
+            }
+
+            var appointment = liveQueue.Appointment;
+            if (appointment == null || appointment.User == null)
+            {
+                return false;
+            }
+            var user = appointment.User;
+            var provider = appointment.Shift.ProviderAssignment.Provider;
+
+            var turnChangeNotification = new Notification
+            {
+                Title = "Queue Position Changed",
+                Message = $"Dear {user.Client.FirstName} {user.Client.LastName}, " +
+                         $"Your appointment with Dr. {provider.FirstName} {provider.LastName} on " +
+                         $"{appointment.AppointmentDate.ToShortDateString()} has been moved to queue number: {newQueuePosition}. " +
+                         "Please contact us if you have any questions.",
+                CreatedAt = DateTime.Now,
+                IsRead = false,
+                UserId = user.Id,
+                AppointmentId = appointment.AppointmentId
+            };
+
+            user.Notifications.Add(turnChangeNotification);
+            commitData.SaveChanges();
+
+            var clientConnectionId = notificationSignalRService.SendMessage(user.Id, new NotificationDTO {
+                NotificationId = turnChangeNotification.NotificationId,
+                Title = turnChangeNotification.Title,
+                CreatedAt = turnChangeNotification.CreatedAt,
+                Message = turnChangeNotification.Message,
+                IsRead = turnChangeNotification.IsRead
+            });
+            var ClientpaginatedNotifications = notificationServices.GetNotification(user.Id);
+            await notificationSignalRService.SendUpdatedNotificationList(user.Id, ClientpaginatedNotifications);
+
+            return true;
+
+        }
+
+        public async Task <PaginationViewModel<ProviderLiveQueueViewModel>> editTurn(int shiftId, int currentQueuePosition)
         {
 
             var shift = shiftRepository.GetShiftById(shiftId);
@@ -262,8 +315,6 @@ namespace Services
             // case 1: waiting 
             // case 2: not checked -> shift 1 turn - replace with the first waiting turn
             // 1 2 3 4 -> 1 4 3 2
-            // special case 1: if it last turn -> pause live queue & connect with the patient
-            // sepcial case 2: if there is not cheked & no waiting turns -> pause live queue & connect with the first patient
 
             if (next != null)
             {
@@ -285,6 +336,7 @@ namespace Services
                             var position = lq.CurrentQueuePosition ?? 0;
 
                             reOrder(lq, lq.ShiftId, position, currentQueuePosition + 1);
+                            await NotifyTurnChange(lq.LiveQueueId, currentQueuePosition + 1);
 
                             return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
@@ -295,11 +347,15 @@ namespace Services
 
                     if (flag)
                     {
-                        // send notification to user
-                        return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                        var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+                        if (currentQueue != null)
+                        {
+                            await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
+                        }
+                        return  GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
                     }
 
-                    return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                    return  GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
 
                 }
@@ -308,8 +364,12 @@ namespace Services
 
             else
             {
-                // send notification to user
-                return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+                if (currentQueue != null)
+                {
+                    await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
+                }
+                return  GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
             }
 
@@ -319,6 +379,10 @@ namespace Services
         public void reOrder(LiveQueue lq, int shiftId, int positionNumber, int currentQueuePosition)
         {
             LiveQueue late = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+            if (late == null)
+            {
+                return;
+            }
 
             late.CurrentQueuePosition = positionNumber;
 
@@ -330,6 +394,7 @@ namespace Services
 
             commitData.SaveChanges();
 
+            NotifyTurnChange(late.LiveQueueId, positionNumber).GetAwaiter().GetResult();
 
         }
     }
