@@ -1,5 +1,6 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
+using Microsoft.EntityFrameworkCore;
 using Repositories;
 
 namespace Services
@@ -40,16 +41,29 @@ namespace Services
             pageSize: pageSize);
             return paginationResponse;
         }
-        public void MarkNotificationAsRead(int notificationId)
+        public bool MarkNotificationAsRead(int notificationId)
         {
             var notification = _notificationRepository.GetById(n => n.NotificationId == notificationId);
-            if (notification != null)
+            if (notification == null)
             {
-                notification.IsRead = true;
-                _notificationRepository.Edit(notification);
-                commitData.SaveChanges();
-
+                return false;
             }
+            notification.IsRead = true;
+            _notificationRepository.Edit(notification);
+            commitData.SaveChanges();
+            return true;
+        }
+        public bool MarkAllNotificationsAsRead(string userId)
+        {
+            var notifications = _notificationRepository
+                .GetList(n => n.UserId == userId && !n.IsRead);
+            if (notifications == null)
+            {
+                return false;
+            }
+            notifications.ExecuteUpdate(no => no.SetProperty(p => p.IsRead, true));
+            commitData.SaveChanges();
+            return true;
         }
     }
 }

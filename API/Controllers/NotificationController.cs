@@ -71,8 +71,27 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Message = "Invalid Notification id", Status = 400 });
             }
-            _notificationServices.MarkNotificationAsRead(Id);
-            return Ok();
+            var isModified = _notificationServices.MarkNotificationAsRead(Id);
+            if (!isModified)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Not found notification to mark it as read", Status = 404 });
+            }
+            return Ok(new ApiResponse<object> { Message = "Notifications is marked as is read successfully", Status = 200 });
+        }
+        [HttpPost("MarkAllAsRead")]
+        public IActionResult MarkAllAsRead()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+            }
+            var isModified = _notificationServices.MarkAllNotificationsAsRead(userId);
+            if (!isModified)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Not found notifications to mark it as read", Status = 404 });
+            }
+            return Ok(new ApiResponse<object> { Message = "All notifications are marked as is read successfully", Status = 200 });
         }
     }
 }
