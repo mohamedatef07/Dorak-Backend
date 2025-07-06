@@ -356,16 +356,21 @@ namespace API.Controllers
         [HttpGet("queue/by-appointment/{appointmentId}")]
         public IActionResult GetQueueByAppointment(int appointmentId)
         {
-
+            if (appointmentId <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid appoinment id", Status = 400 });
+            }
 
             var result = liveQueueServices.GetQueueEntryByAppointmentId(appointmentId);
             if (result == null || !result.Any())
-                return NotFound("No live queue found for this appointment.");
+            {
+                return NotFound(new ApiResponse<object> { Message = "No live queue found for this appointment", Status = 404 });
+            }
 
             return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
             {
+                Message = "Queue retrieved successfully",
                 Status = 200,
-                Message = "Queue retrieved successfully.",
                 Data = result
             });
         }
@@ -376,16 +381,18 @@ namespace API.Controllers
         {
 
             if (appointmentid <= 0)
+            {
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
+            }
 
             var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
 
             if (Appointment == null)
+            {
                 return NotFound(new ApiResponse<object> { Status = 400, Message = "No appointments found." });
-
+            }
 
             return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Appointment retrived.", Data = Appointment });
-
         }
 
 

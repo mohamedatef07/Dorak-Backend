@@ -18,10 +18,19 @@ namespace Services
         private readonly WalletRepository walletRepository;
         private readonly CommitData commitData;
         private readonly IHubContext<ShiftListHub> shiftListHubContext;
-        private readonly IHubContext<NotificationHub> notificationHubContext;
+        private readonly NotificationSignalRService _notificationSignalRService;
         private readonly NotificationServices notificationServices;
 
-        public ShiftServices(ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, LiveQueueRepository _liveQueueRepository, CommitData _commitData, CenterServices _centerServices, WalletRepository _walletRepository, IHubContext<ShiftListHub> _shiftListHubContext, IHubContext<NotificationHub> _notificationHubContext, NotificationServices notificationServices)
+        public ShiftServices(ShiftRepository _shiftRepository,
+            AppointmentRepository _appointmentRepository,
+            LiveQueueRepository _liveQueueRepository,
+            CommitData _commitData,
+            CenterServices _centerServices,
+            WalletRepository _walletRepository,
+            IHubContext<ShiftListHub> _shiftListHubContext,
+            NotificationSignalRService notificationSignalRService,
+            NotificationServices _notificationServices
+            )
         {
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
@@ -29,9 +38,9 @@ namespace Services
             commitData = _commitData;
             centerServices = _centerServices;
             shiftListHubContext = _shiftListHubContext;
-            notificationHubContext = _notificationHubContext;
-            this.notificationServices = notificationServices;
             walletRepository = _walletRepository;
+            _notificationSignalRService = notificationSignalRService;
+            notificationServices = _notificationServices;
         }
         public Shift GetShiftById(int shiftId)
         {
@@ -156,14 +165,16 @@ namespace Services
             };
             shift.ProviderAssignment.Provider.User.Notifications.Add(shiftCancelNotification);
             commitData.SaveChanges();
-            var providerConnectionId = notificationServices.SendMessage(shift.ProviderAssignment.Provider.ProviderId, new NotificationDTO
+            var providerConnectionId = _notificationSignalRService.SendMessage(shift.ProviderAssignment.Provider.ProviderId, new NotificationDTO
             {
+                NotificationId = shiftCancelNotification.NotificationId,
                 Title = shiftCancelNotification.Title,
                 CreatedAt = shiftCancelNotification.CreatedAt,
                 Message = shiftCancelNotification.Message,
                 IsRead = shiftCancelNotification.IsRead
             });
-        
+            var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
+            await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
 
             if (shift.Appointments != null && shift.Appointments.Any())
             {
@@ -195,14 +206,16 @@ namespace Services
                         appointment.User.Notifications.Add(appointmentCancelationNotification);
                         commitData.SaveChanges();
 
-                        var clientConnectionId = notificationServices.SendMessage(appointment.User.Id, new NotificationDTO
+                        var clientConnectionId = _notificationSignalRService.SendMessage(appointment.User.Id, new NotificationDTO
                         {
+                            NotificationId = appointmentCancelationNotification.NotificationId,
                             Title = appointmentCancelationNotification.Title,
                             CreatedAt = appointmentCancelationNotification.CreatedAt,
-                            Message= appointmentCancelationNotification.Message,
+                            Message = appointmentCancelationNotification.Message,
                             IsRead = appointmentCancelationNotification.IsRead
                         });
-                        
+                        var ClientpaginatedNotifications = notificationServices.GetNotification(appointment.User.Id);
+                        await _notificationSignalRService.SendUpdatedNotificationList(appointment.User.Id, ClientpaginatedNotifications);
                     }
                 }
                 shiftRepository.Edit(shift);

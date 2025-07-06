@@ -163,7 +163,7 @@ namespace Services
                         app.AppointmentDate >= DateOnly.FromDateTime(DateTime.Now) &&
                         app.AppointmentStatus != AppointmentStatus.Cancelled;
 
-            var upcoming = appointmentRepository.Get(filter, pageSize, pageNumber)
+            var upcoming = appointmentRepository.GetAllOrderedByExpression(filter, pageSize, pageNumber, query => query.OrderBy(app => app.AppointmentDate))
                            .Select(a => a.AppointmentToAppointmentCardDTO()).ToList();
 
             var totalRecords = appointmentRepository.GetList(filter).Count();
@@ -180,7 +180,7 @@ namespace Services
 
         public PaginationApiResponse<List<AppointmentCardDTO>> GetAppointmentsHistory(string userId, int pageNumber = 1, int pageSize = 10)
         {
-            var AppointmentsHistory = appointmentRepository.Get(app => app.UserId == userId, pageSize, pageNumber)
+            var AppointmentsHistory = appointmentRepository.GetAllOrderedByExpression(app => app.UserId == userId, pageSize, pageNumber, query => query.OrderByDescending(app => app.AppointmentDate))
                            .Select(a => a.AppointmentToAppointmentCardDTO()).ToList();
 
 
