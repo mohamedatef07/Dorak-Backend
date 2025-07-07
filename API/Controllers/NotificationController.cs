@@ -14,12 +14,12 @@ namespace API.Controllers
     {
         private readonly NotificationServices _notificationServices;
         private readonly NotificationSignalRService _notificationSignalRService;
-        private readonly UserManager<User> userManager;
+        private readonly UserManager<User> _userManager;
 
         public NotificationController(NotificationServices notificationServices, UserManager<User> userManager, NotificationSignalRService notificationSignalRService)
         {
             _notificationServices = notificationServices;
-            this.userManager = userManager;
+            _userManager = userManager;
             _notificationSignalRService = notificationSignalRService;
         }
 
@@ -27,13 +27,11 @@ namespace API.Controllers
         [Route("RegisterUserToNotificationHub")]
         public async Task<IActionResult> RegisterUserToNotificationHub(NotificationRequestDTO request)
         {
-
-            var userInfo = await userManager.GetUserAsync(HttpContext.User);
+            var userInfo = await _userManager.GetUserAsync(HttpContext.User);
             if (userInfo != null)
             {
                 var userRole = HttpContext.User?.FindFirst(ClaimTypes.Role)?.Value;
                 var userId = userInfo.Id;
-
                 await _notificationSignalRService.AddToUserNotificationHub(request.ConnectionId,
                               new AddUserToNotificationHubDTO()
                               {
@@ -41,13 +39,11 @@ namespace API.Controllers
                                   ConnectionId = request.ConnectionId,
                                   Role = userRole,
                                   Name = userInfo.UserName,
-
-
                               });
             }
             return Ok();
-
         }
+
         [HttpGet("notifications")]
         public IActionResult GetNotifications([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
@@ -71,8 +67,27 @@ namespace API.Controllers
             {
                 return BadRequest(new ApiResponse<object> { Message = "Invalid Notification id", Status = 400 });
             }
-            _notificationServices.MarkNotificationAsRead(Id);
-            return Ok();
+            var isModified = _notificationServices.MarkNotificationAsRead(Id);
+            if (!isModified)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Not found notification to mark it as read", Status = 404 });
+            }
+            return Ok(new ApiResponse<object> { Message = "Notifications is marked as is read successfully", Status = 200 });
+        }
+        [HttpPost("MarkAllAsRead")]
+        public IActionResult MarkAllAsRead()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return Unauthorized(new ApiResponse<object> { Message = "You are not authorized to perform this action", Status = 401 });
+            }
+            var isModified = _notificationServices.MarkAllNotificationsAsRead(userId);
+            if (!isModified)
+            {
+                return NotFound(new ApiResponse<object> { Message = "Not found notifications to mark it as read", Status = 404 });
+            }
+            return Ok(new ApiResponse<object> { Message = "All notifications are marked as is read successfully", Status = 200 });
         }
     }
 }
