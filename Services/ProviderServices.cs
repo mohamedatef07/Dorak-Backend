@@ -3,6 +3,7 @@ using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using LinqKit;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
@@ -319,7 +320,7 @@ namespace Services
             return "Weekly assignment completed successfully.";
         }
 
-       
+
         public string RescheduleAssignment(RescheduleAssignmentViewModel model)
         {
             if (string.IsNullOrEmpty(model.ProviderId) || !providerRepository.GetAll().Any(p => p.ProviderId == model.ProviderId))
@@ -439,9 +440,9 @@ namespace Services
 
                 return "Weekly assignment rescheduled successfully.";
             }
-            else 
+            else
             {
-                
+
                 var newAssignment = new ProviderAssignment
                 {
                     ProviderId = model.ProviderId,
@@ -904,24 +905,74 @@ namespace Services
             commitData.SaveChanges();
             return true;
         }
-        public List<ProviderCardViewModel> GetProviderCards()
+        public List<ProviderCardViewModel> GetProviderCardsWithSearchAndFilters(FilterProviderDTO? filter)
         {
-            var providers = context.Providers
-                .Where(p => !p.IsDeleted)
-                .Select(p => new ProviderCardViewModel
+
+            var predicate = PredicateBuilder.New<Provider>(p => !p.IsDeleted);
+            if (filter is not null)
+            {
+                if (!string.IsNullOrWhiteSpace(filter.SearchText))
                 {
-                    id = p.ProviderId,
-                    Image = p.Image,
-                    FullName = $"{p.FirstName} {p.LastName}",
-                    Specialization = p.Specialization,
-                    City = p.City,
-                    Rate = p.Rate,
-                    EstimatedDuration = p.EstimatedDuration,
-                    Price = p.ProviderCenterServices.Any()
-                        ? p.ProviderCenterServices.Min(s => s.Price)
-                        : 0
-                })
-                .ToList();
+                    var txt = filter.SearchText.ToLower();
+                    predicate = predicate.And(p =>
+                        p.FirstName.ToLower().Contains(txt) ||
+                        p.LastName.ToLower().Contains(txt));
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.City))
+                {
+                    var city = filter.City.ToLower();
+                    predicate = predicate.And(p => p.City.ToLower() == city);
+                }
+
+                if (!string.IsNullOrWhiteSpace(filter.Specialization))
+                {
+                    var spec = filter.Specialization.ToLower();
+                    predicate = predicate.And(p => p.Specialization.ToLower() == spec);
+                }
+
+                if (filter.Title.HasValue)
+                {
+                    predicate = predicate.And(p => p.providerTitle == filter.Title.Value);
+                }
+                if (filter.Gender.HasValue)
+                {
+                    predicate = predicate.And(p => p.Gender == filter.Gender.Value);
+                }
+
+                if (filter.MinPrice.HasValue)
+                {
+                    predicate = predicate.And(p =>
+                        p.ProviderCenterServices.Any(s => s.Price >= filter.MinPrice.Value));
+                }
+
+                if (filter.MaxPrice.HasValue)
+                {
+                    predicate = predicate.And(p =>
+                        p.ProviderCenterServices.Any(s => s.Price <= filter.MaxPrice.Value));
+                }
+                if (filter.MinRate.HasValue)
+                {
+                    predicate = predicate.And(p => p.Rate >= filter.MinRate.Value);
+                }
+                if (filter.MaxRate.HasValue)
+                {
+                    predicate = predicate.And(p => p.Rate <= filter.MaxRate.Value);
+                }
+
+                if (filter.AvailableDate.HasValue)
+                {
+                    var date = filter.AvailableDate.Value;
+                    // assuming you have a navigational property p.Availabilities with a DateOnly field
+                    predicate = predicate.And(p => p.ProviderAssignments.Any(a =>
+                    a.StartDate <= date && a.EndDate >= date));
+                }
+            }
+
+
+            var providers = providerRepository.GetList(predicate)
+                .Select(p => p.ToCardView()).ToList();
+
 
             return providers;
         }

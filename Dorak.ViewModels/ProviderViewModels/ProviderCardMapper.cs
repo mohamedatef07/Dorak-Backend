@@ -8,14 +8,16 @@ namespace Dorak.ViewModels
         {
             return new ProviderCardViewModel
             {
+                id = provider.ProviderId,
+                Image = provider.Image,
                 FullName = $"{provider.FirstName} {provider.LastName}",
                 Specialization = provider.Specialization,
                 Rate = provider.Rate,
                 EstimatedDuration = provider.EstimatedDuration,
                 City = provider.City,
                 Price = provider.ProviderCenterServices.Any()
-         ? provider.ProviderCenterServices.Min(s => s.Price)
-         : 0
+                 ? provider.ProviderCenterServices.Min(s => s.Price)
+                 : 0
             };
 
 

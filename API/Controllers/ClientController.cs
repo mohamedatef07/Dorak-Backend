@@ -34,6 +34,8 @@ namespace API.Controllers
             clientServices = _clientServices;
             liveQueueServices = _liveQueueServices;
         }
+
+
         [HttpGet("main-info")]
         public IActionResult ProviderMainInfo([FromQuery] string providerId)
         {
@@ -179,13 +181,13 @@ namespace API.Controllers
             return Ok(PaginationResponse);
         }
 
-        [HttpGet("cards")]
-        public IActionResult GetProviderCards()
+        [HttpGet("provider-cards")]
+        public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter)
         {
-            var providers = providerServices.GetProviderCards();
+            var providers = providerServices.GetProviderCardsWithSearchAndFilters(filter);
             if (providers == null || !providers.Any())
             {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+                return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
             }
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
