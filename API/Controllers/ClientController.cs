@@ -180,8 +180,8 @@ namespace API.Controllers
             }
             return Ok(PaginationResponse);
         }
-
-        [HttpGet("provider-cards")]
+        [AllowAnonymous]
+        [HttpPost("provider-cards")]
         public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter)
         {
             var providers = providerServices.GetProviderCardsWithSearchAndFilters(filter);
