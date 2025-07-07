@@ -158,30 +158,12 @@ namespace API.Controllers
         // [Authorize(Roles = "Admin, Operator")]
         [HttpGet]
         [Route("GetProviderLiveQueues")]
-        public IActionResult GetProviderLiveQueues(string providerId, int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
+        public IActionResult GetProviderLiveQueues(int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
             try
             {
-                if (string.IsNullOrEmpty(providerId))
-                {
-                    return BadRequest(new ApiResponse<ProviderLiveQueueViewModel>
-                    {
-                        Message = "Provider Id is required",
-                        Status = 400
-                    });
-                }
-
-                var provider = providerServices.GetProviderById(providerId);
-                if (provider == null)
-                {
-                    return NotFound(new ApiResponse<ProviderLiveQueueViewModel>
-                    {
-                        Message = "Provider not found",
-                        Status = 404
-                    });
-                }
-
-                var liveQueues = liveQueueServices.GetLiveQueuesForProvider(providerId, centerId, shiftId, pageNumber, pageSize);
+               
+                var liveQueues = liveQueueServices.GetLiveQueuesForProvider(centerId, shiftId, pageNumber, pageSize);
 
                 if (liveQueues.Data == null || !liveQueues.Data.Any())
                 {
