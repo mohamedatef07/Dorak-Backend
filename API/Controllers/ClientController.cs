@@ -217,18 +217,18 @@ namespace API.Controllers
         }
 
 
-        [HttpPost("filter")]
-        public IActionResult FilterDoctors([FromBody] FilterProviderDTO filter)
-        {
-            var result = providerServices.FilterProviders(filter);
+        //[HttpPost("filter")]
+        //public IActionResult FilterDoctors([FromBody] FilterProviderDTO filter)
+        //{
+        //    var result = providerServices.FilterProviders(filter);
 
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Status = 200,
-                Message = "Filtered Successfully",
-                Data = result
-            });
-        }
+        //    return Ok(new ApiResponse<List<ProviderCardViewModel>>
+        //    {
+        //        Status = 200,
+        //        Message = "Filtered Successfully",
+        //        Data = result
+        //    });
+        //}
 
 
 
