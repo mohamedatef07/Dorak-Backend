@@ -919,26 +919,20 @@ namespace Services
                         p.LastName.ToLower().Contains(txt));
                 }
 
-                if (!string.IsNullOrWhiteSpace(filter.City))
-                {
-                    var city = filter.City.ToLower();
-                    predicate = predicate.And(p => p.City.ToLower() == city);
-                }
+                if (filter.Titles?.Any() == true)
+                    predicate = predicate.And(p => filter.Titles.Contains(p.providerTitle));
 
-                if (!string.IsNullOrWhiteSpace(filter.Specialization))
-                {
-                    var spec = filter.Specialization.ToLower();
-                    predicate = predicate.And(p => p.Specialization.ToLower() == spec);
-                }
+                if (filter.Genders?.Any() == true)
+                    predicate = predicate.And(p => filter.Genders.Contains(p.Gender));
 
-                if (filter.Title.HasValue)
-                {
-                    predicate = predicate.And(p => p.providerTitle == filter.Title.Value);
-                }
-                if (filter.Gender.HasValue)
-                {
-                    predicate = predicate.And(p => p.Gender == filter.Gender.Value);
-                }
+                if (filter.Cities?.Any() == true)
+                    predicate = predicate.And(p => filter.Cities
+                                                  .Select(c => c.ToLower())
+                                                  .Contains(p.City.ToLower()));
+                if (filter.Specializations?.Any() == true)
+                    predicate = predicate.And(p => filter.Specializations
+                                                  .Select(s => s.ToLower())
+                                                  .Contains(p.Specialization.ToLower()));
 
                 if (filter.MinPrice.HasValue)
                 {
@@ -1010,47 +1004,47 @@ namespace Services
         }
 
 
-        public List<ProviderCardViewModel> FilterProviders(FilterProviderDTO filter)
-        {
-            var query = context.Providers
-                .Where(p => !p.IsDeleted);
+        //public List<ProviderCardViewModel> FilterProviders(FilterProviderDTO filter)
+        //{
+        //    var query = context.Providers
+        //        .Where(p => !p.IsDeleted);
 
-            if (filter.Gender.HasValue)
-                query = query.Where(p => p.Gender == (GenderType)filter.Gender.Value);
+        //    if (filter.Gender.HasValue)
+        //        query = query.Where(p => p.Gender == (GenderType)filter.Gender.Value);
 
-            if (filter.Title.HasValue)
-                query = query.Where(p => p.providerTitle == (ProviderTitle)filter.Title.Value);
+        //    if (filter.Title.HasValue)
+        //        query = query.Where(p => p.providerTitle == (ProviderTitle)filter.Title.Value);
 
-            if (!string.IsNullOrWhiteSpace(filter.City))
-                query = query.Where(p => p.City.ToLower().Contains(filter.City.ToLower()));
+        //    if (!string.IsNullOrWhiteSpace(filter.City))
+        //        query = query.Where(p => p.City.ToLower().Contains(filter.City.ToLower()));
 
-            if (filter.MinRate.HasValue)
-                query = query.Where(p => p.Rate >= (decimal)filter.MinRate.Value);
+        //    if (filter.MinRate.HasValue)
+        //        query = query.Where(p => p.Rate >= (decimal)filter.MinRate.Value);
 
-            if (filter.MaxRate.HasValue)
-                query = query.Where(p => p.Rate <= (decimal)filter.MaxRate.Value);
+        //    if (filter.MaxRate.HasValue)
+        //        query = query.Where(p => p.Rate <= (decimal)filter.MaxRate.Value);
 
-            if (filter.MinPrice.HasValue || filter.MaxPrice.HasValue)
-            {
-                query = query.Where(p => p.ProviderCenterServices.Any(s =>
-                    (!filter.MinPrice.HasValue || s.Price >= filter.MinPrice.Value) &&
-                    (!filter.MaxPrice.HasValue || s.Price <= filter.MaxPrice.Value)
-                ));
-            }
+        //    if (filter.MinPrice.HasValue || filter.MaxPrice.HasValue)
+        //    {
+        //        query = query.Where(p => p.ProviderCenterServices.Any(s =>
+        //            (!filter.MinPrice.HasValue || s.Price >= filter.MinPrice.Value) &&
+        //            (!filter.MaxPrice.HasValue || s.Price <= filter.MaxPrice.Value)
+        //        ));
+        //    }
 
-            if (filter.AvailableDate.HasValue)
-            {
-                var date = filter.AvailableDate.Value;
-                query = query.Where(p => p.ProviderAssignments.Any(a =>
-                    a.StartDate <= date && a.EndDate >= date
-                ));
-            }
+        //    if (filter.AvailableDate.HasValue)
+        //    {
+        //        var date = filter.AvailableDate.Value;
+        //        query = query.Where(p => p.ProviderAssignments.Any(a =>
+        //            a.StartDate <= date && a.EndDate >= date
+        //        ));
+        //    }
 
-            return query
-                .ToList()
-                .Select(p => p.ToCardView())
-                .ToList();
-        }
+        //    return query
+        //        .ToList()
+        //        .Select(p => p.ToCardView())
+        //        .ToList();
+        //}
 
         public List<ProviderCardViewModel> GetTopRatedProviders(int count = 3)
         {
