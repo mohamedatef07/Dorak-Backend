@@ -180,15 +180,16 @@ namespace API.Controllers
             }
             return Ok(PaginationResponse);
         }
+
         [AllowAnonymous]
         [HttpPost("provider-cards")]
         public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter)
         {
             var providers = providerServices.GetProviderCardsWithSearchAndFilters(filter);
-            if (providers == null || !providers.Any())
-            {
-                return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
-            }
+            //if (providers == null || !providers.Any())
+            //{
+            //    return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+            //}
             return Ok(new ApiResponse<List<ProviderCardViewModel>>
             {
                 Message = "Cards are displayed.",
@@ -196,41 +197,6 @@ namespace API.Controllers
                 Data = providers
             });
         }
-
-        [HttpGet("search")]
-        public IActionResult SearchProviders(
-           [FromQuery] string? searchText,
-           [FromQuery] string? city,
-           [FromQuery] string? specialization)
-        {
-            var providers = providerServices.SearchProviders(searchText, city, specialization);
-            if (providers == null || !providers.Any())
-            {
-                return BadRequest(new ApiResponse<object> { Status = 404, Message = "No found providers" });
-            }
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
-            {
-                Message = "Search Done Successfully",
-                Status = 200,
-                Data = providers
-            });
-        }
-
-
-        //[HttpPost("filter")]
-        //public IActionResult FilterDoctors([FromBody] FilterProviderDTO filter)
-        //{
-        //    var result = providerServices.FilterProviders(filter);
-
-        //    return Ok(new ApiResponse<List<ProviderCardViewModel>>
-        //    {
-        //        Status = 200,
-        //        Message = "Filtered Successfully",
-        //        Data = result
-        //    });
-        //}
-
-
 
         // Add new review
         [HttpPost("add-review")]
