@@ -67,6 +67,21 @@ namespace Dorak.ViewModels
         // From AdminCenterViewModel
         // FirstName, LastName, Gender, and Image are already included above.
 
+        // From CenterDTO_
+        public string? CenterName { get; set; }
+        public string? ContactNumber { get; set; }
+        public string? CenterStreet { get; set; }
+        public string? CenterCity { get; set; }
+        public string? CenterGovernorate { get; set; }
+        public string? CenterCountry { get; set; }
+        public string? CenterEmail { get; set; }
+        public string? WebsiteURL { get; set; }
+        public decimal? Latitude { get; set; }
+        public decimal? Longitude { get; set; }
+        public string? MapURL { get; set; }
+
+
+
         // From Operator
         public int? CenterId { get;set; }
     }

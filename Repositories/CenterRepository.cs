@@ -1,4 +1,6 @@
-﻿using Data;
+﻿using System.Runtime.InteropServices;
+using Data;
+using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using LinqKit;
@@ -8,10 +10,39 @@ namespace Repositories
 {
     public class CenterRepository : BaseRepository<Center>
     {
-        public CenterRepository(DorakContext context):base(context)
+        public CommitData commitData;
+        public CenterRepository(DorakContext context, CommitData _commitData) : base(context)
         {
-            
+            commitData = _commitData;
         }
+
+        public async Task<Center> CreateCenter(CenterDTO_ center)
+        {
+            if (center is null)
+                return null;
+
+            var newCenter = new Center
+            {
+                CenterName = center.CenterName,
+                ContactNumber = center.ContactNumber,
+                Street = center.Street,
+                City = center.City,
+                Governorate = center.Governorate,
+                Country = center.Country,
+                Email = center.Email,
+                WebsiteURL = center.WebsiteURL,
+                Latitude = center.Latitude,
+                Longitude = center.Longitude,
+                MapURL = center.MapURL,
+                CenterStatus = center.CenterStatus,
+                IsDeleted = center.IsDeleted
+            };
+
+            Add(newCenter);
+            commitData.SaveChanges();
+            return newCenter;
+        }
+
         public PaginationViewModel<CenterViewModel> Search(string searchText = "", int pageNumber = 1,
         int pageSize = 2)
         {
