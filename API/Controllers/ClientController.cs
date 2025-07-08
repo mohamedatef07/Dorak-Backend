@@ -182,7 +182,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("provider-cards")]
-        public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 9)
+        public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 6)
         {
             var PaginationResponse = providerServices.GetProviderCardsWithSearchAndFilters(filter, pageSize, pageNumber);
             if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
