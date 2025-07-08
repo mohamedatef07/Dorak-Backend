@@ -310,7 +310,7 @@ namespace Services
                         try
                         {
                             commitData.SaveChanges();
-                            return providerId; // Return the ProviderId
+                            return providerId;
                         }
                         catch (Exception ex)
                         {
@@ -416,7 +416,7 @@ namespace Services
                 }
 
                 var allProviders = providerRepository.GetList(builder)
-                    .OrderBy(p => p.ProviderId) // 
+                    .OrderBy(p => p.ProviderId)
                     .ToList();
 
                 var count = allProviders.Count();

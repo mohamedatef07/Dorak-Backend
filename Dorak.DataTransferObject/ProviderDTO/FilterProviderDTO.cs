@@ -1,26 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Models.Enums;
+﻿using Models.Enums;
 
 namespace Dorak.DataTransferObject.ProviderDTO
 {
     public class FilterProviderDTO
     {
-        public ProviderTitle? Title { get; set; } 
-        public GenderType? Gender { get; set; } 
+        public List<ProviderTitle>? Titles { get; set; }
+        public List<GenderType>? Genders { get; set; }
 
-        public string? City { get; set; }
+        public List<string>? Cities { get; set; }
+        public string? SearchText { get; set; }
+        public List<string>? Specializations { get; set; }
 
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
 
-        public double? MinRate { get; set; }
-        public double? MaxRate { get; set; }
+        public decimal? MinRate { get; set; }
+        public decimal? MaxRate { get; set; }
 
-        public DateOnly? AvailableDate { get; set; } 
+        public DateOnly? AvailableDate { get; set; }
 
     }
 }

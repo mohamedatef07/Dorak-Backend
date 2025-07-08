@@ -87,10 +87,10 @@ namespace Services
             return result;
         }
         //from owner side
-        public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(string providerId, int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
+        public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider( int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
             var providerAssignments = providerAssignmentRepository.GetAll()
-                .Where(pa => pa.ProviderId == providerId && pa.CenterId == centerId && !pa.IsDeleted)
+                .Where(pa => pa.CenterId == centerId && !pa.IsDeleted)
                 .ToList();
 
             if (!providerAssignments.Any())
@@ -321,7 +321,7 @@ namespace Services
 
                 if (next.AppointmentStatus == QueueAppointmentStatus.Waiting)
                 {
-                    return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
                 }
 
                 else
@@ -338,7 +338,7 @@ namespace Services
                             reOrder(lq, lq.ShiftId, position, currentQueuePosition + 1);
                             await NotifyTurnChange(lq.LiveQueueId, currentQueuePosition + 1);
 
-                            return GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                            return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
                         }
 
@@ -352,10 +352,10 @@ namespace Services
                         {
                             await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
                         }
-                        return  GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                        return  GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
                     }
 
-                    return  GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                    return  GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
 
                 }
@@ -369,7 +369,7 @@ namespace Services
                 {
                     await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
                 }
-                return  GetLiveQueuesForProvider(shift.ProviderAssignment.ProviderId, shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                return  GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
             }
 
