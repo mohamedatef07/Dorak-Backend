@@ -820,7 +820,7 @@ namespace Services
         }
 
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
-                                                            int pageSize = 2)
+                                                            int pageSize = 10)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
@@ -905,7 +905,8 @@ namespace Services
             commitData.SaveChanges();
             return true;
         }
-        public List<ProviderCardViewModel> GetProviderCardsWithSearchAndFilters(FilterProviderDTO? filter)
+        public PaginationApiResponse<List<ProviderCardViewModel>> GetProviderCardsWithSearchAndFilters(FilterProviderDTO? filter, int pageSize = 9,
+                                                            int pageNumber = 1)
         {
 
             var predicate = PredicateBuilder.New<Provider>(p => !p.IsDeleted);
@@ -973,11 +974,37 @@ namespace Services
                 }
             }
 
-            var providers = providerRepository.GetList(predicate)
+
+            var providers = providerRepository.Get(predicate, pageSize: pageSize, pageNumber: pageNumber)
                 .Select(p => p.ToCardView()).ToList();
 
-            return providers;
+
+            var totalRecords = providerRepository.GetList(predicate).Count();
+
+            if (providers == null || !providers.Any())
+            {
+                return new PaginationApiResponse<List<ProviderCardViewModel>>(
+                    success: false,
+                    message: "No providers found matching the criteria.",
+                    status: 404,
+                    totalRecords: 0,
+                    data: null,
+                    currentPage: pageNumber,
+                    pageSize: pageSize);
+            }
+            var paginationResponse = new PaginationApiResponse<List<ProviderCardViewModel>>(
+            success: true,
+            message: "Providers retrieved successfully.",
+            status: 200,
+            data: providers,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+
+            return paginationResponse;
+
         }
+
 
         public List<ProviderCardViewModel> GetTopRatedProviders(int count = 3)
         {

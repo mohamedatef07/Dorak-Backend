@@ -9,12 +9,12 @@ namespace Dorak.Models
         public void Configure(EntityTypeBuilder<AdminCenterManagement> builder)
         {
             //Primary Key
-            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminCenterManagementId);
+            builder.HasKey(adminCenterManagement => adminCenterManagement.AdminId);
 
             // Relations Many to One
             builder.HasOne(adminCenterManagement => adminCenterManagement.Admin)
-                .WithMany(user => user.AdminCentersManagement)
-                .HasForeignKey(adminCenterManagement => adminCenterManagement.AdminId)
+                .WithOne(user => user.AdminCentersManagement)
+                .HasForeignKey<AdminCenterManagement>(adminCenterManagement => adminCenterManagement.AdminId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             //Properties

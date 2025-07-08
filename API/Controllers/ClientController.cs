@@ -2,7 +2,6 @@
 using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
-using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
@@ -183,19 +182,14 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("provider-cards")]
-        public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter)
+        public IActionResult GetProviderCardsWithSearchAndFilters([FromBody] FilterProviderDTO? filter, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 9)
         {
-            var providers = providerServices.GetProviderCardsWithSearchAndFilters(filter);
-            //if (providers == null || !providers.Any())
-            //{
-            //    return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
-            //}
-            return Ok(new ApiResponse<List<ProviderCardViewModel>>
+            var PaginationResponse = providerServices.GetProviderCardsWithSearchAndFilters(filter, pageSize, pageNumber);
+            if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                Message = "Cards are displayed.",
-                Status = 200,
-                Data = providers
-            });
+                return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+            }
+            return Ok(PaginationResponse);
         }
 
         // Add new review

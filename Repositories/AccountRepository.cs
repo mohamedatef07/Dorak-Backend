@@ -62,7 +62,6 @@ namespace Repositories
             return await UserManager.GetRolesAsync(user);
         }
 
-
         public async Task Signout()
         {
             await signInManager.SignOutAsync();

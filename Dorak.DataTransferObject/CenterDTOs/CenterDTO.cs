@@ -1,10 +1,14 @@
-﻿using Models.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Models.Enums;
 
-namespace Dorak.Models
+namespace Dorak.DataTransferObject
 {
-    public class Center
+    public class CenterDTO_
     {
-        public int CenterId { get; set; }
         public string CenterName { get; set; }
         public string ContactNumber { get; set; }
         public string Street { get; set; }
@@ -18,9 +22,5 @@ namespace Dorak.Models
         public string MapURL { get; set; }
         public bool IsDeleted { get; set; }
         public CenterStatus CenterStatus { get; set; }
-        public virtual ICollection<AdminCenterManagement> AdminCentersManagement { get; set; }
-        public virtual ICollection<ProviderCenterService> ProviderCenterServices { get; set; }
-        public virtual ICollection<ProviderAssignment> ProviderAssignments { get; set; }
-        public virtual ICollection<Operator> Operators { get; set; }
     }
 }
