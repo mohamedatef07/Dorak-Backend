@@ -921,19 +921,29 @@ namespace Services
                 }
 
                 if (filter.Titles?.Any() == true)
+                {
                     predicate = predicate.And(p => filter.Titles.Contains(p.providerTitle));
+                }
+
 
                 if (filter.Genders?.Any() == true)
+                {
                     predicate = predicate.And(p => filter.Genders.Contains(p.Gender));
+                }
 
                 if (filter.Cities?.Any() == true)
+                {
                     predicate = predicate.And(p => filter.Cities
                                                   .Select(c => c.ToLower())
                                                   .Contains(p.City.ToLower()));
+                }
+
                 if (filter.Specializations?.Any() == true)
+                {
                     predicate = predicate.And(p => filter.Specializations
                                                   .Select(s => s.ToLower())
                                                   .Contains(p.Specialization.ToLower()));
+                }
 
                 if (filter.MinPrice.HasValue)
                 {
