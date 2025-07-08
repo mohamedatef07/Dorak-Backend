@@ -38,6 +38,35 @@ namespace Services
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
         }
+
+        //public async Task<bool> CreateCenter(CenterDTO_ center)
+        //{
+        //    if (center is null)                          
+        //        return false;
+                    
+        //    var newCenter = new Center
+        //    {
+        //        CenterName = center.CenterName,
+        //        ContactNumber = center.ContactNumber,
+        //        Street = center.Street,
+        //        City = center.City,
+        //        Governorate = center.Governorate,
+        //        Country = center.Country,
+        //        Email = center.Email,
+        //        WebsiteURL = center.WebsiteURL,
+        //        Latitude = center.Latitude,
+        //        Longitude = center.Longitude,
+        //        MapURL = center.MapURL,
+        //        CenterStatus = center.CenterStatus,
+        //        IsDeleted = center.IsDeleted
+        //    };
+
+        //    centerRepository.Add(newCenter);
+        //    commitData.SaveChanges();
+        //    return true;
+        //}
+
+        
         public List<Center> GetAll()
         {
             return centerRepository.GetAll().ToList();
