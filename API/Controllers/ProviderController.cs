@@ -2,6 +2,7 @@
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Repositories;
 using Services;
@@ -9,7 +10,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    //[Authorize(Roles = "Provider")]
+    [Authorize(Roles = "Provider")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
