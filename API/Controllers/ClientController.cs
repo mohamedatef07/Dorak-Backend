@@ -285,8 +285,6 @@ namespace API.Controllers
             return Ok(new ApiResponse<ClientInfoToLiveQueueDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
         }
 
-
-
         [HttpGet("client-wallet/{userId}")]
         public IActionResult ClientWalletAndProfile(string userId)
         {
@@ -365,7 +363,7 @@ namespace API.Controllers
         }
 
         [HttpGet("ClientProfile")]
-        public IActionResult GetMyClientProfile()
+        public IActionResult GetClientProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -438,6 +436,17 @@ namespace API.Controllers
                 return BadRequest(new PaginationApiResponse<object>(false, "No found History appointments", 400, null, 0, pageNumber, pageSize));
             }
             return Ok(PaginationResponse);
+        }
+        [AllowAnonymous]
+        [HttpGet("all-cities-specializations")]
+        public IActionResult GetAllCitiesAndSpecializationsDTO()
+        {
+            var citiesAndSpecializationsLists = providerServices.GetAllCitiesAndSpecializationsForProviders();
+            if (citiesAndSpecializationsLists == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "get all cities and specializations not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<object> { Message = "get all cities and specializations successfully", Status = 200, Data = citiesAndSpecializationsLists });
         }
     }
 }

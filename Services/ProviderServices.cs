@@ -1073,6 +1073,21 @@ namespace Services
                 AverageEstimatedTime = provider.EstimatedDuration,
             };
         }
+        public GetAllCitiesAndSpecializationsDTO GetAllCitiesAndSpecializationsForProviders()
+        {
+            List<string> cities = new List<string>();
+            List<string> specializations = new List<string>();
+            var providers = providerRepository.GetList(p => !p.IsDeleted);
+            cities = providers.Where(p => p.City != null).Select(p => p.City).Distinct().ToList();
+            specializations = providers.Where(p => p.Specialization != null).Select(p => p.Specialization).Distinct().ToList();
+
+            return new GetAllCitiesAndSpecializationsDTO
+            {
+                Cities = cities,
+                Specializations = specializations,
+            };
+        }
+
     }
 }
 
