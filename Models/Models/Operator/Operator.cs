@@ -13,7 +13,7 @@ namespace Dorak.Models
         public int? CenterId { get; set; }
         public bool IsDeleted { get; set; } = false;
 
-        public virtual Center Center { get; set; }
+        public virtual Center? Center { get; set; }
         public virtual ICollection<LiveQueue> LiveQueues { get; set; }
         public virtual ICollection<Shift> Shifts { get; set; }
         public virtual ICollection<Appointment> Appointments { get; set; }

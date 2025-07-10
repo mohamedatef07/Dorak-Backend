@@ -3,13 +3,11 @@ using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Hubs;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
 using System.Data.Entity;
 using System.Net.Sockets;
-using System.Threading;
 
 namespace Services
 {
@@ -255,9 +253,41 @@ namespace Services
                     IsCurrentClient = false // سيتم تحديده بالفرونت
                 }).ToList();
 
+            var ProviderliveQueueList = liveQueueRepository
+                .GetLiveQueueDetailsForShift(shiftId).Where(lq => lq.AppointmentStatus != QueueAppointmentStatus.Completed)//we dont get the completed lq from db 
+                .Select(lq => new GetQueueEntriesDTO
+                {
+                    FullName = lq.Appointment.User != null
+                    ? $"{lq.Appointment.User.Client.FirstName ?? ""} {lq.Appointment.User.Client.LastName ?? ""}"
+                    : $"{lq.Appointment.TemporaryClient.FirstName ?? ""} {lq.Appointment.TemporaryClient.LastName ?? ""}",
+
+                    ArrivalTime = lq.ArrivalTime,
+                    AppointmentDate = lq.Appointment.AppointmentDate,
+                    ClientType = lq.Appointment.ClientType,
+                    Status = lq.AppointmentStatus,
+                    PhoneNumber = lq.Appointment.User != null ? lq.Appointment.User.PhoneNumber ?? ""
+                        : lq.Appointment.TemporaryClient.ContactInfo ?? "",
+                    CurrentQueuePosition = lq.CurrentQueuePosition
+
+                }).ToList();
             await hubContext.Clients//.All
                 .Group($"shift_{shiftId}")
                 .SendAsync("QueueUpdated", liveQueueList);
+
+            var providerUserId = shiftRepository.GetShiftById(shiftId)?.ProviderAssignment?.Provider?.ProviderId;
+
+            if (!string.IsNullOrEmpty(providerUserId))
+            {
+                var providerCconnectionId = QueueHub.GetConnectionId(providerUserId);
+
+                if (providerCconnectionId != null)
+                {
+
+                    await hubContext.Clients
+                        .Client(providerCconnectionId)
+                        .SendAsync("ProviderQueueUpdated", ProviderliveQueueList);
+                }
+            }
         }
 
         public async Task<bool> NotifyTurnChange(int liveQueueId, int newQueuePosition)
@@ -292,7 +322,8 @@ namespace Services
             user.Notifications.Add(turnChangeNotification);
             commitData.SaveChanges();
 
-            var clientConnectionId = notificationSignalRService.SendMessage(user.Id, new NotificationDTO {
+            var clientConnectionId = notificationSignalRService.SendMessage(user.Id, new NotificationDTO
+            {
                 NotificationId = turnChangeNotification.NotificationId,
                 Title = turnChangeNotification.Title,
                 CreatedAt = turnChangeNotification.CreatedAt,
@@ -306,7 +337,7 @@ namespace Services
 
         }
 
-        public async Task <PaginationViewModel<ProviderLiveQueueViewModel>> editTurn(int shiftId, int currentQueuePosition)
+        public async Task<PaginationViewModel<ProviderLiveQueueViewModel>> editTurn(int shiftId, int currentQueuePosition)
         {
 
             var shift = shiftRepository.GetShiftById(shiftId);
@@ -356,10 +387,10 @@ namespace Services
                         {
                             await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
                         }
-                        return  GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                        return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
                     }
 
-                    return  GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
 
                 }
@@ -373,7 +404,7 @@ namespace Services
                 {
                     await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
                 }
-                return  GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
+                return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId, 1, 16);
 
             }
 

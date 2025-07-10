@@ -820,7 +820,7 @@ namespace Services
         }
 
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
-                                                            int pageSize = 2)
+                                                            int pageSize = 10)
         {
             return providerRepository.Search(searchText, pageNumber, pageSize);
         }
@@ -905,7 +905,8 @@ namespace Services
             commitData.SaveChanges();
             return true;
         }
-        public List<ProviderCardViewModel> GetProviderCardsWithSearchAndFilters(FilterProviderDTO? filter)
+        public PaginationApiResponse<List<ProviderCardViewModel>> GetProviderCardsWithSearchAndFilters(FilterProviderDTO? filter, int pageSize = 9,
+                                                            int pageNumber = 1)
         {
 
             var predicate = PredicateBuilder.New<Provider>(p => !p.IsDeleted);
@@ -919,25 +920,29 @@ namespace Services
                         p.LastName.ToLower().Contains(txt));
                 }
 
-                if (!string.IsNullOrWhiteSpace(filter.City))
+                if (filter.Titles?.Any() == true)
                 {
-                    var city = filter.City.ToLower();
-                    predicate = predicate.And(p => p.City.ToLower() == city);
+                    predicate = predicate.And(p => filter.Titles.Contains(p.providerTitle));
                 }
 
-                if (!string.IsNullOrWhiteSpace(filter.Specialization))
+
+                if (filter.Genders?.Any() == true)
                 {
-                    var spec = filter.Specialization.ToLower();
-                    predicate = predicate.And(p => p.Specialization.ToLower() == spec);
+                    predicate = predicate.And(p => filter.Genders.Contains(p.Gender));
                 }
 
-                if (filter.Title.HasValue)
+                if (filter.Cities?.Any() == true)
                 {
-                    predicate = predicate.And(p => p.providerTitle == filter.Title.Value);
+                    predicate = predicate.And(p => filter.Cities
+                                                  .Select(c => c.ToLower())
+                                                  .Contains(p.City.ToLower()));
                 }
-                if (filter.Gender.HasValue)
+
+                if (filter.Specializations?.Any() == true)
                 {
-                    predicate = predicate.And(p => p.Gender == filter.Gender.Value);
+                    predicate = predicate.And(p => filter.Specializations
+                                                  .Select(s => s.ToLower())
+                                                  .Contains(p.Specialization.ToLower()));
                 }
 
                 if (filter.MinPrice.HasValue)
@@ -970,87 +975,36 @@ namespace Services
             }
 
 
-            var providers = providerRepository.GetList(predicate)
+            var providers = providerRepository.Get(predicate, pageSize: pageSize, pageNumber: pageNumber)
                 .Select(p => p.ToCardView()).ToList();
 
 
-            return providers;
-        }
-        public List<ProviderCardViewModel> SearchProviders(string? searchText, string? city, string? specialization)
-        {
-            var query = context.Providers
-                .Where(p => !p.IsDeleted);
+            var totalRecords = providerRepository.GetList(predicate).Count();
 
-            if (!string.IsNullOrWhiteSpace(searchText))
+            if (providers == null || !providers.Any())
             {
-                query = query.Where(p => (p.FirstName + " " + p.LastName).ToLower().Contains(searchText.ToLower()));
+                return new PaginationApiResponse<List<ProviderCardViewModel>>(
+                    success: false,
+                    message: "No providers found matching the criteria.",
+                    status: 404,
+                    totalRecords: 0,
+                    data: null,
+                    currentPage: pageNumber,
+                    pageSize: pageSize);
             }
+            var paginationResponse = new PaginationApiResponse<List<ProviderCardViewModel>>(
+            success: true,
+            message: "Providers retrieved successfully.",
+            status: 200,
+            data: providers,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
 
-            if (!string.IsNullOrWhiteSpace(city))
-            {
-                query = query.Where(p => p.City.ToLower() == city.ToLower());
-            }
+            return paginationResponse;
 
-            if (!string.IsNullOrWhiteSpace(specialization))
-            {
-                query = query.Where(p => p.Specialization.ToLower() == specialization.ToLower());
-            }
-
-            return query.Select(p => new ProviderCardViewModel
-            {
-                FullName = $"{p.FirstName} {p.LastName}",
-                Specialization = p.Specialization,
-                City = p.City,
-                Rate = p.Rate,
-                EstimatedDuration = p.EstimatedDuration,
-                Price = p.ProviderCenterServices.Any()
-                    ? p.ProviderCenterServices.Min(s => s.Price)
-                    : 0
-            }).ToList();
         }
 
-
-        public List<ProviderCardViewModel> FilterProviders(FilterProviderDTO filter)
-        {
-            var query = context.Providers
-                .Where(p => !p.IsDeleted);
-
-            if (filter.Gender.HasValue)
-                query = query.Where(p => p.Gender == (GenderType)filter.Gender.Value);
-
-            if (filter.Title.HasValue)
-                query = query.Where(p => p.providerTitle == (ProviderTitle)filter.Title.Value);
-
-            if (!string.IsNullOrWhiteSpace(filter.City))
-                query = query.Where(p => p.City.ToLower().Contains(filter.City.ToLower()));
-
-            if (filter.MinRate.HasValue)
-                query = query.Where(p => p.Rate >= (decimal)filter.MinRate.Value);
-
-            if (filter.MaxRate.HasValue)
-                query = query.Where(p => p.Rate <= (decimal)filter.MaxRate.Value);
-
-            if (filter.MinPrice.HasValue || filter.MaxPrice.HasValue)
-            {
-                query = query.Where(p => p.ProviderCenterServices.Any(s =>
-                    (!filter.MinPrice.HasValue || s.Price >= filter.MinPrice.Value) &&
-                    (!filter.MaxPrice.HasValue || s.Price <= filter.MaxPrice.Value)
-                ));
-            }
-
-            if (filter.AvailableDate.HasValue)
-            {
-                var date = filter.AvailableDate.Value;
-                query = query.Where(p => p.ProviderAssignments.Any(a =>
-                    a.StartDate <= date && a.EndDate >= date
-                ));
-            }
-
-            return query
-                .ToList()
-                .Select(p => p.ToCardView())
-                .ToList();
-        }
 
         public List<ProviderCardViewModel> GetTopRatedProviders(int count = 3)
         {
@@ -1119,6 +1073,21 @@ namespace Services
                 AverageEstimatedTime = provider.EstimatedDuration,
             };
         }
+        public GetAllCitiesAndSpecializationsDTO GetAllCitiesAndSpecializationsForProviders()
+        {
+            List<string> cities = new List<string>();
+            List<string> specializations = new List<string>();
+            var providers = providerRepository.GetList(p => !p.IsDeleted);
+            cities = providers.Where(p => p.City != null).Select(p => p.City).Distinct().ToList();
+            specializations = providers.Where(p => p.Specialization != null).Select(p => p.Specialization).Distinct().ToList();
+
+            return new GetAllCitiesAndSpecializationsDTO
+            {
+                Cities = cities,
+                Specializations = specializations,
+            };
+        }
+
     }
 }
 

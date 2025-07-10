@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 using System.Security.Claims;
-using System.Web;
 
 namespace API.Controllers
 {
@@ -22,15 +21,12 @@ namespace API.Controllers
         private readonly OperatorServices _operatorServices;
         private readonly AdminCenterServices _adminCenterServices;
         private readonly UserManager<User> _userManager;
-        private readonly MailKitEmailSender _emailSender;
-
         public AccountController(AccountServices accountServices,
                                 ClientServices clientServices,
                                 ProviderServices providerServices,
                                 OperatorServices operatorServices,
                                 AdminCenterServices adminCenterServices,
-                                UserManager<User> userManager,
-                                MailKitEmailSender emailSender)
+                                UserManager<User> userManager)
         {
             _accountServices = accountServices;
             _clientServices = clientServices;
@@ -38,11 +34,10 @@ namespace API.Controllers
             _operatorServices = operatorServices;
             _adminCenterServices = adminCenterServices;
             _userManager = userManager;
-            _emailSender = emailSender;
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> Register([FromForm]RegisterationViewModel user)
+        public async Task<IActionResult> Register([FromForm] RegisterationViewModel user)
         {
             if (!ModelState.IsValid)
             {
@@ -298,27 +293,27 @@ namespace API.Controllers
         }
 
         //Forgot Password
-        [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Invalid Email", Status = 400 });
-            }
-            User? user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-            {
-                return Ok(new ApiResponse<object> { Message = "If that email exists, a reset link has been sent", Status = 200 });
-            }
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-            var encodedToken = HttpUtility.UrlEncode(token);
+        //[HttpPost("forgot-password")]
+        //public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return BadRequest(new ApiResponse<object> { Message = "Invalid Email", Status = 400 });
+        //    }
+        //    User? user = await _userManager.FindByEmailAsync(model.Email);
+        //    if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+        //    {
+        //        return Ok(new ApiResponse<object> { Message = "If that email exists, a reset link has been sent", Status = 200 });
+        //    }
+        //    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+        //    var encodedToken = HttpUtility.UrlEncode(token);
 
-            var resetLink = $"{model.ClientAppUrl}/reset-password?email={user.Email}&token={encodedToken}";
+        //    var resetLink = $"{model.ClientAppUrl}/reset-password?email={user.Email}&token={encodedToken}";
 
-            await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-                $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>");
-            return Ok(new ApiResponse<string> { Message = "If that email exists, a reset link has been sent", Status = 200 });
-        }
+        //    await _emailSender.SendEmailAsync(model.Email, "Reset Password",
+        //        $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>");
+        //    return Ok(new ApiResponse<string> { Message = "If that email exists, a reset link has been sent", Status = 200 });
+        //}
         //Reset Password
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO model)

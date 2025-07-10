@@ -1,10 +1,7 @@
 using Data;
 using Dorak.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Repositories;
 using Services;
 
@@ -31,13 +28,12 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(ProviderServices));
             builder.Services.AddScoped(typeof(S_Services));
             builder.Services.AddScoped(typeof(ShiftRepository));
-            builder.Services.AddDbContext<DorakContext>(options => options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")));
             builder.Services.AddScoped(typeof(RoleRepository));
             builder.Services.AddScoped(typeof(CommitData));
             builder.Services.AddScoped(typeof(ProviderCenterService));
             builder.Services.AddScoped(typeof(AccountServices));
             builder.Services.AddScoped(typeof(AccountRepository));
+            builder.Services.AddScoped(typeof(WalletRepository));
 
             builder.Services.AddScoped(typeof(AdminCenterManagement));
             builder.Services.AddScoped(typeof(ClientRepository));
@@ -48,7 +44,14 @@ namespace AdminArea
             builder.Services.AddScoped(typeof(OperatorServices));
             builder.Services.AddScoped(typeof(AdminCenterServices));
             builder.Services.AddScoped(typeof(AppointmentRepository));
+            builder.Services.AddScoped(typeof(AppointmentServices));
+            builder.Services.AddScoped(typeof(PaymentRepository));
+            builder.Services.AddScoped(typeof(PaymentServices));
+            builder.Services.AddScoped(typeof(LiveQueueRepository));
+            builder.Services.AddScoped(typeof(LiveQueueServices));
+            builder.Services.AddScoped<NotificationServices>();
 
+            builder.Services.AddSignalR();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

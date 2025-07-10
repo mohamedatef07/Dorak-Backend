@@ -4,12 +4,12 @@ namespace Dorak.DataTransferObject.ProviderDTO
 {
     public class FilterProviderDTO
     {
-        public ProviderTitle? Title { get; set; }
-        public GenderType? Gender { get; set; }
+        public List<ProviderTitle>? Titles { get; set; }
+        public List<GenderType>? Genders { get; set; }
 
-        public string? City { get; set; }
+        public List<string>? Cities { get; set; }
         public string? SearchText { get; set; }
-        public string? Specialization { get; set; }
+        public List<string>? Specializations { get; set; }
 
         public decimal? MinPrice { get; set; }
         public decimal? MaxPrice { get; set; }
