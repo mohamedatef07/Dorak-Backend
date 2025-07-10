@@ -14,7 +14,7 @@ namespace Services
     public class OperatorServices
     {
         private readonly OperatorRepository operatorRepository;
-        private readonly ClientRepository clientRepository;
+
         private readonly AccountRepository accountRepository;
         private readonly LiveQueueServices liveQueueServices;
         private readonly AppointmentRepository appointmentRepository;
@@ -29,11 +29,10 @@ namespace Services
         private readonly IHubContext<NotificationHub> notificationHubContext;
 
 
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _queueHubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository, UserManager<User> _userManager, LiveQueueServices _liveQueueServices, IHubContext<NotificationHub> _notificationHubContext)
+        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _queueHubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository, UserManager<User> _userManager, LiveQueueServices _liveQueueServices, IHubContext<NotificationHub> _notificationHubContext)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
-            clientRepository = _clientRepository;
             appointmentRepository = _appointmentRepository;
             liveQueueRepository = _liveQueueRepository;
             commitData = _commitData;
