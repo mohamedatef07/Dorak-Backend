@@ -2,6 +2,7 @@
 using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.Models;
+using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
@@ -187,7 +188,7 @@ namespace API.Controllers
             var PaginationResponse = providerServices.GetProviderCardsWithSearchAndFilters(filter, pageSize, pageNumber);
             if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+                return Ok(new PaginationApiResponse<List<ProviderCardViewModel>>(false, "No found upcoming appointments", 400, [], 0, pageNumber, pageSize));
             }
             return Ok(PaginationResponse);
         }
