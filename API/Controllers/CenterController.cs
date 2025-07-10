@@ -75,7 +75,20 @@ namespace API.Controllers
             }
         }
 
-
+        [HttpGet]
+        [Route("AllProvidersDropDown")]
+        public IActionResult AllProvidersDropDown(int centerId)
+        {
+            try
+            {
+                var res = centerServices.GetProvidersOfCenterDropDown(centerId);
+                return Ok(new ApiResponse<List<ProviderDropDownDTO>> { Data = res, Message = "Success", Status = 200 });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ApiResponse<string> { Message = $"Internal Server Error: {ex.Message}", Status = 500 });
+            }
+        }
 
 
 

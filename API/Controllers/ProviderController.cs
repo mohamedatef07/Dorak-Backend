@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Authorize(Roles = "Provider")]
+    [Authorize(Roles = "Provider , Admin , Operator")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase

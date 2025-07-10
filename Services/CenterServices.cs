@@ -4,11 +4,8 @@ using Dorak.Models;
 using Dorak.ViewModels;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
 using Models.Enums;
 using Repositories;
-using System.Data.Entity.Core.Common;
-using System.Linq.Expressions;
 
 namespace Services
 {
@@ -43,7 +40,7 @@ namespace Services
         //{
         //    if (center is null)                          
         //        return false;
-                    
+
         //    var newCenter = new Center
         //    {
         //        CenterName = center.CenterName,
@@ -66,7 +63,7 @@ namespace Services
         //    return true;
         //}
 
-        
+
         public List<Center> GetAll()
         {
             return centerRepository.GetAll().ToList();
@@ -137,11 +134,11 @@ namespace Services
 
         public PaginationViewModel<ProviderViewModel> GetProvidersOfCenter(int centerId, int pageNumber, int pageSize, string sortBy, string specializationFilter)
         {
-            
+
             var builder = PredicateBuilder.New<ProviderAssignment>(true);
             builder = builder.And(pa => pa.CenterId == centerId && !pa.IsDeleted);
 
-            
+
             var assignments = providerAssignmentRepository.GetList(builder).ToList();
             var validAssignments = assignments
                 .Select(pa =>
@@ -161,12 +158,12 @@ namespace Services
                     .ToList();
             }
 
-           
+
             var total = filteredAssignments.Count;
 
             Console.WriteLine($"Applied specializationFilter: {specializationFilter}, Filtered count: {total}");
 
-            
+
             var orderedAssignments = providerAssignmentRepository.FilterBy(
                 filtereq: pa => filteredAssignments.Contains(pa),
                 Order_ColName: "StartDate",
@@ -175,13 +172,13 @@ namespace Services
 
             Console.WriteLine($"Sorted by StartDate, Ordered count: {orderedAssignments.Count}");
 
-            
+
             var paginatedAssignments = orderedAssignments
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            
+
             var result = paginatedAssignments.Select(pa => new ProviderViewModel
             {
                 AssignmentId = pa.AssignmentId,
@@ -214,6 +211,23 @@ namespace Services
                 Total = total,
                 Data = result
             };
+        }
+
+        public List<ProviderDropDownDTO> GetProvidersOfCenterDropDown(int CenterId)
+        {
+            var builder = PredicateBuilder.New<ProviderAssignment>(true);
+            builder = builder.And(pa => pa.CenterId == CenterId && !pa.IsDeleted);
+            var assignments = providerAssignmentRepository.GetList(builder).ToList();
+            var result = assignments
+                .Select(pa => new ProviderDropDownDTO
+                {
+                    ProviderId = pa.ProviderId,
+                    FullName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
+                    Specialization = pa.Provider.Specialization
+                })
+                .ToList();
+            return result;
+
         }
 
         public async Task<string> GetProviderID(ProviderAssignmentDTO providerDto)
@@ -368,12 +382,12 @@ namespace Services
 
                     foreach (var appointment in appointments)
                     {
-                        
+
                         appointment.AppointmentStatus = AppointmentStatus.Cancelled;
-                        appointmentRepository.Edit(appointment); 
+                        appointmentRepository.Edit(appointment);
                     }
 
-                    shiftRepository.Edit(shift); 
+                    shiftRepository.Edit(shift);
                 }
 
                 providerAssignmentRepository.Edit(assignment);
@@ -389,7 +403,7 @@ namespace Services
         {
             var builder = PredicateBuilder.New<Provider>(true);
 
-            
+
             builder = builder.And(i => i.IsDeleted == false);
 
             if (!string.IsNullOrEmpty(searchText))
