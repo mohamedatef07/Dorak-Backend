@@ -9,13 +9,13 @@ namespace API.Controllers
     [ApiController]
     public class ShiftController : ControllerBase
     {
-        private readonly ProviderServices providerServices;
+
         private readonly ShiftServices shiftServices;
         private readonly CenterServices centerServices;
 
-        public ShiftController(ProviderServices _providerServices, ShiftServices _shiftServices, CenterServices _centerServices)
+        public ShiftController(ShiftServices _shiftServices, CenterServices _centerServices)
         {
-            providerServices = _providerServices;
+
             shiftServices = _shiftServices;
             centerServices = _centerServices;
         }

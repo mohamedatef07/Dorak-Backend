@@ -136,7 +136,7 @@ namespace Services
                              {
                                  ServiceId = pcs.Service.ServiceId,
                                  ServiceName = pcs.Service.ServiceName,
-                                 BasePrice = pcs.Service.BasePrice
+                                 BasePrice = pcs.Price
                              }).ToList()
                      })
                             ).ToList();
