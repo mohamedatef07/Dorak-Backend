@@ -121,5 +121,46 @@ namespace API.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("get-all-provider-center-services")]
+        public IActionResult GetAllProviderCenterServices(int centerId)
+        {
+            var ProviderCenterServices = S_services.GetProviderCenterServices(centerId); // Calling the service method to get all services
+
+            if (ProviderCenterServices == null || ProviderCenterServices.Count == 0)
+            {
+                return NotFound(new ApiResponse<object>
+                {
+                    Data = null,
+                    Message = "No Provider Center Services found.",
+                    Status = 404
+                });
+            }
+
+            return Ok(new ApiResponse<List<ProviderCenterServiceDTO>>
+            {
+                Data = ProviderCenterServices,
+                Message = "Retrive Provider Center Services Successfully !",
+                Status = 200
+            });
+        }
+
+        [HttpPut("update-provider-center-services")]
+        public IActionResult UpdateProviderCenterServices(int PCSId, [FromForm] EditProviderCenterServiceDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object>() { Status = 500, Message = "Invalid Data" });
+            }
+
+
+            var result = S_services.UpdateProviderCenterServices(PCSId, model);
+            if (!result)
+            {
+                return BadRequest(new ApiResponse<bool> { Message = "Failed to Update Provider Center Service", Status = 400 });
+            }
+            return Ok(new ApiResponse<bool> { Status = 200, Message = "Provider Center Service Updated Successfully !", Data = true });
+        }
+
     }
 }
