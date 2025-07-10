@@ -126,7 +126,47 @@ namespace Services
                                          ServiceName = s.ServiceName
                                      }).ToList();
         }
+        public List<ProviderCenterServiceDTO> GetProviderCenterServices(int centerId)
+        {
+            if (centerId <= 0)
+            {
+                return null;
+            }
 
+            var assignments = providerCenterServiceRepository
+                .GetList(pcs => pcs.CenterId == centerId && !pcs.IsDeleted)
+                .Select(pcs => new ProviderCenterServiceDTO
+                {
+                    Id = pcs.ProviderCenterServiceId,
+                    ServiceName = pcs.Service.ServiceName,
+                    ProviderName = $"{pcs.Provider.FirstName} {pcs.Provider.LastName}",
+                    Price = pcs.Price,
+                    Duration = pcs.Duration
+                })
+                .ToList();
+            return assignments;
+        }
+
+        public bool UpdateProviderCenterServices(int PCSId, EditProviderCenterServiceDTO model)
+        {
+            if (model == null)
+            {
+                return false;
+            }
+            var providerCenterService = providerCenterServiceRepository.GetById(pcs => pcs.ProviderCenterServiceId == PCSId && !pcs.IsDeleted);
+            if (providerCenterService == null)
+            {
+                return false; // Service not found
+            }
+            // Update the properties of the existing service
+            providerCenterService.Price = model.Price;
+            // Save the changes to the database
+            providerCenterServiceRepository.Edit(providerCenterService);
+            commitData.SaveChanges();
+            return true; // Update successful
+
+
+        }
     }
 }
 
