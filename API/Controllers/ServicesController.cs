@@ -1,10 +1,11 @@
 ﻿using Dorak.DataTransferObject;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
 namespace API.Controllers
 {
-    //[Authorize(Roles = "Admin , Operator , Provider")]
+    [Authorize(Roles = "Admin , Operator , Provider")]
     [Route("api/[controller]")]
     [ApiController]
     public class ServicesController : ControllerBase
