@@ -14,5 +14,8 @@ namespace Dorak.ViewModels
       public string PhoneNumber { get; set; }
       public int? CurrentQueuePosition { get; set; } 
       public IEnumerable AvailableStatuses { get; set; }
+      public string ProviderName { get; set; }
+
+
     } 
 }

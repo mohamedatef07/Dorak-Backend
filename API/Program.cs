@@ -109,11 +109,9 @@ namespace API
             builder.Services.AddScoped(typeof(PaymentServices));
             builder.Services.AddScoped(typeof(ReviewRepository));
             builder.Services.AddScoped(typeof(ReviewServices));
-            builder.Services.AddTransient<MailKitEmailSender>();
             builder.Services.AddScoped(typeof(NotificationServices)); // Register NotificationServices as a singleton
             builder.Services.AddScoped(typeof(NotificationRepository));
             builder.Services.AddSingleton(typeof(NotificationSignalRService));
-            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
