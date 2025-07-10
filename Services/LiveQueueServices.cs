@@ -87,8 +87,9 @@ namespace Services
             return result;
         }
         //from owner side
-        public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider( int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
+        public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
+            Provider shiftProvider = shiftRepository.GetShiftById(shiftId).ProviderAssignment.Provider;
             var providerAssignments = providerAssignmentRepository.GetAll()
                 .Where(pa => pa.CenterId == centerId && !pa.IsDeleted)
                 .ToList();
@@ -149,7 +150,9 @@ namespace Services
                         Status = liveQueue.AppointmentStatus,
                         PhoneNumber = appointment.TemporaryClient.ContactInfo,
                         CurrentQueuePosition = liveQueue.CurrentQueuePosition,
-                        AvailableStatuses = Enum.GetValues(typeof(QueueAppointmentStatus)).Cast<QueueAppointmentStatus>()
+                        AvailableStatuses = Enum.GetValues(typeof(QueueAppointmentStatus)).Cast<QueueAppointmentStatus>(),
+                        ProviderName = shiftProvider.FirstName + " " + shiftProvider.LastName
+
                     });
                 }
                 else
@@ -164,7 +167,8 @@ namespace Services
                         Status = liveQueue.AppointmentStatus,
                         PhoneNumber = appointment.User.PhoneNumber,
                         CurrentQueuePosition = liveQueue.CurrentQueuePosition,
-                        AvailableStatuses = Enum.GetValues(typeof(QueueAppointmentStatus)).Cast<QueueAppointmentStatus>()
+                        AvailableStatuses = Enum.GetValues(typeof(QueueAppointmentStatus)).Cast<QueueAppointmentStatus>(),
+                        ProviderName = shiftProvider.FirstName + " " + shiftProvider.LastName
                     });
                 }
             }
