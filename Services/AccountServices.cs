@@ -1,20 +1,19 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+﻿using Data;
+using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.AccountDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using LinqKit;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Configuration;
-using Repositories;
-using Models.Enums;
-using System.Security.Cryptography;
-using Data;
-using Dorak.DataTransferObject;
 using Microsoft.AspNetCore.Hosting;
-using Dorak.DataTransferObject.AccountDTO;
-using System.Diagnostics;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using Models.Enums;
+using Repositories;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 
 
@@ -45,7 +44,7 @@ namespace Services
                                AdminCenterRepository _adminCenterRepository,
                                IConfiguration _configuration,
                                AdminCenterManagement _adminCenterManagement,
-                               CommitData _commitData,  
+                               CommitData _commitData,
                                UserManager<User> _userManager,
                                OperatorRepository _operatorRepository,
                                IWebHostEnvironment env,
@@ -149,71 +148,71 @@ namespace Services
                         }
 
                     }
-                    }
-                    else if (user.Role == "Operator")
+                }
+                else if (user.Role == "Operator")
+                {
+                    var operarorres = await operatorServices.CreateOperator(currentUser.Id, new OperatorViewModel
                     {
-                        var operarorres = await operatorServices.CreateOperator(currentUser.Id, new OperatorViewModel
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Gender = user.Gender,
-                            Image = await SaveImageAsync(user),
-                            CenterId = user.CenterId
-                        });
-                        if (operarorres.Succeeded)
-                        {
-                            return IdentityResult.Success;
-                        }
-                    }
-                    else if (user.Role == "Provider")
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Gender = user.Gender,
+                        Image = await SaveImageAsync(user),
+                        CenterId = user.CenterId
+                    });
+                    if (operarorres.Succeeded)
                     {
-
-                        var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            Specialization = user.Specialization,
-                            Bio = user.Bio,
-                            ExperienceYears = user.ExperienceYears,
-                            ProviderType = user.ProviderType,
-                            LicenseNumber = user.LicenseNumber,
-                            Gender = user.Gender,
-                            BirthDate = user.BirthDate,
-                            Street = user.Street,
-                            City = user.City,
-                            Governorate = user.Governorate,
-                            Country = user.Country,
-                            Image = await SaveImageAsync(user),
-                            EstimatedDuration = user.EstimatedDuration ?? 0,
-
-                        });
-                        if (providerres.Succeeded)
-                        {
-                            return IdentityResult.Success;
-                        }
-                    }
-                    else if (user.Role == "Client")
-                    {
-                        var clientRes = await clientServices.CreateClient(currentUser.Id, new ClientRegisterViewModel
-                        {
-                            FirstName = user.FirstName,
-                            LastName = user.LastName,
-                            BirthDate = user.BirthDate,
-                            Gender = user.Gender,
-                            Street = user.Street,
-                            City = user.City,
-                            Governorate = user.Governorate,
-                            Country = user.Country,
-                            Image = await SaveImageAsync(user)
-                        });
-                        if (clientRes.Succeeded)
-                        {
-                            return IdentityResult.Success;
-                        }
+                        return IdentityResult.Success;
                     }
                 }
-                return IdentityResult.Failed();
+                else if (user.Role == "Provider")
+                {
+
+                    var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        Specialization = user.Specialization,
+                        Bio = user.Bio,
+                        ExperienceYears = user.ExperienceYears,
+                        ProviderType = user.ProviderType,
+                        LicenseNumber = user.LicenseNumber,
+                        Gender = user.Gender,
+                        BirthDate = user.BirthDate,
+                        Street = user.Street,
+                        City = user.City,
+                        Governorate = user.Governorate,
+                        Country = user.Country,
+                        Image = await SaveImageAsync(user),
+                        EstimatedDuration = user.EstimatedDuration ?? 0,
+
+                    });
+                    if (providerres.Succeeded)
+                    {
+                        return IdentityResult.Success;
+                    }
+                }
+                else if (user.Role == "Client")
+                {
+                    var clientRes = await clientServices.CreateClient(currentUser.Id, new ClientRegisterViewModel
+                    {
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        BirthDate = user.BirthDate,
+                        Gender = user.Gender,
+                        Street = user.Street,
+                        City = user.City,
+                        Governorate = user.Governorate,
+                        Country = user.Country,
+                        Image = await SaveImageAsync(user)
+                    });
+                    if (clientRes.Succeeded)
+                    {
+                        return IdentityResult.Success;
+                    }
+                }
             }
+            return IdentityResult.Failed();
+        }
 
         public async Task<SignInResult> Login(UserLoginViewModel user)
         {
@@ -254,6 +253,20 @@ namespace Services
                         if (Operator.Image != null)
                         {
                             claims.Add(new Claim("Image", Operator.Image));
+                        }
+                    }
+                }
+
+                if (roles.Contains("Admin"))
+                {
+                    var Admin = adminCenterRepository.GetById(a => a.AdminId == user.Id);
+                    if (Admin != null && Admin.CenterId != null)
+                    {
+                        claims.Add(new Claim("CenterId", Admin.CenterId.ToString()));
+
+                        if (Admin.Image != null)
+                        {
+                            claims.Add(new Claim("Image", Admin.Image));
                         }
                     }
                 }
