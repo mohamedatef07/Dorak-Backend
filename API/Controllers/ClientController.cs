@@ -19,16 +19,15 @@ namespace API.Controllers
     public class ClientController : ControllerBase
     {
         private readonly ProviderServices providerServices;
-        private readonly ShiftServices shiftServices;
+
         private readonly AppointmentServices appointmentServices;
         private readonly ReviewServices reviewServices;
         private readonly ClientServices clientServices;
         private readonly LiveQueueServices liveQueueServices;
 
-        public ClientController(AppointmentServices _appointmentServices, LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices, ClientServices _clientServices)
+        public ClientController(AppointmentServices _appointmentServices, LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ReviewServices _reviewServices, ClientServices _clientServices)
         {
             providerServices = _providerServices;
-            shiftServices = _shiftServices;
             appointmentServices = _appointmentServices;
             reviewServices = _reviewServices;
             clientServices = _clientServices;

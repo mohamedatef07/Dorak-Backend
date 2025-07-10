@@ -22,7 +22,7 @@ namespace API.Controllers
             providerServices = _providerServices;
         }
 
-        
+
         [HttpPost]
         [Route("AddProviderAndAssignIt")]
         public async Task<IActionResult> AddProviderAndAssignIt([FromForm] RegisterationViewModel provider)
@@ -38,7 +38,7 @@ namespace API.Controllers
 
         [HttpGet]
         [Route("OperatorstoCenter")]
-        public IActionResult GetOperators([FromQuery]int centerId)
+        public IActionResult GetOperators([FromQuery] int centerId)
 
         {
             var operators = operatorServices.GetOperatorsByCenterId(centerId);
@@ -77,7 +77,7 @@ namespace API.Controllers
 
 
 
-        
+
 
         [HttpPost]
         [Route("DeleteProviderFromCenter")]
