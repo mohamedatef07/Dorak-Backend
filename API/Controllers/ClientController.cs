@@ -40,7 +40,7 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<object> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Invalid provider id", Status = 400 });
             }
             var provider = providerServices.GetProviderById(providerId);
 
@@ -61,7 +61,7 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<object> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Invalid provider id", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
@@ -86,7 +86,7 @@ namespace API.Controllers
         {
             if (string.IsNullOrWhiteSpace(providerId))
             {
-                return BadRequest(new ApiResponse<object> { Message = "Provider id is required", Status = 400 });
+                return BadRequest(new ApiResponse<object> { Message = "Invalid provider id", Status = 400 });
             }
             Provider provider = providerServices.GetProviderById(providerId);
             if (provider == null)
@@ -159,23 +159,29 @@ namespace API.Controllers
         [HttpGet("last-appointment/{userId}")]
         public IActionResult GetLastAppointment(string userId)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "User id is required", Status = 400 });
+            }
             var lastAppointment = appointmentServices.GetLastAppointment(userId);
-
             if (lastAppointment == null)
-                return NotFound(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found." });
-
-
-            return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Last Appointment retrived.", Data = lastAppointment });
-
+            {
+                return NotFound(new ApiResponse<Appointment> { Status = 400, Message = "No appointments found" });
+            }
+            return Ok(new ApiResponse<AppointmentDTO> { Status = 200, Message = "Last Appointment retrived", Data = lastAppointment });
         }
 
         [HttpGet("upcoming-appointments/{userId}")]
         public IActionResult GetUpcomingAppointments(string userId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new PaginationApiResponse<object>(false, "Invalid user id", 400, null, 0, pageNumber, pageSize));
+            }
             var PaginationResponse = appointmentServices.GetUpcomingAppointments(userId, pageNumber, pageSize);
             if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                return BadRequest(new PaginationApiResponse<object>(false, "No found upcoming appointments", 400, null, 0, pageNumber, pageSize));
+                return NotFound(new PaginationApiResponse<object>(false, "No found upcoming appointments", 404, null, 0, pageNumber, pageSize));
             }
             return Ok(PaginationResponse);
         }
@@ -279,8 +285,6 @@ namespace API.Controllers
             return Ok(new ApiResponse<ClientInfoToLiveQueueDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
         }
 
-
-
         [HttpGet("client-wallet/{userId}")]
         public IActionResult ClientWalletAndProfile(string userId)
         {
@@ -291,29 +295,6 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<ClientWalletAndProfileDTO> { Status = 200, Message = "wallet Retrive", Data = clientWalletProfileDTO });
         }
-
-
-
-        //live queue NT
-        //[HttpGet("shift-queue/{shiftId}/user/{userId}")]
-        //public async Task<IActionResult> GetShiftQueueWithClientFlag(int shiftId, string userId)
-        //{
-        //    var queue = await liveQueueServices.GetLiveQueueForShiftAsync(shiftId, userId);
-
-        //    if (queue == null || !queue.Any())
-        //    {
-        //        return Ok(new ApiResponse<object> { Status = 404, Message = "No queue data found." });
-        //    }
-
-        //    return Ok(new ApiResponse<List<ClientLiveQueueDTO>>
-        //    {
-        //        Status = 200,
-        //        Message = "Queue retrieved successfully.",
-        //        Data = queue
-        //    });
-        //}
-
-
 
         [HttpGet("queue/by-appointment/{appointmentId}")]
         public IActionResult GetQueueByAppointment(int appointmentId)
@@ -337,14 +318,13 @@ namespace API.Controllers
             });
         }
 
-
         [HttpGet("appointment/{appointmentid}")]
         public IActionResult GetAppointmentById(int appointmentid)
         {
 
             if (appointmentid <= 0)
             {
-                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment" });
+                return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment id" });
             }
 
             var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
@@ -383,7 +363,7 @@ namespace API.Controllers
         }
 
         [HttpGet("ClientProfile")]
-        public IActionResult GetMyClientProfile()
+        public IActionResult GetClientProfile()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -456,6 +436,17 @@ namespace API.Controllers
                 return BadRequest(new PaginationApiResponse<object>(false, "No found History appointments", 400, null, 0, pageNumber, pageSize));
             }
             return Ok(PaginationResponse);
+        }
+        [AllowAnonymous]
+        [HttpGet("all-cities-specializations")]
+        public IActionResult GetAllCitiesAndSpecializationsDTO()
+        {
+            var citiesAndSpecializationsLists = providerServices.GetAllCitiesAndSpecializationsForProviders();
+            if (citiesAndSpecializationsLists == null)
+            {
+                return NotFound(new ApiResponse<object> { Message = "get all cities and specializations not found", Status = 404 });
+            }
+            return Ok(new ApiResponse<object> { Message = "get all cities and specializations successfully", Status = 200, Data = citiesAndSpecializationsLists });
         }
     }
 }
