@@ -52,10 +52,8 @@ namespace Dorak.Controllers
                     IsBodyHtml = true
                 };
 
-                // 👇 Makes it so you can reply directly to the user
                 mail.ReplyToList.Add(new MailAddress(form.Email));
 
-                // 👇 You receive the message in your Dorak inbox
                 mail.To.Add(_config["Smtp:To"]);
 
                 await smtpClient.SendMailAsync(mail);

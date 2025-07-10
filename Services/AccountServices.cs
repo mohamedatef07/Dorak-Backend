@@ -167,7 +167,6 @@ namespace Services
                     }
                     else if (user.Role == "Provider")
                     {
-
                         var providerres = await providerServices.CreateProvider(currentUser.Id, new ProviderRegisterViewModel
                         {
                             FirstName = user.FirstName,
@@ -185,7 +184,7 @@ namespace Services
                             Country = user.Country,
                             Image = await SaveImageAsync(user),
                             EstimatedDuration = user.EstimatedDuration ?? 0,
-
+                            providerTitle = user.providerTitle,
                         });
                         if (providerres.Succeeded)
                         {
