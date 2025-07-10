@@ -16,7 +16,7 @@ namespace Services
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
         private readonly ProviderRepository providerRepository;
         private readonly AccountServices accountServices;
-        private readonly ProviderServices providerServices;
+
         private readonly ShiftRepository shiftRepository;
         private readonly AppointmentRepository appointmentRepository;
 
@@ -24,14 +24,13 @@ namespace Services
             CommitData _commitData,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ProviderRepository _providerRepository,
-            AccountServices _accountServices, ProviderServices _providerServices, ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository)
+            AccountServices _accountServices, ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository)
         {
             centerRepository = _centerRepository;
             commitData = _commitData;
             providerAssignmentRepository = _providerAssignmentRepository;
             providerRepository = _providerRepository;
             accountServices = _accountServices;
-            providerServices = _providerServices;
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
         }
