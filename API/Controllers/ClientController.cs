@@ -3,6 +3,7 @@ using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
 using Dorak.DataTransferObject.ReviewDTOs;
 using Dorak.Models;
+using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Enums;
@@ -19,16 +20,15 @@ namespace API.Controllers
     public class ClientController : ControllerBase
     {
         private readonly ProviderServices providerServices;
-        private readonly ShiftServices shiftServices;
+
         private readonly AppointmentServices appointmentServices;
         private readonly ReviewServices reviewServices;
         private readonly ClientServices clientServices;
         private readonly LiveQueueServices liveQueueServices;
 
-        public ClientController(AppointmentServices _appointmentServices, LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ShiftServices _shiftServices, ReviewServices _reviewServices, ClientServices _clientServices)
+        public ClientController(AppointmentServices _appointmentServices, LiveQueueServices _liveQueueServices, ProviderServices _providerServices, ReviewServices _reviewServices, ClientServices _clientServices)
         {
             providerServices = _providerServices;
-            shiftServices = _shiftServices;
             appointmentServices = _appointmentServices;
             reviewServices = _reviewServices;
             clientServices = _clientServices;
@@ -194,7 +194,7 @@ namespace API.Controllers
             var PaginationResponse = providerServices.GetProviderCardsWithSearchAndFilters(filter, pageSize, pageNumber);
             if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                return NotFound(new ApiResponse<object> { Status = 404, Message = "No found providers" });
+                return Ok(new PaginationApiResponse<List<ProviderCardViewModel>>(false, "No found upcoming appointments", 400, [], 0, pageNumber, pageSize));
             }
             return Ok(PaginationResponse);
         }

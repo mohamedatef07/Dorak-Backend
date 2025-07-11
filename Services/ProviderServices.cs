@@ -20,13 +20,11 @@ namespace Services
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
         private readonly ShiftRepository shiftRepository;
         private readonly ProviderCenterServiceRepository providerCenterServiceRepository;
-        private readonly ServicesRepository servicesRepository;
         private readonly CenterRepository centerRepository;
-        private readonly AccountServices accountServices;
         private readonly UserManager<User> userManager;
         private readonly CommitData commitData;
         private readonly AccountRepository accountRepository;
-        private readonly DorakContext context;
+
         private readonly IWebHostEnvironment env;
 
         public ProviderServices(
@@ -39,7 +37,6 @@ namespace Services
             UserManager<User> _userManager,
             CommitData _commitData,
             ServicesRepository _servicesRepository,
-            DorakContext _context,
             IWebHostEnvironment _env
             )
         {
@@ -51,8 +48,6 @@ namespace Services
             accountRepository = _accountRepository;
             userManager = _userManager;
             commitData = _commitData;
-            servicesRepository = _servicesRepository;
-            context = _context;
             env = _env;
         }
 
@@ -887,7 +882,7 @@ namespace Services
             providerRepository.Edit(provider);
             accountRepository.Edit(user);
 
-            await context.SaveChangesAsync();
+            await commitData.SaveChangesAsync();
 
             return "Profile updated successfully.";
         }
@@ -948,14 +943,17 @@ namespace Services
                 if (filter.MinPrice.HasValue)
                 {
                     predicate = predicate.And(p =>
-                        p.ProviderCenterServices.Any(s => s.Price >= filter.MinPrice.Value));
+                        p.ProviderCenterServices.Any() &&
+                        p.ProviderCenterServices.Min(s => s.Price) >= filter.MinPrice.Value);
                 }
 
                 if (filter.MaxPrice.HasValue)
                 {
                     predicate = predicate.And(p =>
-                        p.ProviderCenterServices.Any(s => s.Price <= filter.MaxPrice.Value));
+                        p.ProviderCenterServices.Any() &&
+                        p.ProviderCenterServices.Min(s => s.Price) <= filter.MaxPrice.Value);
                 }
+
                 if (filter.MinRate.HasValue)
                 {
                     predicate = predicate.And(p => p.Rate >= filter.MinRate.Value);
@@ -1008,7 +1006,7 @@ namespace Services
 
         public List<ProviderCardViewModel> GetTopRatedProviders(int count = 3)
         {
-            return context.Providers
+            return providerRepository.GetAll()
                 .OrderByDescending(p => p.Rate)
                 .Take(count)
                 .Select(p => new ProviderCardViewModel
@@ -1087,6 +1085,9 @@ namespace Services
                 Specializations = specializations,
             };
         }
+
+
+
 
     }
 }

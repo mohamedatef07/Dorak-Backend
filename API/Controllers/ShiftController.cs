@@ -9,13 +9,13 @@ namespace API.Controllers
     [ApiController]
     public class ShiftController : ControllerBase
     {
-        private readonly ProviderServices providerServices;
+
         private readonly ShiftServices shiftServices;
         private readonly CenterServices centerServices;
 
-        public ShiftController(ProviderServices _providerServices, ShiftServices _shiftServices, CenterServices _centerServices)
+        public ShiftController(ShiftServices _shiftServices, CenterServices _centerServices)
         {
-            providerServices = _providerServices;
+
             shiftServices = _shiftServices;
             centerServices = _centerServices;
         }
@@ -86,9 +86,16 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<IQueryable<AppointmentDTO>> { Message = "get shift appointments successfully", Status = 200, Data = appointments });
         }
+
         [HttpGet("get-all-center-shifts")]
-        public IActionResult GetAllCenterShifts([FromQuery] int centerId)
+        public IActionResult GetAllCenterShifts([FromQuery] int centerId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
+            if (pageNumber < 1 || pageSize < 1)
+                return BadRequest(new ApiResponse<object>
+                {
+                    Message = "pageNumber and pageSize must be ≥ 1",
+                    Status = 400
+                });
             if (centerId <= 0)
             {
                 return BadRequest(new ApiResponse<object> { Message = "Invalid center ID provided", Status = 400 });
@@ -98,12 +105,9 @@ namespace API.Controllers
             {
                 return NotFound(new ApiResponse<object> { Message = "Center not found", Status = 404 });
             }
-            var allCenterShifts = shiftServices.GetAllCenterShifts(center);
-            if (allCenterShifts == null || !allCenterShifts.Any())
-            {
-                return NotFound(new ApiResponse<object> { Message = "No shifts found for this center", Status = 404 });
-            }
-            return Ok(new ApiResponse<List<GetAllCenterShiftsDTO>> { Message = "Get all center shifts successfully", Status = 200, Data = allCenterShifts });
+            var pagedResult = shiftServices.GetAllCenterShifts(center, pageNumber, pageSize);
+
+            return Ok(pagedResult);
         }
 
         [HttpGet("get-all-centerShifts-and-services")]
@@ -119,10 +123,6 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<object> { Message = "Center not found", Status = 404 });
             }
             var allCenterShifts = shiftServices.GetAllCenterShiftsAndServices(center);
-            if (allCenterShifts == null || !allCenterShifts.Any())
-            {
-                return NotFound(new ApiResponse<object> { Message = "No shifts found for this center", Status = 404 });
-            }
             return Ok(new ApiResponse<List<GetAllCenterShiftAndServicesDTO>> { Message = "Get all center shifts successfully", Status = 200, Data = allCenterShifts });
         }
     }

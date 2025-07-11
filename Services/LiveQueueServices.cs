@@ -87,7 +87,8 @@ namespace Services
         //from owner side
         public PaginationViewModel<ProviderLiveQueueViewModel> GetLiveQueuesForProvider(int centerId, int shiftId, int pageNumber = 1, int pageSize = 16)
         {
-            Provider shiftProvider = shiftRepository.GetShiftById(shiftId).ProviderAssignment.Provider;
+            var res = shiftRepository.GetShiftById(shiftId);//.ProviderAssignment.Provider;
+            Provider shiftProvider = res.ProviderAssignment.Provider;
             var providerAssignments = providerAssignmentRepository.GetAll()
                 .Where(pa => pa.CenterId == centerId && !pa.IsDeleted)
                 .ToList();
