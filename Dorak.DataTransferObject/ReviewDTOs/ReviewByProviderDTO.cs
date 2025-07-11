@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Dorak.DataTransferObject
+﻿namespace Dorak.DataTransferObject
 {
     public class ReviewByProviderDTO
     {
@@ -14,7 +8,7 @@ namespace Dorak.DataTransferObject
         public string ProviderName { get; set; }
         public string ClientId { get; set; }
         public decimal Rate { get; set; }
-        public DateOnly Date {  get; set; }
+        public DateOnly Date { get; set; }
     }
 
 }

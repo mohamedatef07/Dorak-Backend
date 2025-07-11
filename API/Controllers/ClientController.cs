@@ -1,6 +1,7 @@
 ﻿using Dorak.DataTransferObject;
 using Dorak.DataTransferObject.ClientDTO;
 using Dorak.DataTransferObject.ProviderDTO;
+using Dorak.DataTransferObject.ReviewDTOs;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -200,32 +201,61 @@ namespace API.Controllers
 
         // Add new review
         [HttpPost("add-review")]
-        public IActionResult CreateReview([FromBody] ReviewDTO model)
+        public IActionResult AddReview([FromBody] AddReviewDTO model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                var review = new Review
-                {
-                    Rating = model.Rating,
-                    Description = model.Description,
-                    ProviderId = model.Providerid,
-                    ClientId = model.ClientId
-                };
-
-                var result = reviewServices.CreateReview(review);
-                return Ok(new ApiResponse<string>
-                {
-                    Message = result,
-                    Status = 200,
-                    Data = result
-                });
+                return BadRequest(new ApiResponse<object> { Message = "Invalid provided data", Status = 400 });
             }
-            return BadRequest(ModelState);
+            var review = new Review
+            {
+                Rating = model.Rating,
+                Description = model.Description,
+                ProviderId = model.ProviderId,
+                ClientId = model.ClientId
+            };
+
+            bool result = reviewServices.CreateReview(review);
+            if (!result)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Review creation failed", Status = 400 });
+            }
+            return Ok(new ApiResponse<bool>
+            {
+                Message = "Add review successfully",
+                Status = 200,
+                Data = result
+            });
+        }
+
+        [HttpDelete("delete-review")]
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (reviewId <= 0)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid review id", Status = 400 });
+            }
+
+            bool result = reviewServices.DeleteReview(reviewId);
+            if (!result)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Review deleation failed", Status = 400 });
+            }
+            return Ok(new ApiResponse<bool>
+            {
+                Message = "Delete review successfully",
+                Status = 200,
+                Data = result
+            });
         }
 
         [HttpGet("provider-reviews")]
         public IActionResult GetReviewsForProvider([FromQuery] string providerId)
         {
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid provider id", Status = 400 });
+            }
             var reviews = reviewServices.GetReviewsForProvider(providerId);
             if (!reviews.Any())
             {
@@ -243,36 +273,37 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("reviews-by-client")]
-        public IActionResult GetReviewsByClient([FromQuery] string clientId)
+        [HttpGet("client-reviews")]
+        public IActionResult GetClientReviews([FromQuery] string clientId, int pageNumber = 1, int pageSize = 10)
         {
             if (string.IsNullOrWhiteSpace(clientId))
-                return BadRequest(new ApiResponse<string> { Message = "Client ID is required", Status = 400 });
-
-            var reviews = reviewServices.GetReviewsForClient(clientId);
-
-            if (!reviews.Any())
-                return NotFound(new ApiResponse<string> { Message = "No reviews found for this client", Status = 404 });
-
-            return Ok(new ApiResponse<List<ReviewByClientDTO>>
             {
-                Message = "Client reviews retrieved successfully",
-                Status = 200,
-                Data = reviews
-            });
+                return BadRequest(new PaginationApiResponse<object>(false, "Invalid client id", 400, null, 0, pageNumber, pageSize));
+            }
+
+            var PaginationResponse = reviewServices.GetReviewsForClient(clientId);
+
+            if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
+            {
+                return NotFound(new PaginationApiResponse<object>(false, "No review found", 404, null, 0, pageNumber, pageSize));
+            }
+            return Ok(PaginationResponse);
         }
 
-        [HttpGet("profile-all-appointment/{userId}")]
-        public IActionResult ProfileAndAllAppointments(string userId)
+        [HttpGet("profile/{userId}")]
+        public IActionResult GetProfileData(string userId)
         {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid user id", Status = 400 });
+            }
             var profile = clientServices.GetProfile(userId);
             if (profile == null)
             {
-                return Ok(new ApiResponse<object> { Status = 404, Message = "No found appointments" });
+                return NotFound(new ApiResponse<object> { Status = 404, Message = "No appointments found" });
             }
-            return Ok(new ApiResponse<ClientProfileDTO> { Status = 200, Message = "Profile retrived.", Data = profile });
+            return Ok(new ApiResponse<ClientProfileDTO> { Status = 200, Message = "Profile retrived successfully", Data = profile });
         }
-
 
         [HttpGet("profile-for-live-queue/{userId}")]
         public IActionResult ProfileForliveQueue(string userId)

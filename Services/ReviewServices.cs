@@ -1,45 +1,59 @@
 ﻿using Data;
-using Dorak.Models;
-using Dorak.ViewModels;
-using Microsoft.EntityFrameworkCore;
-using Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Data.Entity;
 using Dorak.DataTransferObject;
+using Dorak.Models;
+using Repositories;
 
 namespace Services
 {
     public class ReviewServices
     {
-        private readonly CommitData commitData;
-        private readonly DorakContext context;
+        private readonly CommitData _commitData;
+        private readonly ReviewRepository _reviewRepository;
+        private readonly ProviderRepository _providerRepository;
 
-        public ReviewServices(CommitData _commitData, DorakContext _context)
+        public ReviewServices(CommitData commitData, ReviewRepository reviewRepository, ProviderRepository providerRepository)
         {
-            commitData = _commitData;
-            context = _context;
+            _commitData = commitData;
+            _reviewRepository = reviewRepository;
+            _providerRepository = providerRepository;
         }
 
-        public string CreateReview(Review review)
+        public bool CreateReview(Review review)
         {
-            context.Reviews.Add(review);
-            commitData.SaveChanges();
+            if (review == null)
+            {
+                return false;
+            }
 
-            return "Review added successfully.";
+            _reviewRepository.Add(review);
+            _commitData.SaveChanges();
+            return true;
+        }
+        public bool DeleteReview(int reviewId)
+        {
+            if (reviewId <= 0)
+            {
+                return false;
+            }
+            var review = _reviewRepository.GetById(rev => rev.ReviewId == reviewId);
+            if (review == null)
+            {
+                return false;
+            }
+            review.IsDeleted = true;
+            _reviewRepository.Edit(review);
+            _commitData.SaveChanges();
+            return true;
         }
 
         public void UpdateAllProvidersAverageRating()
         {
-            var providers = context.Providers.ToList();
+            var providers = _providerRepository.GetList(p => !p.IsDeleted);
 
             foreach (var provider in providers)
             {
-                var reviews = context.Reviews
-                    .Where(r => r.ProviderId == provider.ProviderId)
+                var reviews = _reviewRepository.GetList(r => r.ProviderId == provider.ProviderId && !r.IsDeleted)
                     .ToList();
-
                 if (reviews.Any())
                 {
                     provider.Rate = reviews.Average(r => r.Rating);
@@ -49,37 +63,45 @@ namespace Services
                     provider.Rate = 0;
                 }
             }
-
-            commitData.SaveChanges();
+            _commitData.SaveChanges();
         }
 
 
         public List<ReviewByProviderDTO> GetReviewsForProvider(string providerId)
         {
-            return context.Reviews
-                .Where(r => r.ProviderId == providerId)
+            return _reviewRepository.GetList(r => r.ProviderId == providerId && !r.IsDeleted)
                 .Select(r => new ReviewByProviderDTO
                 {
                     ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
                     ClientName = $"{r.Client.FirstName} {r.Client.LastName}",
                     Review = r.Description,
-                    ClientId = r.ClientId ,
-                    Rate=r.Rating,
+                    ClientId = r.ClientId,
+                    Rate = r.Rating,
                     Date = r.Date
                 }).ToList();
         }
 
-        public List<ReviewByClientDTO> GetReviewsForClient(string ClientId)
+        public PaginationApiResponse<List<ReviewByClientDTO>> GetReviewsForClient(string ClientId, int pageNumber = 1, int pageSize = 10)
         {
-            return context.Reviews
-                .Where(r => r.ClientId == ClientId)
+            var reviews = _reviewRepository.GetList(r => r.ClientId == ClientId && !r.IsDeleted).OrderByDescending(r => r.Date)
                 .Select(r => new ReviewByClientDTO
                 {
-                    ProviderName =$"{r.Provider.FirstName} {r.Provider.LastName}",
+                    ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
                     Review = r.Description,
-                    ProviderId = r.ProviderId,
-                    Rate=r.Rating
+                    Rate = r.Rating,
+                    Date = r.Date
                 }).ToList();
+
+            var totalRecords = reviews.Count();
+            var paginationResponse = new PaginationApiResponse<List<ReviewByClientDTO>>(
+            success: true,
+            message: "Client reviews retrieved successfully.",
+            status: 200,
+            data: reviews,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
     }
 }
