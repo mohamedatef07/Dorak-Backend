@@ -130,7 +130,7 @@ namespace API.Controllers
             try
             {
                 // Retrieve the appointment
-                var appointment = appointmentServices.GetAppointmentById(checkoutRequest.AppointmentId);
+                var appointment = appointmentServices.GetAppointmentByIdForCheckout(checkoutRequest.AppointmentId);
                 if (appointment == null)
                     return NotFound(new ApiResponse<string> { Status = 404, Message = "Appointment not found." });
 
@@ -229,7 +229,7 @@ namespace API.Controllers
         }
 
         [HttpDelete("delete-review")]
-        public IActionResult DeleteReview(int reviewId)
+        public IActionResult DeleteReview([FromQuery] int reviewId)
         {
             if (reviewId <= 0)
             {
@@ -244,6 +244,26 @@ namespace API.Controllers
             return Ok(new ApiResponse<bool>
             {
                 Message = "Delete review successfully",
+                Status = 200,
+                Data = result
+            });
+        }
+        [HttpPut("edit-review")]
+        public IActionResult EditReview([FromBody] EditReviewDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Invalid provided data", Status = 400 });
+            }
+
+            bool result = reviewServices.EditReview(model);
+            if (!result)
+            {
+                return BadRequest(new ApiResponse<object> { Message = "Review updated failed", Status = 400 });
+            }
+            return Ok(new ApiResponse<bool>
+            {
+                Message = "Update review successfully",
                 Status = 200,
                 Data = result
             });
@@ -281,7 +301,7 @@ namespace API.Controllers
                 return BadRequest(new PaginationApiResponse<object>(false, "Invalid client id", 400, null, 0, pageNumber, pageSize));
             }
 
-            var PaginationResponse = reviewServices.GetReviewsForClient(clientId);
+            var PaginationResponse = reviewServices.GetReviewsForClient(clientId, pageNumber, pageSize);
 
             if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
@@ -349,16 +369,16 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("appointment/{appointmentid}")]
-        public IActionResult GetAppointmentById(int appointmentid)
+        [HttpGet("appointment-details/{appointmentid}")]
+        public IActionResult GetAppointmentDetails(int appointmentId)
         {
 
-            if (appointmentid <= 0)
+            if (appointmentId <= 0)
             {
                 return BadRequest(new ApiResponse<object> { Status = 400, Message = "Invalid appointment id" });
             }
 
-            var Appointment = appointmentServices.GetAppointmentbyId(appointmentid);
+            var Appointment = appointmentServices.GetAppointmentDetailsById(appointmentId);
 
             if (Appointment == null)
             {
