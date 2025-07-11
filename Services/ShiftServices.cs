@@ -20,6 +20,7 @@ namespace Services
         private readonly IHubContext<ShiftListHub> shiftListHubContext;
         private readonly NotificationSignalRService _notificationSignalRService;
         private readonly NotificationServices notificationServices;
+        private readonly ProviderAssignmentRepository providerAssignmentRepository;
 
         public ShiftServices(ShiftRepository _shiftRepository,
             AppointmentRepository _appointmentRepository,
@@ -29,7 +30,8 @@ namespace Services
             WalletRepository _walletRepository,
             IHubContext<ShiftListHub> _shiftListHubContext,
             NotificationSignalRService notificationSignalRService,
-            NotificationServices _notificationServices
+            NotificationServices _notificationServices,
+            ProviderAssignmentRepository _providerAssignmentRepository
             )
         {
             shiftRepository = _shiftRepository;
@@ -41,6 +43,7 @@ namespace Services
             walletRepository = _walletRepository;
             _notificationSignalRService = notificationSignalRService;
             notificationServices = _notificationServices;
+            providerAssignmentRepository = _providerAssignmentRepository;
         }
         public Shift GetShiftById(int shiftId)
         {
@@ -88,27 +91,59 @@ namespace Services
             }
             return null;
         }
-        public List<GetAllCenterShiftsDTO> GetAllCenterShifts(Center center)
+        public PaginationApiResponse<List<GetAllCenterShiftsDTO>> GetAllCenterShifts(Center center, int pageNumber = 1, int pageSize = 10)
         {
             if (center?.ProviderAssignments == null || !center.ProviderAssignments.Any())
             {
-                return new List<GetAllCenterShiftsDTO>();
+                return new PaginationApiResponse<List<GetAllCenterShiftsDTO>>(
+                    success: true,
+                    message: "No shifts found.",
+                    status: 200,
+                    data: new List<GetAllCenterShiftsDTO>(),
+                    totalRecords: 0,
+                    currentPage: pageNumber,
+                    pageSize: pageSize
+                );
             }
-            var proivderAssignments = center.ProviderAssignments;
 
-            var shifts = proivderAssignments.SelectMany(
-                pa =>
-                     pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled).Select(shift => new GetAllCenterShiftsDTO
-                     {
-                         ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
-                         ShiftId = shift.ShiftId,
-                         ShiftType = shift.ShiftType,
-                         ShiftDate = shift.ShiftDate,
-                         StartTime = shift.StartTime,
-                         EndTime = shift.EndTime,
-                     })
-                ).ToList();
-            return shifts;
+
+            var pagedShifts = shiftRepository
+            .GetAllOrderedByExpression(
+            // only include non‐cancelled shifts for this center
+            sh => sh.ProviderAssignment.CenterId == center.CenterId
+                 && sh.ShiftType != ShiftType.Cancelled
+                 && !sh.IsDeleted
+                 && sh.ShiftDate >= DateOnly.FromDateTime(DateTime.Now)
+                 ,
+            pageSize,
+            pageNumber,
+            query => query.OrderBy(sh => sh.ShiftDate).ThenBy(sh => sh.StartTime)
+            ).Select(sh => new GetAllCenterShiftsDTO
+            {
+                ProviderName = $"{sh.ProviderAssignment.Provider.FirstName} {sh.ProviderAssignment.Provider.LastName}",
+                ShiftId = sh.ShiftId,
+                ShiftType = sh.ShiftType,
+                ShiftDate = sh.ShiftDate,
+                StartTime = sh.StartTime,
+                EndTime = sh.EndTime,
+            }).ToList();
+
+            var totalRecords = shiftRepository
+            .GetList(sh => sh.ProviderAssignment.CenterId == center.CenterId
+                 && sh.ShiftType != ShiftType.Cancelled
+                 && !sh.IsDeleted
+                 && sh.ShiftDate >= DateOnly.FromDateTime(DateTime.Now))
+            .Count();
+
+            return new PaginationApiResponse<List<GetAllCenterShiftsDTO>>(
+                    success: true,
+                    message: "Center shifts retrieved successfully.",
+                    status: 200,
+                    data: pagedShifts,
+                    totalRecords: totalRecords,
+                    currentPage: pageNumber,
+                    pageSize: pageSize
+                );
         }
 
         public List<GetAllCenterShiftAndServicesDTO> GetAllCenterShiftsAndServices(Center center)
