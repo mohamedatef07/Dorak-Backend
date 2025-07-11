@@ -1,5 +1,4 @@
 using Dorak.DataTransferObject;
-using Dorak.DataTransferObject.OperatorDTO;
 using Dorak.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +20,7 @@ namespace API.Controllers
             operatorServices = _operatorServices;
             providerServices = _providerServices;
         }
+
 
 
         [HttpPost]
@@ -89,6 +89,7 @@ namespace API.Controllers
                 return StatusCode(500, new ApiResponse<string> { Message = $"Internal Server Error: {ex.Message}", Status = 500 });
             }
         }
+
 
 
 
