@@ -1,7 +1,9 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.ReviewDTOs;
 using Dorak.Models;
 using Repositories;
+using System.Linq.Expressions;
 
 namespace Services
 {
@@ -24,7 +26,6 @@ namespace Services
             {
                 return false;
             }
-
             _reviewRepository.Add(review);
             _commitData.SaveChanges();
             return true;
@@ -41,6 +42,23 @@ namespace Services
                 return false;
             }
             review.IsDeleted = true;
+            _reviewRepository.Edit(review);
+            _commitData.SaveChanges();
+            return true;
+        }
+        public bool EditReview(EditReviewDTO updatedReview)
+        {
+            if (updatedReview == null)
+            {
+                return false;
+            }
+            var review = _reviewRepository.GetById(rev => rev.ReviewId == updatedReview.ReviewId);
+            if (review == null)
+            {
+                return false;
+            }
+            review.Description = updatedReview.Review;
+            review.Rating = updatedReview.Rate;
             _reviewRepository.Edit(review);
             _commitData.SaveChanges();
             return true;
@@ -83,16 +101,19 @@ namespace Services
 
         public PaginationApiResponse<List<ReviewByClientDTO>> GetReviewsForClient(string ClientId, int pageNumber = 1, int pageSize = 10)
         {
-            var reviews = _reviewRepository.GetList(r => r.ClientId == ClientId && !r.IsDeleted).OrderByDescending(r => r.Date)
-                .Select(r => new ReviewByClientDTO
-                {
-                    ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
-                    Review = r.Description,
-                    Rate = r.Rating,
-                    Date = r.Date
-                }).ToList();
+            Expression<Func<Review, bool>> filter = rev => rev.ClientId == ClientId && !rev.IsDeleted;
+            var reviews = _reviewRepository.GetAllOrderedByExpression(filter, pageSize, pageNumber, query => query.OrderByDescending(rev => rev.Date))
 
-            var totalRecords = reviews.Count();
+                         .Select(r => new ReviewByClientDTO
+                         {
+                             ReviewId = r.ReviewId,
+                             ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
+                             Review = r.Description,
+                             Rate = r.Rating,
+                             Date = r.Date
+                         }).ToList();
+
+            var totalRecords = _reviewRepository.GetList(filter).Count();
             var paginationResponse = new PaginationApiResponse<List<ReviewByClientDTO>>(
             success: true,
             message: "Client reviews retrieved successfully.",

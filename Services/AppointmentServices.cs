@@ -196,7 +196,7 @@ namespace Services
             return paginationResponse;
         }
 
-        public Appointment GetAppointmentById(int AppointmentId)
+        public Appointment GetAppointmentByIdForCheckout(int AppointmentId)
         {
             return appointmentRepository.GetById(a => a.AppointmentId == AppointmentId);
         }
@@ -336,9 +336,9 @@ namespace Services
             return shift.StartTime.AddMinutes(TotalDuration);
         }
 
-        public AppointmentDTO GetAppointmentbyId(int AppointmentId)
+        public AppointmentDTO GetAppointmentDetailsById(int AppointmentId)
         {
-            var appointments = appointmentRepository.GetById(app => app.AppointmentId == AppointmentId && app.AppointmentStatus != AppointmentStatus.Cancelled);
+            var appointments = appointmentRepository.GetById(app => app.AppointmentId == AppointmentId);
 
             if (appointments == null)
             {
