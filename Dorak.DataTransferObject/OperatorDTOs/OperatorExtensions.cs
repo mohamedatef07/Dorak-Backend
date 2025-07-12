@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dorak.Models;
+﻿using Dorak.Models;
 
-namespace Dorak.DataTransferObject.OperatorDTO
+namespace Dorak.DataTransferObject
 {
     public static class OperatorExtensions
     {

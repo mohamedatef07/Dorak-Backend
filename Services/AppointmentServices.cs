@@ -34,9 +34,10 @@ namespace Services
         public async Task<CheckoutRequest> ReserveAppointment(ReserveApointmentDTO reserveApointmentDTO)
         {
             if (reserveApointmentDTO.AppointmentDate < DateOnly.FromDateTime(DateTime.Now))
-                throw new InvalidOperationException("Cannot reserve an appointment in the past.");
-
-            var app = reserveApointmentDTO.reserveApointmentDTOToAppointment();
+            {
+                return null;
+                //throw new InvalidOperationException("Cannot reserve an appointment in the past.");
+            }
 
             var pcs = providerCenterServiceRepository
                 .GetAll()
@@ -48,7 +49,29 @@ namespace Services
                 );
 
             if (pcs == null)
-                throw new Exception("Invalid provider, center, or service combination.");
+            {
+                return null;
+                //throw new Exception("Invalid provider, center, or service combination.");
+            }
+
+            var shift = shiftRepository.GetById(sh => sh.ShiftId == reserveApointmentDTO.ShiftId);
+
+            if (shift == null)
+                return null;
+
+            if (shift.MaxPatientsPerDay.HasValue)
+            {
+                var booked = shift.Appointments
+                    .Count(a =>
+                        a.ShiftId == reserveApointmentDTO.ShiftId &&
+                        a.AppointmentDate == reserveApointmentDTO.AppointmentDate);
+                if (booked >= shift.MaxPatientsPerDay.Value)
+                    return null;
+            }
+
+            var app = reserveApointmentDTO.reserveApointmentDTOToAppointment();
+
+
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
 
@@ -58,7 +81,10 @@ namespace Services
 
             commitData.SaveChanges();
 
-            var queue = AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
+            var queue = AssignToQueue(
+                app.ProviderCenterServiceId,
+                app.AppointmentDate,
+                createdAppointment.AppointmentId);
 
             var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
             if (queuedAppointment != null)
@@ -196,7 +222,7 @@ namespace Services
             return paginationResponse;
         }
 
-        public Appointment GetAppointmentById(int AppointmentId)
+        public Appointment GetAppointmentByIdForCheckout(int AppointmentId)
         {
             return appointmentRepository.GetById(a => a.AppointmentId == AppointmentId);
         }
@@ -336,9 +362,9 @@ namespace Services
             return shift.StartTime.AddMinutes(TotalDuration);
         }
 
-        public AppointmentDTO GetAppointmentbyId(int AppointmentId)
+        public AppointmentDTO GetAppointmentDetailsById(int AppointmentId)
         {
-            var appointments = appointmentRepository.GetById(app => app.AppointmentId == AppointmentId && app.AppointmentStatus != AppointmentStatus.Cancelled);
+            var appointments = appointmentRepository.GetById(app => app.AppointmentId == AppointmentId);
 
             if (appointments == null)
             {
