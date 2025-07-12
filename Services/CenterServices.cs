@@ -6,6 +6,7 @@ using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
 using Repositories;
+using System.Collections.Generic;
 
 namespace Services
 {
@@ -62,6 +63,8 @@ namespace Services
         //    return true;
         //}
 
+
+         
 
         public List<Center> GetAll()
         {
@@ -458,5 +461,34 @@ namespace Services
             }
         }
 
+        public CenterStatisticsDTO GetCenterStatistics(int centerId)
+
+        {
+
+            var center = centerRepository.GetById(c => c.CenterId == centerId);
+
+            var providerCount = providerAssignmentRepository.GetList(pa => pa.CenterId == centerId && !pa.IsDeleted)
+                .Select(pa => pa.ProviderId)
+                .Distinct()
+                .Count();
+
+            var operatorCount = center?.Operators.Count(o => o.CenterId == centerId) ?? 0;
+
+            var appointmentCount = appointmentRepository.GetAll()
+                .Count(a => a.ProviderCenterService.CenterId == centerId);
+
+            decimal totalRevenue = appointmentRepository.GetAll()
+            .Where(a => a.ProviderCenterService.CenterId == centerId)
+            .Sum(a => a.Fees + a.AdditionalFees);
+
+
+            return new CenterStatisticsDTO
+            {
+                ProvidersCount = providerCount,
+                OperatorsCount = operatorCount,
+                AppointmentsCount = appointmentCount,
+                TotalRevenue = totalRevenue
+            };
+        }
     }
 }
