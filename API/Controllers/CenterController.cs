@@ -190,10 +190,25 @@ namespace API.Controllers
             });
         }
 
-
-
-
-
-
+        [HttpGet]
+        [Route("CenterStatistics")]
+        public IActionResult GetCenterStatistics([FromQuery] int centerId)
+        {
+            if (centerId <= 0)
+            {
+                return BadRequest(new ApiResponse<string>
+                {
+                    Message = "Invalid centerId.",
+                    Status = 400
+                });
+            }
+            var stats = centerServices.GetCenterStatistics(centerId);
+            return Ok(new ApiResponse<CenterStatisticsDTO>
+            {
+                Data = stats,
+                Message = "Success",
+                Status = 200
+            });
+        }
     }
 }

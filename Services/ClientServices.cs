@@ -24,7 +24,7 @@ namespace Services
         private readonly AccountRepository accountRepository;
         private readonly UserManager<User> userManager;
 
-        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData,AppointmentServices appointmentServices,WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository, UserManager<User> _userManager)
+        public ClientServices(ClientRepository _clientRepository, TemperoryClientRepository _temperoryClientRepository, AppointmentRepository _appointmentRepository, CommitData _commitData, AppointmentServices appointmentServices, WalletRepository _walletRepository, IWebHostEnvironment env, AccountRepository _accountRepository, UserManager<User> _userManager)
         {
             clientRepository = _clientRepository;
             temperoryClientRepository = _temperoryClientRepository;
@@ -129,7 +129,7 @@ namespace Services
             // Create Client entity
             var client = new Client
             {
-                ClientId = user.Id, 
+                ClientId = user.Id,
                 FirstName = model.FirstName,
                 LastName = model.LastName,
                 Gender = model.Gender,
@@ -142,13 +142,13 @@ namespace Services
                 User = user
             };
 
-            
+
             clientRepository.Add(client);
             commitData.SaveChanges();
 
             return IdentityResult.Success;
         }
-   
+
 
 
         public ClientProfileDTO GetProfile(string userId)
@@ -183,7 +183,6 @@ namespace Services
             };
 
             return wallet;
-
         }
 
         public ClientInfoToLiveQueueDTO GetClientInfoToLiveQueue(string userId)
