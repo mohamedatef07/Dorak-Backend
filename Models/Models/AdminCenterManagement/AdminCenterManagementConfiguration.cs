@@ -8,6 +8,7 @@ namespace Dorak.Models
     {
         public void Configure(EntityTypeBuilder<AdminCenterManagement> builder)
         {
+            builder.HasQueryFilter(adminCenterManagement => !adminCenterManagement.IsDeleted);
             //Primary Key
             builder.HasKey(adminCenterManagement => adminCenterManagement.AdminId);
 

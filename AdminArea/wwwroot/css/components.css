@@ -63,6 +63,10 @@ a {
   text-decoration: none;
   color: black;
 }
+.main-btn {
+    background-color: var(--main-bg-color-Light) !important;
+    width: fit-content !important;
+}
 /* Nav Bar */
 .nav {
   position: fixed;

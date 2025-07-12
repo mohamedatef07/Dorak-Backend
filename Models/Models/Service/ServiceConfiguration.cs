@@ -24,6 +24,9 @@ namespace Dorak.Models
 
             builder.Property(service => service.IsDeleted).HasDefaultValue(false);
 
+            builder.HasQueryFilter(s => !s.IsDeleted);
+
+
         }
     }
 }
