@@ -42,6 +42,10 @@ namespace Dorak.Models
 
             builder.Property(tempclient => tempclient.IsDeleted)
                 .HasDefaultValue(false);
+
+
+            builder.HasQueryFilter(tc => !tc.IsDeleted);
+
         }
     }
 }

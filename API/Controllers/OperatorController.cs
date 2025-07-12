@@ -1,12 +1,9 @@
-﻿using System.Threading.Tasks;
-using Dorak.DataTransferObject;
+﻿using Dorak.DataTransferObject;
 using Dorak.ViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Services;
-using System.Data.Entity.Core.Common;
 
 namespace API.Controllers
 {
@@ -80,9 +77,9 @@ namespace API.Controllers
         }
 
         [HttpGet("end-shift")]
-        public IActionResult EndShift([FromQuery] int shiftId, [FromQuery] string operatorId)
+        public async Task<IActionResult> EndShift([FromQuery] int shiftId, [FromQuery] string operatorId)
         {
-            var result = operatorServices.EndShift(shiftId, operatorId);
+            var result = await operatorServices.EndShift(shiftId, operatorId);
             if (result == true)
             {
                 return Ok(new ApiResponse<OperatorViewModel> { Status = 200, Message = "Successfully End Shift." });

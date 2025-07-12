@@ -16,6 +16,9 @@ namespace Dorak.Models
                 .HasForeignKey(s => s.ProviderCenterServiceId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.HasQueryFilter(pcs => !pcs.IsDeleted);
+
+
         }
     }
 }

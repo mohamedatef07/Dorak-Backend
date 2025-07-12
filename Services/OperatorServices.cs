@@ -27,9 +27,24 @@ namespace Services
         private readonly CommitData commitData;
         private readonly IHubContext<QueueHub> queueHubContext;
         private readonly IHubContext<NotificationHub> notificationHubContext;
+        private readonly NotificationSignalRService _notificationSignalRService;
+        private readonly NotificationServices notificationServices;
 
-
-        public OperatorServices(OperatorRepository _operatorRepository, CommitData _commitData, AppointmentRepository _appointmentRepository, ShiftRepository _shiftRepository, LiveQueueRepository _liveQueueRepository, AppointmentServices _appointmentServices, IHubContext<QueueHub> _queueHubContext, ProviderCenterServiceRepository _providerCenterServiceRepository, TemperoryClientRepository _temperoryClientRepository, AccountRepository _accountRepository, UserManager<User> _userManager, LiveQueueServices _liveQueueServices, IHubContext<NotificationHub> _notificationHubContext)
+        public OperatorServices(OperatorRepository _operatorRepository,
+            CommitData _commitData,
+            AppointmentRepository _appointmentRepository,
+            ShiftRepository _shiftRepository,
+            LiveQueueRepository _liveQueueRepository,
+            AppointmentServices _appointmentServices,
+            IHubContext<QueueHub> _queueHubContext,
+            ProviderCenterServiceRepository _providerCenterServiceRepository,
+            TemperoryClientRepository _temperoryClientRepository,
+            AccountRepository _accountRepository,
+            UserManager<User> _userManager,
+            LiveQueueServices _liveQueueServices,
+            IHubContext<NotificationHub> _notificationHubContext,
+                        NotificationSignalRService notificationSignalRService,
+            NotificationServices _notificationServices)
         {
             shiftRepository = _shiftRepository;
             operatorRepository = _operatorRepository;
@@ -44,6 +59,8 @@ namespace Services
             userManager = _userManager;
             queueHubContext = _queueHubContext;
             notificationHubContext = _notificationHubContext;
+            _notificationSignalRService = notificationSignalRService;
+            notificationServices = _notificationServices;
         }
         public async Task<IdentityResult> CreateOperator(string userId, OperatorViewModel model)
         {
@@ -226,15 +243,20 @@ namespace Services
                 shift.ShiftType = ShiftType.OnGoing;
                 shiftRepository.Edit(shift);
                 commitData.SaveChanges();
-                var startShiftNotification = new Notification()
+                if (shift?.ProviderAssignment?.Provider?.User?.Notifications != null)
                 {
-                    Title = "Start Shift",
-                    Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n" +
-                              $"Your shift at {shift.ProviderAssignment.Center.CenterName} has officially begun."
-                };
-                shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
-                commitData.SaveChanges();
-                await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("startShiftNotification", startShiftNotification);
+                    var startShiftNotification = new Notification()
+                    {
+                        Title = "Start Shift",
+                        Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n" +
+                              $"Your shift at {shift.ProviderAssignment.Center.CenterName} Has been started NOW at {DateTime.Now.ToString("dd-MM-yyyy hh:mm tt")}."
+                    };
+                    shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
+                    commitData.SaveChanges();
+                    //await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("startShiftNotification", startShiftNotification);
+                    var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
+                    await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
+                }
             }
             else
             {
@@ -258,12 +280,34 @@ namespace Services
                     CurrentQueuePosition = ++count,
                 };
                 liveQueueRepository.Add(livequeue);
+                var appointmentstartNotification = new Notification()
+                {
+                    Title = "Shift for Appointment Started",
+                    Message = $"Your appointment on {appointment.AppointmentDate.ToShortDateString()} with Dr. {appointment.Shift.ProviderAssignment.Provider.FirstName} {appointment.Shift.ProviderAssignment.Provider.LastName} has been Started. We apologize for any inconvenience. Stay Tuned For any Updates!"
+                };
+                if (appointment.User != null)
+                {
+
+                    appointment.User.Notifications.Add(appointmentstartNotification);
+                    commitData.SaveChanges();
+
+                    var clientConnectionId = _notificationSignalRService.SendMessage(appointment.User.Id, new NotificationDTO
+                    {
+                        NotificationId = appointmentstartNotification.NotificationId,
+                        Title = appointmentstartNotification.Title,
+                        CreatedAt = appointmentstartNotification.CreatedAt,
+                        Message = appointmentstartNotification.Message,
+                        IsRead = appointmentstartNotification.IsRead
+                    });
+                    var ClientpaginatedNotifications = notificationServices.GetNotification(appointment.User.Id);
+                    await _notificationSignalRService.SendUpdatedNotificationList(appointment.User.Id, ClientpaginatedNotifications);
+                }
             }
             commitData.SaveChanges();
             return true;
         }
 
-        public bool EndShift(int ShiftId, string operatorId)
+        public async Task<bool> EndShift(int ShiftId, string operatorId)
         {
             DateTime currentTime = DateTime.Now;
             TimeOnly timeNow = TimeOnly.FromDateTime(currentTime);
@@ -275,7 +319,19 @@ namespace Services
                 shift.ExactEndTime = timeNow;
                 shift.ShiftType = ShiftType.Completed;
                 shiftRepository.Edit(shift);
-                commitData.SaveChanges();
+                if (shift?.ProviderAssignment?.Provider?.User?.Notifications != null)
+                {
+                    var EndShiftNotification = new Notification()
+                    {
+                        Title = "End Shift",
+                        Message = $"Dear Dr. {shift.ProviderAssignment.Provider.FirstName} {shift.ProviderAssignment.Provider.LastName},\n" +
+                              $"Your shift at {shift.ProviderAssignment.Center.CenterName} has ended at {DateTime.Now.ToString("dd-MM-yyyy hh:mm tt")}."
+                    };
+                    shift.ProviderAssignment.Provider.User.Notifications.Add(EndShiftNotification);
+                    commitData.SaveChanges();
+                    var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
+                    await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
+                }
             }
             else
             {
