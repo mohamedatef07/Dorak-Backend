@@ -37,7 +37,6 @@ namespace Dorak.ViewModels
         [Required(ErrorMessage = "Role is required")]
         public string Role { get; set; }
 
-
         // Shared fields (present in Client, Provider, AdminCenter)
         // Duplicated in ClientRegisterViewModel, ProviderRegisterViewModel, and AdminCenterViewModel
         public string? FirstName { get; set; }
