@@ -1,24 +1,167 @@
-﻿@using Models.Enums
-@using Dorak.ViewModels
-@section styles {
+﻿@section styles {
     <link rel="stylesheet" href="~/css/TableLayout.css" />
+    <link rel="stylesheet" href="~/lib/font-awesome/css/all.min.css" />
 }
-<div class="container">
-    <div class="card shadow rounded-3 p-4">
-        <div class="card-body">
-            <h2 class="card-title mb-3 main-bg-color text-white fw-bold border-bottom text-center rounded-3 p-2">@Model.CenterName</h2>
-            <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><strong>Center ID:</strong> @Model.CenterId</li>
-                <li class="list-group-item"><strong>Contact Number:</strong> @Model.ContactNumber</li>
-                <li class="list-group-item"><strong>Email:</strong> @Model.Email</li>
-                <li class="list-group-item"><strong>Website:</strong> <a href="@Model.WebsiteURL" target="_blank">@Model.WebsiteURL</a></li>
-                <li class="list-group-item"><strong>Location:</strong> @Model.Street, @Model.City, @Model.Governorate, @Model.Country</li>
-                <li class="list-group-item"><strong>Status:</strong> <span class="badge bg-@(Model.CenterStatus == CenterStatus.Active ? "success" : "danger")">@Model.CenterStatus</span></li>
-                <li class="list-group-item"><strong>Latitude:</strong> @Model.Latitude</li>
-                <li class="list-group-item"><strong>Longitude:</strong> @Model.Longitude</li>
-                <li class="list-group-item"><strong>Map URL:</strong> @Model.MapURL</li>
-            </ul>
-            <a asp-controller="center" asp-action="Index" style="" class="btn text-white main-bg-color mt-3">Back to List</a>
+<div class="row justify-content-center">
+    <div>
+        <!-- Main Card with Gradient Background -->
+        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+            <!-- Header with Gradient -->
+            <div class="card-header bg-gradient-primary text-white p-4 border-0">
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="text-center">
+                        <h2 class="card-title mb-1 fw-bold">@Model.CenterName</h2>
+                        <p class="mb-0 opacity-75">Center Details</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <!-- Status Badge -->
+                <div class="p-4 pb-0">
+                    <span class="badge fs-6 px-3 py-2 bg-@(Model.CenterStatus == CenterStatus.Active ? "success" : "danger") bg-opacity-10 text-@(Model.CenterStatus == CenterStatus.Active ? "success" : "danger") border border-@(Model.CenterStatus == CenterStatus.Active ? "success" : "danger")">
+                        <i class="fas fa-@(Model.CenterStatus == CenterStatus.Active ? "check-circle" : "times-circle") me-2"></i>
+                        @Model.CenterStatus
+                    </span>
+                </div>
+                <!-- Information Grid -->
+                <div class="row g-0 p-3">
+                    <!-- Contact Information -->
+                    <div class="col-md-6 p-4">
+                        <h5 class="text-primary fw-bold mb-3">
+                            <i class="fas fa-address-card me-2"></i>Contact Information
+                        </h5>
+                        <div class="space-y-3">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-phone text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Contact Number</small>
+                                    <strong>@Model.ContactNumber</strong>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Email Address</small>
+                                    <strong>@Model.Email</strong>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-globe text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Website</small>
+                                    <a href="@Model.WebsiteURL" target="_blank" class="text-decoration-none">
+                                        <strong class="text-primary">@Model.WebsiteURL</strong>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Location Information -->
+                    <div class="col-md-6 p-4">
+                        <h5 class="text-primary fw-bold mb-3">
+                            <i class="fas fa-map-marker-alt me-2"></i>Location Details
+                        </h5>
+                        <div class="space-y-3">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-map-pin text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Full Address</small>
+                                    <strong>@Model.Street, @Model.City</strong><br>
+                                    <small class="text-muted">@Model.Governorate, @Model.Country</small>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-location-arrow text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Coordinates</small>
+                                    <strong>@Model.Latitude, @Model.Longitude</strong>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-light rounded-circle p-2 me-3">
+                                    <i class="fas fa-map text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block">Map Link</small>
+                                    <strong class="text-primary">@Model.MapURL</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div>
+                    <div class="d-flex justify-content-end">
+                        <a asp-controller="Center" asp-action="Index" class="btn btn-secondary text-white">
+                            <i class="fas fa-arrow-left me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+<style>
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #2a6f97 0%, #1e4d6b 100%);
+    }
+
+    .space-y-3 > * + * {
+        margin-top: 1rem;
+    }
+
+    .card {
+        transition: transform 0.2s ease-in-out;
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+    .bg-light {
+        background-color: #f8f9fa !important;
+    }
+
+    .rounded-circle {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn {
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+    .badge {
+        border-radius: 0.5rem;
+        font-weight: 500;
+    }
+
+    .text-primary {
+        color: #2a6f97 !important;
+    }
+
+</style>
