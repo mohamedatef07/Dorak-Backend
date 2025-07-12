@@ -20,6 +20,7 @@ namespace Dorak.Models
             //Properties
             builder.Property(wallet => wallet.Balance)
                 .IsRequired(true);
+
         }
     }
 }

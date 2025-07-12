@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dorak.Models
 {
@@ -56,6 +56,9 @@ namespace Dorak.Models
 
             builder.Property(p => p.IsDeleted)
                 .HasDefaultValue(false);
+
+            builder.HasQueryFilter(o => !o.IsDeleted);
+
         }
     }
 

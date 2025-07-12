@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
 
 namespace Dorak.Models
 {
@@ -19,7 +17,7 @@ namespace Dorak.Models
                 .HasForeignKey<LiveQueue>(c => c.AppointmentId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-           
+
         }
     }
 }

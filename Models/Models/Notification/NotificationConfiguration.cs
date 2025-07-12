@@ -28,6 +28,7 @@ namespace Dorak.Models
                 .IsRequired(true);
             builder.Property(notification => notification.ExpiredAt)
                 .IsRequired(true);
+
         }
 
     }
