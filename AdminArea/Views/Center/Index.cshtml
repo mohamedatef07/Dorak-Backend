@@ -1,5 +1,4 @@
-﻿@using Models.Enums
-@model PaginationViewModel<CenterViewModel>
+﻿@model PaginationViewModel<CenterViewModel>
 @{
     bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
     bool canBack = Model.PageNumber <= 1;
