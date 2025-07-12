@@ -45,6 +45,7 @@ namespace Dorak.Models
 
             builder.Property(c => c.IsDeleted)
                 .HasDefaultValue(false);
+            builder.HasQueryFilter(c => !c.IsDeleted);
         }
     }
 }

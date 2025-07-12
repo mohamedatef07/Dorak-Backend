@@ -20,6 +20,8 @@ namespace Dorak.Models
                      .WithOne(LiveQueue => LiveQueue.Shift)
                      .HasForeignKey(LiveQueue => LiveQueue.ShiftId)
                      .OnDelete(DeleteBehavior.NoAction);
+            builder.HasQueryFilter(sh => !sh.IsDeleted);
+
 
         }
     }

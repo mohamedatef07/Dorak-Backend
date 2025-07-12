@@ -13,6 +13,9 @@ namespace Dorak.Models
             //Property
             builder.Property(providercertifications => providercertifications.IsDeleted)
                 .HasDefaultValue(false);
+
+            builder.HasQueryFilter(c => !c.IsDeleted);
+
         }
 
     }

@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Models.Enums;
 
 namespace Dorak.Models
 {
@@ -80,6 +78,9 @@ namespace Dorak.Models
 
             builder.Property(p => p.IsDeleted)
                 .HasDefaultValue(false);
+
+            builder.HasQueryFilter(p => !p.IsDeleted);
+
         }
     }
 }
