@@ -288,6 +288,7 @@ namespace API
              "update-provider-ratings",
               service => service.UpdateAllProvidersAverageRating(),
                Cron.Monthly);
+
             app.MapHub<QueueHub>("/queueHub");
             app.MapHub<ShiftListHub>("/shiftListHub");
             app.MapHub<NotificationHub>("/notificationHub");

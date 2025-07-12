@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace API.Controllers
 {
-    [Authorize(Roles = "Provider , Admin , Operator")]
+    //[Authorize(Roles = "Provider , Admin , Operator")]
     [ApiController]
     [Route("api/[controller]")]
     public class ProviderController : ControllerBase
@@ -21,7 +21,8 @@ namespace API.Controllers
         private readonly ShiftServices shiftServices;
         private readonly LiveQueueServices liveQueueServices;
         private readonly LiveQueueRepository liveQueueRepository;
-        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices, CenterServices _centerServices, OperatorServices _operatorServices, LiveQueueRepository _liveQueueRepository)
+        private readonly ReviewServices reviewServices;
+        public ProviderController(ProviderServices _providerServices, ShiftServices _shiftServices, LiveQueueServices _liveQueueServices, CenterServices _centerServices, OperatorServices _operatorServices, LiveQueueRepository _liveQueueRepository, ReviewServices _reviewServices)
         {
             centerServices = _centerServices;
             providerServices = _providerServices;
@@ -29,7 +30,7 @@ namespace API.Controllers
             liveQueueServices = _liveQueueServices;
             operatorServices = _operatorServices;
             liveQueueRepository = _liveQueueRepository;
-
+            reviewServices = _reviewServices;
         }
 
         [HttpGet("GetProviderById/{providerId}")]
@@ -291,6 +292,21 @@ namespace API.Controllers
                 return NotFound(new ApiResponse<object> { Message = "General statistics not found", Status = 404 });
             }
             return Ok(new ApiResponse<GeneralStatisticsDTO> { Message = "Get general statistics successfully", Status = 200, Data = generalStatistics });
+        }
+        [HttpGet("provider-reviews")]
+        public IActionResult GetReviewsForProvider([FromQuery] string providerId, int pageNumber = 1, int pageSize = 10)
+        {
+            if (string.IsNullOrWhiteSpace(providerId))
+            {
+                return BadRequest(new PaginationApiResponse<object>(false, "Invalid provider id", 400, null, 0, pageNumber, pageSize));
+            }
+            var paginationResponse = reviewServices.GetReviewsForProvider(providerId, pageNumber, pageSize);
+            if (paginationResponse.Data == null || !paginationResponse.Data.Any())
+            {
+                return NotFound(new PaginationApiResponse<object>(false, "No review found", 404, null, 0, pageNumber, pageSize));
+
+            }
+            return Ok(paginationResponse);
         }
     }
 }
