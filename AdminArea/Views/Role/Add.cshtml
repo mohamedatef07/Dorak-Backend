@@ -1,113 +1,57 @@
 ﻿@model List<RoleViewModel>
-<style>
-    div form .Add-btn {
-        background-color: var(--main-bg-color-Light);
-        width: fit-content;
-    }
-</style>
+@{
+    int roleId = 0;
+}
 
-<div class="container">
-    <h1>System Roles</h1>
+@section styles {
+    <link rel="stylesheet" href="~/css/components.css" />
+    <link rel="stylesheet" href="~/css/TableLayout.css" />
+}
 
-    @if (ViewBag.Invalid == 1)
-    {
-        <div class="alert alert-danger" role="alert">
-            Sorry Can Not Add This Role !!!!!
-        </div>
-    }
-    else if (ViewBag.Invalid == 2)
-    {
-        <div class="alert alert-success" role="alert">
-            Role Added Succssfully
-        </div>
-    }
-    <form asp-action="Add" asp-controller="Role">
-        <div class="mb-3 ">
-            <label class="form-label">Role Name</label>
-            <input type="text" class="form-control" name="roleName">
-        </div>
-        <input class="Add-btn btn text-white" type="submit" value="Add Role" />
-    </form>
-
-
-
-    <table class="table">
-        <thead>
+<h1>Roles</h1>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Edit</th>
+            <th scope="col">Delete</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            roleId++;
             <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Action</th>
+                <td>@roleId</td>
+                <td>@item.Name</td>
+                <td>
+                    <a asp-action="Edit" asp-controller="Role" asp-route-roleName="@item.Name" class="btn btn-secondary">Edit </a>
+                </td>
+                <td>
+                    <a asp-action="Delete" asp-controller="Role" asp-route-roleName="@item.Name" class="btn btn-danger">Delete </a>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <th scope="row">@item.Id</th>
-                    <td>@item.Name</td>
-                    <td>
-                        <a asp-action="Delete" asp-controller="Role" asp-route-roleName="@item.Name">Delete </a>
-                        <a asp-action="Edit" asp-controller="Role" asp-route-roleName="@item.Name">Edit </a>
-                    </td>
-                </tr>
-            }
+        }
+    </tbody>
+</table>
 
-        </tbody>
-    </table>
-</div>
-
-
-
-@* @model List<RoleViewModel>
-
-
-<div class="container">
-    <h1>System Roles</h1>
-
-    @if (ViewBag.Invalid == 1)
-    {
-        <div class="alert alert-danger" role="alert">
-            Sorry Can Not Add This Role !!!!!
-        </div>
-    }
-    else if (ViewBag.Invalid == 2)
-    {
-        <div class="alert alert-success" role="alert">
-            Role Added Succssfully
-        </div>
-    }
-    <form asp-action="Add" asp-controller="Role">
-        <div class="mb-3">
-            <label class="form-label">Role Name</label>
-            <input type="text" class="form-control" name="roleName">
-        </div>
-        <input type="submit" value="Add Role" />
-    </form>
-
-
-
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <th scope="row">@item.Id</th>
-                    <td>@item.Name</td>
-                    <td>
-                        <a asp-action="Delete" asp-controller="Role" asp-route-roleName="@item.Name">Delete </a>
-                        <a asp-action="Edit" asp-controller="Role" asp-route-roleName="@item.Name">Edit </a>
-                    </td>
-                </tr>
-            }
-
-        </tbody>
-    </table>
-</div>
- *@
+@if (ViewBag.Invalid == 1)
+{
+    <div class="alert alert-danger w-50" role="alert">
+        Sorry Can Not Add This Role !!!!!
+    </div>
+}
+else if (ViewBag.Invalid == 2)
+{
+    <div class="alert alert-success w-50" role="alert">
+        Role Added Succssfully
+    </div>
+}
+<form asp-action="Add" asp-controller="Role">
+    <div class="mb-3 ">
+        <label class="form-label">Role Name</label>
+        <input type="text" class="w-50 form-control" name="roleName" class="w-75">
+    </div>
+    <input class="btn btn-success text-white mb-4" type="submit" value="Add Role" />
+</form>
