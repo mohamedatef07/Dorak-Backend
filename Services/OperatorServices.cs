@@ -220,14 +220,14 @@ namespace Services
                 createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
             }
 
-            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId==reserveApointmentDTO.ShiftId);
-            
-            if (Currentshift.ShiftType==ShiftType.OnGoing)
+            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId == reserveApointmentDTO.ShiftId);
+
+            if (Currentshift.ShiftType == ShiftType.OnGoing)
             {
-                var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l=>l.CurrentQueuePosition).FirstOrDefault(l=>l.AppointmentStatus==QueueAppointmentStatus.Waiting);
-                if (FirstLiveQueueWaiting==null)
+                var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.Waiting);
+                if (FirstLiveQueueWaiting == null)
                 {
-                    FirstLiveQueueWaiting= liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
+                    FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
 
                 }
                 liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
@@ -277,7 +277,7 @@ namespace Services
                               $"Your shift at {shift.ProviderAssignment.Center.CenterName} Has been started NOW at {DateTime.Now.ToString("dd-MM-yyyy hh:mm tt")}."
                     };
                     shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
-                    
+
                     //await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("startShiftNotification", startShiftNotification);
                     var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
                     await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
