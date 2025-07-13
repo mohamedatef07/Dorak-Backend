@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Repositories;
 using Serilog;
 using Services;
+using Services.EmailService;
 using Stripe;
 using System.Diagnostics;
 using System.Text;
@@ -44,8 +45,8 @@ namespace API
 
             // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<DorakContext>();
-
+                .AddEntityFrameworkStores<DorakContext>()
+                .AddDefaultTokenProviders();
 
             var stripeSecretKey = builder.Configuration.GetSection("Stripe:SecretKey").Value;
             if (string.IsNullOrEmpty(stripeSecretKey))
@@ -112,6 +113,8 @@ namespace API
             builder.Services.AddScoped(typeof(NotificationServices)); // Register NotificationServices as a singleton
             builder.Services.AddScoped(typeof(NotificationRepository));
             builder.Services.AddSingleton(typeof(NotificationSignalRService));
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
+
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {

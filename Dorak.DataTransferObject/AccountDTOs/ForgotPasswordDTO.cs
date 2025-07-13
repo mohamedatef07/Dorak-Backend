@@ -10,9 +10,10 @@ namespace Dorak.DataTransferObject
     public class ForgotPasswordDTO
     {
         [Required]
-        [EmailAddress]  
+        [EmailAddress]
         public string Email { get; set; }
+
         [Required]
-        public string ClientAppUrl { get; set; }
+        public string ClientAppUrl { get; set; }  // example: https://dorak.com
     }
 }
