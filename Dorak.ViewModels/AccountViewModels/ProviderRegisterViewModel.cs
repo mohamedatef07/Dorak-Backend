@@ -42,6 +42,7 @@ namespace Dorak.ViewModels
         public string Availability { get; set; }
         public int EstimatedDuration { get; set; }
         public decimal Rate { get; set; }
+        public ProviderTitle providerTitle { get; set; }
 
     }
 }

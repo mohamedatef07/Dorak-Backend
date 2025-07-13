@@ -460,7 +460,7 @@ namespace API.Controllers
             var PaginationResponse = appointmentServices.GetAppointmentsHistory(userId, pageNumber, pageSize);
             if (PaginationResponse.Data == null || !PaginationResponse.Data.Any())
             {
-                return BadRequest(new PaginationApiResponse<object>(false, "No found History appointments", 400, null, 0, pageNumber, pageSize));
+                return Ok(new PaginationApiResponse<List<AppointmentCardDTO>>(false, "No found History appointments", 200, [], 0, pageNumber, pageSize));
             }
             return Ok(PaginationResponse);
         }

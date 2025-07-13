@@ -171,6 +171,8 @@ namespace Services
 
         public ClientWalletAndProfileDTO GetClientWalletAndProfile(string userId)
         {
+            var walletEntity = walletRepository.GetWalletByUserId(userId);
+
             var Client = clientRepository.GetById(c => c.ClientId == userId);
             var wallet = new ClientWalletAndProfileDTO()
             {
@@ -179,7 +181,7 @@ namespace Services
                 Name = $"{Client.FirstName} {Client.LastName}",
                 Phone = Client.User.PhoneNumber,
                 Email = Client.User.Email,
-                Balance = walletRepository.GetWalletByUserId(userId).Balance
+                Balance = walletEntity?.Balance ?? 0
             };
 
             return wallet;

@@ -3,6 +3,7 @@ using System.Net.Mail;
 using Dorak.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Services.EmailService;
 
 namespace Dorak.Controllers
 {
@@ -11,10 +12,12 @@ namespace Dorak.Controllers
     public class EmailController : ControllerBase
     {
         private readonly IConfiguration _config;
+        private readonly IEmailSender _emailSender;
 
-        public EmailController(IConfiguration config)
+        public EmailController(IConfiguration config, IEmailSender emailSender)
         {
             _config = config;
+            _emailSender = emailSender;
         }
 
         [HttpPost("SendEmail")]
@@ -52,10 +55,8 @@ namespace Dorak.Controllers
                     IsBodyHtml = true
                 };
 
-                // 👇 Makes it so you can reply directly to the user
                 mail.ReplyToList.Add(new MailAddress(form.Email));
 
-                // 👇 You receive the message in your Dorak inbox
                 mail.To.Add(_config["Smtp:To"]);
 
                 await smtpClient.SendMailAsync(mail);
@@ -70,6 +71,17 @@ namespace Dorak.Controllers
                     details = ex.Message
                 });
             }
+        }
+
+        [HttpPost("test")]
+        public async Task<IActionResult> TestEmail()
+        {
+            await _emailSender.SendEmailAsync(
+                "dorak.helpdesk@gmail.com",
+                "Test from Dorak EmailSender",
+                "<p>This is a test message from Dorak's email service.</p>"
+            );
+            return Ok("Test email sent!");
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
+using Dorak.Models.Enums;
 using Dorak.ViewModels;
 using Dorak.ViewModels.ServiceViewModel;
 using Repositories;
@@ -72,48 +73,75 @@ namespace Services
         }
 
 
-        public bool AssignServiceToProviderCenterService(AddProviderCenterServiceDTO model)
+        public AssignServiceResult AssignServiceToProviderCenterService(AddProviderCenterServiceDTO model)
         {
-
+            // 1. Input Validation
             if (string.IsNullOrEmpty(model.ProviderId) ||
-                                       model.ServiceId <= 0 ||
-                                       model.CenterId <= 0 ||
-                                       model.Price <= 0)
+                model.ServiceId <= 0 ||
+                model.CenterId <= 0 ||
+                model.Price <= 0)
             {
-                return false; // Any validation failure results in false
+                return AssignServiceResult.InvalidInput; // Specific error for invalid input
             }
 
-            // Check if the provider, service, or center exists in the database
+            // 2. Check if the provider, service, or center exists in the database
             var providerExists = providerRepository.GetById(p => p.ProviderId == model.ProviderId);
             var serviceExists = servicesRepository.GetById(s => s.ServiceId == model.ServiceId);
             var centerExists = centerRepository.GetById(c => c.CenterId == model.CenterId);
 
-            if (providerExists == null || serviceExists == null || centerExists == null)
+            if (providerExists == null)
             {
-                return false; // If any entity doesn't exist, return false
+                return AssignServiceResult.ProviderNotFound; // Specific error for provider not found
+            }
+            if (serviceExists == null)
+            {
+                return AssignServiceResult.ServiceNotFound; // Specific error for service not found
+            }
+            if (centerExists == null)
+            {
+                return AssignServiceResult.CenterNotFound; // Specific error for center not found
             }
 
-            // Create the new ProviderCenterService entity from the model
-            var newService = new ProviderCenterService
+            // 3. Check for existing assignment to prevent duplication
+            var existingAssignment = providerCenterServiceRepository.GetById(
+                p => p.ProviderId == model.ProviderId &&
+                p.ServiceId == model.ServiceId &&
+                p.CenterId == model.CenterId
+            );
+
+            if (existingAssignment != null)
             {
-                ProviderId = model.ProviderId,
-                ServiceId = model.ServiceId,
-                CenterId = model.CenterId,
-                Duration = providerExists.EstimatedDuration,
-                Price = model.Price,
-                Priority = model.Priority,
-                IsDeleted = false // Assuming the service is not deleted initially
-            };
+                return AssignServiceResult.AssignmentAlreadyExists; // Specific error for duplicate
+            }
 
-            // Add the new service to the database
-            providerCenterServiceRepository.Add(newService);
+            try
+            {
+                // 4. Create the new ProviderCenterService entity from the model
+                var newService = new ProviderCenterService
+                {
+                    ProviderId = model.ProviderId,
+                    ServiceId = model.ServiceId,
+                    CenterId = model.CenterId,
+                    Duration = providerExists.EstimatedDuration, // Assuming EstimatedDuration is on providerExists
+                    Price = model.Price,
+                    Priority = model.Priority,
+                    IsDeleted = false
+                };
 
-            // Save the changes
-            commitData.SaveChanges();
+                // 5. Add the new service to the database
+                providerCenterServiceRepository.Add(newService);
 
-            return true;
+                // 6. Save the changes
+                commitData.SaveChanges();
 
-
+                return AssignServiceResult.Success; // Success!
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (e.g., using a logging framework)
+                // logger.LogError(ex, "Error assigning service to provider center.");
+                return AssignServiceResult.UnknownError; // Catch any unexpected errors during DB operations
+            }
         }
         public List<ServicesDTO> GetAllServiceDropDown()
         {
