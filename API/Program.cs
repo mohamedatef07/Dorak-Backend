@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Repositories;
 using Serilog;
 using Services;
+using Services.EmailService;
 using Stripe;
 using System.Diagnostics;
 using System.Text;
@@ -30,7 +31,7 @@ namespace API
 
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log => Debug.WriteLine($"=========\n{log}"), LogLevel.Information).EnableSensitiveDataLogging());
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDBTEst")).LogTo(log => Debug.WriteLine($"=========\n{log}"), LogLevel.Information).EnableSensitiveDataLogging());
             // logging
             Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(@"Logs\DorakLog.txt",
@@ -44,8 +45,8 @@ namespace API
 
             // Dependency Injections
             builder.Services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<DorakContext>();
-
+                .AddEntityFrameworkStores<DorakContext>()
+                .AddDefaultTokenProviders();
 
             var stripeSecretKey = builder.Configuration.GetSection("Stripe:SecretKey").Value;
             if (string.IsNullOrEmpty(stripeSecretKey))
@@ -60,7 +61,7 @@ namespace API
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DorakDB"), new SqlServerStorageOptions
+                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DorakDBTEst"), new SqlServerStorageOptions
                 {
                     CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
                     SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
@@ -112,6 +113,8 @@ namespace API
             builder.Services.AddScoped(typeof(NotificationServices)); // Register NotificationServices as a singleton
             builder.Services.AddScoped(typeof(NotificationRepository));
             builder.Services.AddSingleton(typeof(NotificationSignalRService));
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
+
 
             builder.Services.AddControllers().AddJsonOptions(options =>
             {

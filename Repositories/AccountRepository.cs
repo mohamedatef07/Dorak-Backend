@@ -25,15 +25,19 @@ namespace Repositories
 
         public async Task<IdentityResult> Register(RegisterationViewModel userRegister)
         {
+            var userEntity = userRegister.ToModel();
 
-            var res = await UserManager.CreateAsync(userRegister.ToModel(), userRegister.Password);
+            var res = await UserManager.CreateAsync(userEntity, userRegister.Password);
             if (res.Succeeded)
             {
-                User user = await UserManager.FindByNameAsync(userRegister.UserName);
+                userEntity.EmailConfirmed = true;
+                await UserManager.UpdateAsync(userEntity); 
 
-                res = await UserManager.AddToRoleAsync(user, userRegister.Role);
+                res = await UserManager.AddToRoleAsync(userEntity, userRegister.Role);
+
                 return res;
             }
+
             return res;
         }
 

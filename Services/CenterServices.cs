@@ -142,7 +142,9 @@ namespace Services
             builder = builder.And(pa => pa.CenterId == centerId && !pa.IsDeleted);
 
 
-            var assignments = providerAssignmentRepository.GetList(builder).ToList();
+            var assignments = providerAssignmentRepository.GetList(builder)
+                 .GroupBy(pa => pa.ProviderId)
+                 .Select(g => g.First()).ToList();
             var validAssignments = assignments
                 .Select(pa =>
                 {
@@ -220,7 +222,10 @@ namespace Services
         {
             var builder = PredicateBuilder.New<ProviderAssignment>(true);
             builder = builder.And(pa => pa.CenterId == CenterId && !pa.IsDeleted);
-            var assignments = providerAssignmentRepository.GetList(builder).ToList();
+            var assignments = providerAssignmentRepository.GetList(builder)
+                                              .GroupBy(builder => builder.ProviderId) 
+                                              .Select(group => group.First())       
+                                              .ToList();
             var result = assignments
                 .Select(pa => new ProviderDropDownDTO
                 {
