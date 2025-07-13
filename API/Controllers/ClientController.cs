@@ -269,30 +269,6 @@ namespace API.Controllers
             });
         }
 
-        [HttpGet("provider-reviews")]
-        public IActionResult GetReviewsForProvider([FromQuery] string providerId)
-        {
-            if (string.IsNullOrWhiteSpace(providerId))
-            {
-                return BadRequest(new ApiResponse<object> { Message = "Invalid provider id", Status = 400 });
-            }
-            var reviews = reviewServices.GetReviewsForProvider(providerId);
-            if (!reviews.Any())
-            {
-                return NotFound(new ApiResponse<object>
-                {
-                    Message = "No reviews found",
-                    Status = 404
-                });
-            }
-            return Ok(new ApiResponse<List<ReviewByProviderDTO>>
-            {
-                Message = "Reviews retrieved successfully.",
-                Status = 200,
-                Data = reviews
-            });
-        }
-
         [HttpGet("client-reviews")]
         public IActionResult GetClientReviews([FromQuery] string clientId, int pageNumber = 1, int pageSize = 10)
         {

@@ -66,15 +66,22 @@ namespace Services
 
         public void UpdateAllProvidersAverageRating()
         {
-            var providers = _providerRepository.GetList(p => !p.IsDeleted);
+            var providers = _providerRepository.GetList(p => !p.IsDeleted).ToList();
+
+            var providerAverages = _reviewRepository.GetList(r => !r.IsDeleted).GroupBy(r => r.ProviderId)
+                .Select(g => new
+                {
+                    ProviderId = g.Key,
+                    Rating = g.Average(r => r.Rating)
+                }).ToList();
+
+            var averageDict = providerAverages.ToDictionary(x => x.ProviderId, x => x.Rating);
 
             foreach (var provider in providers)
             {
-                var reviews = _reviewRepository.GetList(r => r.ProviderId == provider.ProviderId && !r.IsDeleted)
-                    .ToList();
-                if (reviews.Any())
+                if (averageDict.TryGetValue(provider.ProviderId, out var averageRate))
                 {
-                    provider.Rate = reviews.Average(r => r.Rating);
+                    provider.Rate = averageRate;
                 }
                 else
                 {
@@ -84,19 +91,29 @@ namespace Services
             _commitData.SaveChanges();
         }
 
-
-        public List<ReviewByProviderDTO> GetReviewsForProvider(string providerId)
+        public PaginationApiResponse<List<GetAllProviderReviewsDTO>> GetReviewsForProvider(string providerId, int pageNumber = 1, int pageSize = 10)
         {
-            return _reviewRepository.GetList(r => r.ProviderId == providerId && !r.IsDeleted)
-                .Select(r => new ReviewByProviderDTO
-                {
-                    ProviderName = $"{r.Provider.FirstName} {r.Provider.LastName}",
-                    ClientName = $"{r.Client.FirstName} {r.Client.LastName}",
-                    Review = r.Description,
-                    ClientId = r.ClientId,
-                    Rate = r.Rating,
-                    Date = r.Date
-                }).ToList();
+            Expression<Func<Review, bool>> filter = rev => rev.ProviderId == providerId && !rev.IsDeleted;
+            var reviews = _reviewRepository.GetAllOrderedByExpression(filter, pageSize, pageNumber, query => query.OrderByDescending(rev => rev.Date))
+                                             .Select(r => new GetAllProviderReviewsDTO
+                                             {
+                                                 ClientName = $"{r.Client.FirstName} {r.Client.LastName}",
+                                                 Review = r.Description,
+                                                 ClientId = r.ClientId,
+                                                 Rate = r.Rating,
+                                                 Date = r.Date
+                                             }).ToList();
+
+            var totalRecords = _reviewRepository.GetList(filter).Count();
+            var paginationResponse = new PaginationApiResponse<List<GetAllProviderReviewsDTO>>(
+            success: true,
+            message: "Provider reviews retrieved successfully.",
+            status: 200,
+            data: reviews,
+            totalRecords: totalRecords,
+            currentPage: pageNumber,
+            pageSize: pageSize);
+            return paginationResponse;
         }
 
         public PaginationApiResponse<List<ReviewByClientDTO>> GetReviewsForClient(string ClientId, int pageNumber = 1, int pageSize = 10)

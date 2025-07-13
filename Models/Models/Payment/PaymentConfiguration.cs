@@ -39,6 +39,8 @@ namespace Dorak.Models
                 .IsRequired(true);
             builder.Property(payment => payment.TransactionDate)
                 .IsRequired(true);
+
+
         }
 
     }
