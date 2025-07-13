@@ -268,7 +268,6 @@ namespace Services
                 shift.ExactStartTime = timeNow;
                 shift.ShiftType = ShiftType.OnGoing;
                 shiftRepository.Edit(shift);
-                commitData.SaveChanges();
                 if (shift?.ProviderAssignment?.Provider?.User?.Notifications != null)
                 {
                     var startShiftNotification = new Notification()
@@ -278,11 +277,12 @@ namespace Services
                               $"Your shift at {shift.ProviderAssignment.Center.CenterName} Has been started NOW at {DateTime.Now.ToString("dd-MM-yyyy hh:mm tt")}."
                     };
                     shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
-                    commitData.SaveChanges();
+                    
                     //await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("startShiftNotification", startShiftNotification);
                     var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
                     await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
                 }
+                commitData.SaveChanges();
             }
             else
             {
@@ -315,7 +315,6 @@ namespace Services
                 {
 
                     appointment.User.Notifications.Add(appointmentstartNotification);
-                    commitData.SaveChanges();
 
                     var clientConnectionId = _notificationSignalRService.SendMessage(appointment.User.Id, new NotificationDTO
                     {
@@ -330,6 +329,7 @@ namespace Services
                 }
             }
             commitData.SaveChanges();
+
             return true;
         }
 
@@ -388,7 +388,7 @@ namespace Services
             var appointment = liveQueue.Appointment;
             var now = DateTime.Now;
             var today = DateOnly.FromDateTime(now);
-
+            int position = liveQueue.CurrentQueuePosition ?? 0;
             switch (model.SelectedStatus)
             {
                 case "NotChecked":
@@ -408,6 +408,8 @@ namespace Services
                     appointment.IsChecked = true;
                     liveQueue.ArrivalTime = TimeOnly.FromDateTime(now);
                     appointment.ArrivalTime = TimeOnly.FromDateTime(now);
+                    position = liveQueue.CurrentQueuePosition ?? 0;
+                    await liveQueueServices.editTurnPrevious(liveQueue.ShiftId, position);
                     break;
 
                 case "InProgress":
@@ -430,8 +432,8 @@ namespace Services
                     appointment.EndTime = TimeOnly.FromDateTime(now);
                     appointment.AdditionalFees = model.AdditionalFees ?? 0m;
                     appointment.AppointmentStatus = AppointmentStatus.Completed;
-                    int position = liveQueue.CurrentQueuePosition ?? 0;
-                    liveQueueServices.editTurn(liveQueue.ShiftId, position);
+                    position = liveQueue.CurrentQueuePosition ?? 0;
+                    await liveQueueServices.editTurn(liveQueue.ShiftId, position);
                     break;
 
                 default:

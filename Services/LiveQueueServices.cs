@@ -3,11 +3,9 @@ using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Hubs;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Models.Enums;
 using Repositories;
-using System.Data.Entity;
 using System.Net.Sockets;
 
 namespace Services
@@ -295,7 +293,7 @@ namespace Services
                 UserId = user.Id,
                 AppointmentId = appointment.AppointmentId
             };
-            
+
             user.Notifications.Add(turnChangeNotification);
             commitData.SaveChanges();
 
@@ -387,12 +385,54 @@ namespace Services
 
             NotifyTurnChange(late.LiveQueueId, positionNumber).GetAwaiter().GetResult();
         }
-
-        public int GetLastLiveQueue(int shiftId)
+        public async Task<List<ProviderLiveQueueViewModel>> editTurnPrevious(int shiftId, int currentQueuePosition)
         {
-            return liveQueueRepository.GetAllShiftLiveQueues(shiftId)
-                                    .Max(li=>li.CurrentQueuePosition)
-                                    .GetValueOrDefault();
+            var shift = shiftRepository.GetShiftById(shiftId);
+            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition < currentQueuePosition).OrderBy(l => l.CurrentQueuePosition).ToList();
+
+
+            bool flag = true;
+
+            if (liveQueues != null && liveQueues.Any())
+            {
+                int position;
+                foreach (LiveQueue lq in liveQueues)
+                {
+                    if (lq.AppointmentStatus == QueueAppointmentStatus.NotChecked)
+                    {
+                        flag = false;
+
+                        position = lq.CurrentQueuePosition ?? 0;
+
+                        reOrder(lq, lq.ShiftId, position, currentQueuePosition);
+                        await NotifyTurnChange(lq.LiveQueueId, position);
+
+                        return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+                    }
+                }
+
+                if (flag)
+                {
+                    var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+                    if (currentQueue != null)
+                    {
+                        await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
+                    }
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+                }
+
+                return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+
+            }
+            else
+            {
+                var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+                if (currentQueue != null)
+                {
+                    await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
+                }
+                return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+            }
         }
     }
 

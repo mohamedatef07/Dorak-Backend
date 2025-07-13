@@ -293,6 +293,7 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<GeneralStatisticsDTO> { Message = "Get general statistics successfully", Status = 200, Data = generalStatistics });
         }
+        [AllowAnonymous]
         [HttpGet("provider-reviews")]
         public IActionResult GetReviewsForProvider([FromQuery] string providerId, int pageNumber = 1, int pageSize = 10)
         {
