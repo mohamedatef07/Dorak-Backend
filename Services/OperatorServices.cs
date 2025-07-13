@@ -362,7 +362,7 @@ namespace Services
             var appointment = liveQueue.Appointment;
             var now = DateTime.Now;
             var today = DateOnly.FromDateTime(now);
-
+            int position = liveQueue.CurrentQueuePosition ?? 0;
             switch (model.SelectedStatus)
             {
                 case "NotChecked":
@@ -382,6 +382,8 @@ namespace Services
                     appointment.IsChecked = true;
                     liveQueue.ArrivalTime = TimeOnly.FromDateTime(now);
                     appointment.ArrivalTime = TimeOnly.FromDateTime(now);
+                    position = liveQueue.CurrentQueuePosition ?? 0;
+                    await liveQueueServices.editTurnPrevious(liveQueue.ShiftId, position);
                     break;
 
                 case "InProgress":
@@ -404,8 +406,8 @@ namespace Services
                     appointment.EndTime = TimeOnly.FromDateTime(now);
                     appointment.AdditionalFees = model.AdditionalFees ?? 0m;
                     appointment.AppointmentStatus = AppointmentStatus.Completed;
-                    int position = liveQueue.CurrentQueuePosition ?? 0;
-                    liveQueueServices.editTurn(liveQueue.ShiftId, position);
+                    position = liveQueue.CurrentQueuePosition ?? 0;
+                    await liveQueueServices.editTurn(liveQueue.ShiftId, position);
                     break;
 
                 default:
