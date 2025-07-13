@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Data
 {
     public class DorakContext : IdentityDbContext<User>
-    {       
+    {
         //Tables
         public virtual DbSet<Center> Centers { get; set; }
         public virtual DbSet<AdminCenterManagement> AdminCentersManagement { get; set; }
@@ -52,6 +52,33 @@ namespace Data
             builder.ApplyConfiguration(new ReviewConfiguration { });
 
             base.OnModelCreating(builder);
+
+            builder.Entity<Service>().HasData(
+                new Service
+                {
+                    ServiceId = 1,
+                    ServiceName = "Normal",
+                    Description = "Normal Consultition",
+                    BasePrice = 150,
+                    IsDeleted = false
+                },
+                new Service
+                {
+                    ServiceId = 2,
+                    ServiceName = "Consultation",
+                    Description = "General medical consultation",
+                    BasePrice = 100,
+                    IsDeleted = false
+                },
+                new Service
+                {
+                    ServiceId = 3,
+                    ServiceName = "Urgent",
+                    Description = "Urgent medical visit",
+                    BasePrice = 150,
+                    IsDeleted = false
+                }
+            );
         }
     }
 }
