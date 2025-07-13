@@ -55,7 +55,7 @@ namespace API.Controllers
             var paginationResponse = _notificationServices.GetNotification(userId, pageNumber, pageSize);
             if (paginationResponse.Data == null || !paginationResponse.Data.Any())
             {
-                return NotFound(new PaginationApiResponse<object>(false, "notifications not found", 404, null, 0, pageNumber, pageSize));
+                return Ok(new PaginationApiResponse<List<NotificationDTO>>(false, "notifications not found", 200, [], 0, pageNumber, pageSize));
             }
             return Ok(paginationResponse);
         }

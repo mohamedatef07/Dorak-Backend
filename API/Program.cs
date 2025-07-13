@@ -31,7 +31,7 @@ namespace API
 
             builder.Services.AddDbContext<DorakContext>(options =>
                 options.UseLazyLoadingProxies()
-                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDB")).LogTo(log => Debug.WriteLine($"=========\n{log}"), LogLevel.Information).EnableSensitiveDataLogging());
+                       .UseSqlServer(builder.Configuration.GetConnectionString("DorakDBTEst")).LogTo(log => Debug.WriteLine($"=========\n{log}"), LogLevel.Information).EnableSensitiveDataLogging());
             // logging
             Serilog.Log.Logger = new LoggerConfiguration()
                 .WriteTo.File(@"Logs\DorakLog.txt",
@@ -61,7 +61,7 @@ namespace API
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DorakDB"), new SqlServerStorageOptions
+                .UseSqlServerStorage(builder.Configuration.GetConnectionString("DorakDBTEst"), new SqlServerStorageOptions
                 {
                     CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
                     SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
