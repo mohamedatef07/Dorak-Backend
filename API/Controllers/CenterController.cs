@@ -190,6 +190,7 @@ namespace API.Controllers
             });
         }
 
+        //[Authorize(Roles = "Admin, Operator")]
         [HttpGet]
         [Route("CenterStatistics")]
         public IActionResult GetCenterStatistics([FromQuery] int centerId)
@@ -208,6 +209,38 @@ namespace API.Controllers
                 Data = stats,
                 Message = "Success",
                 Status = 200
+            });
+        }
+
+        [HttpGet("get-center-assignments")]
+        public IActionResult GetCenterAssignments([FromQuery] int centerId)
+        {
+            if (centerId <= 0)
+            {
+                return BadRequest(new
+                {
+                    Message = "Invalid center ID provided",
+                    Status = 400
+                });
+            }
+
+            var res = centerServices.GetCenterAssignments(centerId);
+
+            if (res == null || !res.Any())
+            {
+                return NotFound(new
+                {
+                    Message = "No assignments found for the specified center",
+                    Status = 404
+                });
+            }
+
+            return Ok(new
+            {
+                Data = res,
+                Message = "Center assignments retrieved successfully",
+                Status = 200,
+
             });
         }
     }
