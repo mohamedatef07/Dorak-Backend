@@ -387,6 +387,13 @@ namespace Services
 
             NotifyTurnChange(late.LiveQueueId, positionNumber).GetAwaiter().GetResult();
         }
+
+        public int GetLastLiveQueue(int shiftId)
+        {
+            return liveQueueRepository.GetAllShiftLiveQueues(shiftId)
+                                    .Max(li=>li.CurrentQueuePosition)
+                                    .GetValueOrDefault();
+        }
     }
 
 }

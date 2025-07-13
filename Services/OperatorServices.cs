@@ -5,6 +5,7 @@ using Dorak.ViewModels;
 using Hubs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models.Enums;
 using Repositories;
 using System.Linq.Expressions;
@@ -209,9 +210,8 @@ namespace Services
             var createdAppointment = await appointmentRepository.CreateAppoinment(app);
             createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
-            Console.WriteLine(" Saving to DB...");
             commitData.SaveChanges();
-            Console.WriteLine(" Done saving to DB");
+
             var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
             var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
@@ -220,6 +220,32 @@ namespace Services
                 createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
             }
 
+            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId==reserveApointmentDTO.ShiftId);
+            
+            if (Currentshift.ShiftType==ShiftType.OnGoing)
+            {
+                var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l=>l.CurrentQueuePosition).FirstOrDefault(l=>l.AppointmentStatus==QueueAppointmentStatus.Waiting);
+                if (FirstLiveQueueWaiting==null)
+                {
+                    FirstLiveQueueWaiting= liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
+
+                }
+                liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
+                var newLiveQueue = new LiveQueue
+                {
+                    ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
+                    EstimatedTime = createdAppointment.EstimatedTime,
+                    EstimatedDuration = createdAppointment.ProviderCenterService.Duration,
+                    AppointmentStatus = QueueAppointmentStatus.NotChecked,
+                    Capacity = createdAppointment.Shift.MaxPatientsPerDay,
+                    OperatorId = createdAppointment.OperatorId,
+                    AppointmentId = createdAppointment.AppointmentId,
+                    ShiftId = createdAppointment.ShiftId,
+                    CurrentQueuePosition = FirstLiveQueueWaiting.CurrentQueuePosition,
+                };
+                liveQueueRepository.Add(newLiveQueue);
+                commitData.SaveChanges();
+            }
             return createdAppointment.ToReserveAppointmentResultDTO();
         }
 
