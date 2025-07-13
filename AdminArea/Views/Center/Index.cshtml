@@ -3,6 +3,7 @@
     bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
     bool canBack = Model.PageNumber <= 1;
     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
+    int centerId = 0;
 }
 @section styles {
     <link rel="stylesheet" href="~/css/TableLayout.css" />
@@ -11,27 +12,29 @@
     <form asp-controller="Center" asp-action="Index" method="get" class="g-3 d-flex gap-4" id="searchForm">
         <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
         <input type="text" class="form form-control" name="searchText" placeholder="Search Text">
-        <input type="submit" class="btn text-white search-btn " value="Search" />
+        <input type="submit" class="btn text-white btn-success" value="Search" />
+        <input type="button" class="btn text-white btn-dark " value="Reset" onclick="resetSearchForm()" />
     </form>
 </div>
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">Center ID</th>
-            <th scope="col">Center Name</th>
-            <th scope="col">Contact Number</th>
-            <th scope="col">City</th>
-            <th scope="col">Status</th>
-            <th scope="col">Active</th>
-            <th scope="col">Delete</th>
-            <th scope="col">Details</th>
+            <th>#</th>
+            <th>Center Name</th>
+            <th>Contact Number</th>
+            <th>City</th>
+            <th>Status</th>
+            <th>Active</th>
+            <th>Delete</th>
+            <th>Details</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var center in Model.Data)
         {
+            ++centerId;
             <tr>
-                <td>@center.CenterId</td>
+                <td class="p-3">@centerId</td>
                 <td>@center.CenterName</td>
                 <td>@center.ContactNumber</td>
                 <td>@center.City</td>
@@ -44,7 +47,7 @@
                                    role="switch"
                                    data-center-id="@center.CenterId"
                                    onchange="toggleCenterStatus(this)"
-                            @(center.CenterStatus == CenterStatus.Active ? "checked=\"checked\"" : "") />
+                                   @(center.CenterStatus == CenterStatus.Active ? "checked=\"checked\"" : "") />
                         </div>
                     </form>
                 </td>
@@ -94,6 +97,11 @@
                 contentType: 'application/json',
                 data: JSON.stringify({ centerId: parseInt(centerId), status })
             });
+        }
+        function resetSearchForm() {
+        document.getElementById('searchForm').reset();
+        document.getElementById('searchForm').submit();
+        form.submit();
         }
     </script>
 }
