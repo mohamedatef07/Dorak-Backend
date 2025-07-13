@@ -1,5 +1,6 @@
 ﻿using Data;
 using Dorak.DataTransferObject;
+using Dorak.DataTransferObject.CenterDTOs;
 using Dorak.Models;
 using Dorak.ViewModels;
 using LinqKit;
@@ -467,6 +468,8 @@ namespace Services
 
             var center = centerRepository.GetById(c => c.CenterId == centerId);
 
+            var centerName = center.CenterName;
+
             var providerCount = providerAssignmentRepository.GetList(pa => pa.CenterId == centerId && !pa.IsDeleted)
                 .Select(pa => pa.ProviderId)
                 .Distinct()
@@ -484,11 +487,38 @@ namespace Services
 
             return new CenterStatisticsDTO
             {
+                CenterName = centerName,
                 ProvidersCount = providerCount,
                 OperatorsCount = operatorCount,
                 AppointmentsCount = appointmentCount,
                 TotalRevenue = totalRevenue
             };
+        }
+
+        public List<GetCenterAssignmentsDTO> GetCenterAssignments(int centerId)
+        {
+            var builder = PredicateBuilder.New<ProviderAssignment>(true);
+            builder = builder.And(pa => pa.CenterId == centerId && !pa.IsDeleted);
+
+            var assignments = providerAssignmentRepository.GetList(builder).ToList();
+            var validAssignments = assignments
+                .Select(pa =>
+                {
+                    pa.Provider = providerRepository.GetProviderById(pa.ProviderId);
+                    return pa;
+                })
+                .Where(pa => pa.Provider != null)
+                .Select(pa => new GetCenterAssignmentsDTO
+                {
+                    AssignmentId = pa.AssignmentId,
+                    CenterId = pa.CenterId,
+                    StartDate = pa.StartDate,
+                    EndDate = pa.EndDate,
+                    IsDeleted = pa.IsDeleted
+                })
+                .ToList();
+
+            return validAssignments;
         }
     }
 }
