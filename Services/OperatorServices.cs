@@ -5,6 +5,7 @@ using Dorak.ViewModels;
 using Hubs;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models.Enums;
 using Repositories;
 using System.Linq.Expressions;
@@ -201,20 +202,78 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
 
+            var appointmentReserved = appointmentRepository.GetList(ap => ap.ShiftId == app.ShiftId && ap.AppointmentStatus != AppointmentStatus.Cancelled).Count();
+
+            var shiftMaxPatientsPerDay = shiftRepository.Get(shift => shift.ShiftId == app.ShiftId).Select(sh=>sh.MaxPatientsPerDay).FirstOrDefault();
+            if (shiftMaxPatientsPerDay <= appointmentReserved)
+                throw new InvalidOperationException("Cannot reserve an appointment shift is full");
+
             var createdAppointment = await appointmentRepository.CreateAppoinment(app);
             createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
-            Console.WriteLine(" Saving to DB...");
             commitData.SaveChanges();
-            Console.WriteLine(" Done saving to DB");
+
             var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
-            var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
-            if (queuedAppointment != null)
+            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId==reserveApointmentDTO.ShiftId);
+            
+            if (Currentshift.ShiftType==ShiftType.OnGoing)
             {
-                createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
-            }
+                var newLiveQueue = new LiveQueue();
+                int shiftDuration = app.ProviderCenterService.Duration;
 
+                if (createdAppointment.AppointmentType==AppointmentType.Urgent)
+                {
+                    var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l=>l.CurrentQueuePosition).FirstOrDefault(l=>l.AppointmentStatus==QueueAppointmentStatus.Waiting);
+                    if (FirstLiveQueueWaiting==null)
+                    {
+                        FirstLiveQueueWaiting= liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
+
+                    }
+                    liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
+                    liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.EstimatedTime, l => l.EstimatedTime.AddMinutes(l.EstimatedDuration)));
+                    newLiveQueue = new LiveQueue
+                    {
+                        ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
+                        EstimatedTime = FirstLiveQueueWaiting.EstimatedTime,
+                        EstimatedDuration = shiftDuration,
+                        AppointmentStatus = QueueAppointmentStatus.Waiting,
+                        Capacity = shiftMaxPatientsPerDay,
+                        OperatorId = createdAppointment.OperatorId,
+                        AppointmentId = createdAppointment.AppointmentId,
+                        ShiftId = createdAppointment.ShiftId,
+                        CurrentQueuePosition = FirstLiveQueueWaiting.CurrentQueuePosition,
+                    };
+                    FirstLiveQueueWaiting.EstimatedTime.AddMinutes(newLiveQueue.EstimatedDuration);
+                    liveQueueRepository.Edit(newLiveQueue);
+                    liveQueueRepository.Add(newLiveQueue);
+                }
+                else
+                {
+                    var lastLiveQueuePosition = liveQueueRepository.GetLiveQueueDetailsForShift(Currentshift.ShiftId).OrderByDescending(lq=>lq.CurrentQueuePosition).FirstOrDefault();
+
+                    newLiveQueue = new LiveQueue
+                    {
+                        ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
+                        EstimatedTime = lastLiveQueuePosition.EstimatedTime.AddMinutes(lastLiveQueuePosition.EstimatedDuration),
+                        EstimatedDuration = createdAppointment.ProviderCenterService.Duration,
+                        AppointmentStatus = QueueAppointmentStatus.NotChecked,
+                        Capacity = shiftMaxPatientsPerDay,
+                        OperatorId = createdAppointment.OperatorId,
+                        AppointmentId = createdAppointment.AppointmentId,
+                        ShiftId = createdAppointment.ShiftId,
+                        CurrentQueuePosition = lastLiveQueuePosition.CurrentQueuePosition + 1,
+                    };
+                    liveQueueRepository.Add(newLiveQueue);
+                    
+                }
+                await commitData.SaveChangesAsync();
+                await UpdateQueueStatusAsync(new UpdateQueueStatusViewModel
+                {
+                    LiveQueueId = newLiveQueue.LiveQueueId,
+                    SelectedStatus = "Waiting"
+                });
+            }
             return createdAppointment.ToReserveAppointmentResultDTO();
         }
 
@@ -237,7 +296,6 @@ namespace Services
                 shift.ExactStartTime = timeNow;
                 shift.ShiftType = ShiftType.OnGoing;
                 shiftRepository.Edit(shift);
-                commitData.SaveChanges();
                 if (shift?.ProviderAssignment?.Provider?.User?.Notifications != null)
                 {
                     var startShiftNotification = new Notification()
@@ -247,26 +305,31 @@ namespace Services
                               $"Your shift at {shift.ProviderAssignment.Center.CenterName} Has been started NOW at {DateTime.Now.ToString("dd-MM-yyyy hh:mm tt")}."
                     };
                     shift.ProviderAssignment.Provider.User.Notifications.Add(startShiftNotification);
-                    commitData.SaveChanges();
+
                     //await notificationHubContext.Clients.User(shift.ProviderAssignment.ProviderId).SendAsync("startShiftNotification", startShiftNotification);
                     var ProviderpaginatedNotifications = notificationServices.GetNotification(shift.ProviderAssignment.Provider.ProviderId);
                     await _notificationSignalRService.SendUpdatedNotificationList(shift.ProviderAssignment.Provider.ProviderId, ProviderpaginatedNotifications);
                 }
+                commitData.SaveChanges();
             }
             else
             {
                 return false;
             }
             IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app => app.EstimatedTime);
+            Appointment appointmentDetails = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app => app.EstimatedTime).FirstOrDefault();
             int count = 0;
+            int shiftDuration = appointmentDetails.ProviderCenterService.Duration;
+            //for shift
+            TimeOnly ExactEstimatedTime = (TimeOnly)shift.ExactStartTime;
             foreach (var appointment in appointments)
             {
                 appointment.OperatorId = operatorId;
                 var livequeue = new LiveQueue
                 {
                     ArrivalTime = null,
-                    EstimatedTime = appointment.EstimatedTime,
-                    EstimatedDuration = appointment.ProviderCenterService.Duration,
+                    EstimatedTime = ExactEstimatedTime.AddMinutes(shiftDuration*count),
+                    EstimatedDuration = shiftDuration,
                     AppointmentStatus = QueueAppointmentStatus.NotChecked,
                     Capacity = appointment.Shift.MaxPatientsPerDay,
                     OperatorId = appointment.OperatorId,
@@ -284,7 +347,6 @@ namespace Services
                 {
 
                     appointment.User.Notifications.Add(appointmentstartNotification);
-                    commitData.SaveChanges();
 
                     var clientConnectionId = _notificationSignalRService.SendMessage(appointment.User.Id, new NotificationDTO
                     {
@@ -299,6 +361,7 @@ namespace Services
                 }
             }
             commitData.SaveChanges();
+
             return true;
         }
 
@@ -357,7 +420,7 @@ namespace Services
             var appointment = liveQueue.Appointment;
             var now = DateTime.Now;
             var today = DateOnly.FromDateTime(now);
-
+            int position = liveQueue.CurrentQueuePosition ?? 0;
             switch (model.SelectedStatus)
             {
                 case "NotChecked":
@@ -377,6 +440,8 @@ namespace Services
                     appointment.IsChecked = true;
                     liveQueue.ArrivalTime = TimeOnly.FromDateTime(now);
                     appointment.ArrivalTime = TimeOnly.FromDateTime(now);
+                    position = liveQueue.CurrentQueuePosition ?? 0;
+                    await liveQueueServices.editTurnPrevious(liveQueue.ShiftId, position);
                     break;
 
                 case "InProgress":
@@ -399,8 +464,8 @@ namespace Services
                     appointment.EndTime = TimeOnly.FromDateTime(now);
                     appointment.AdditionalFees = model.AdditionalFees ?? 0m;
                     appointment.AppointmentStatus = AppointmentStatus.Completed;
-                    int position = liveQueue.CurrentQueuePosition ?? 0;
-                    liveQueueServices.editTurn(liveQueue.ShiftId, position);
+                    position = liveQueue.CurrentQueuePosition ?? 0;
+                    await liveQueueServices.editTurn(liveQueue.ShiftId, position);
                     break;
 
                 default:

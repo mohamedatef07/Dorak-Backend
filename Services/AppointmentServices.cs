@@ -232,7 +232,7 @@ namespace Services
         {
             // Get all appointments scheduled for two days from now
             var upcomingAppointments = appointmentRepository.GetUpcomingAppointments()
-                .Where(a => a.AppointmentDate == DateOnly.FromDateTime(DateTime.Now.AddDays(2)))
+                .Where(a => a.AppointmentDate == DateOnly.FromDateTime(DateTime.Now.AddDays(1)))
                 .ToList();
 
             foreach (var appointment in upcomingAppointments)

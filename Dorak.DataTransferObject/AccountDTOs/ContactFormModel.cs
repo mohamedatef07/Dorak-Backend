@@ -9,9 +9,8 @@ namespace Dorak.Models
 
         [Required, EmailAddress]
         public string Email { get; set; }
-
-        public string Phone { get; set; }          
-        public string CenterName { get; set; }       
+        public string? Phone { get; set; }          
+        public string? CenterName { get; set; }       
         public string InquiryType { get; set; }       
 
         public string Subject { get; set; }

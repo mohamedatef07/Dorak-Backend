@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Services;
+using Services.EmailService;
 using System.Security.Claims;
+using System.Web;
 
 namespace API.Controllers
 {
@@ -21,12 +23,14 @@ namespace API.Controllers
         private readonly OperatorServices _operatorServices;
         private readonly AdminCenterServices _adminCenterServices;
         private readonly UserManager<User> _userManager;
+        private readonly IEmailSender _emailSender;
         public AccountController(AccountServices accountServices,
                                 ClientServices clientServices,
                                 ProviderServices providerServices,
                                 OperatorServices operatorServices,
                                 AdminCenterServices adminCenterServices,
-                                UserManager<User> userManager)
+                                UserManager<User> userManager,
+                                IEmailSender emailSender)
         {
             _accountServices = accountServices;
             _clientServices = clientServices;
@@ -34,6 +38,7 @@ namespace API.Controllers
             _operatorServices = operatorServices;
             _adminCenterServices = adminCenterServices;
             _userManager = userManager;
+            _emailSender = emailSender;
         }
 
         [HttpPost("Register")]
@@ -293,27 +298,69 @@ namespace API.Controllers
         }
 
         //Forgot Password
-        //[HttpPost("forgot-password")]
-        //public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return BadRequest(new ApiResponse<object> { Message = "Invalid Email", Status = 400 });
-        //    }
-        //    User? user = await _userManager.FindByEmailAsync(model.Email);
-        //    if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
-        //    {
-        //        return Ok(new ApiResponse<object> { Message = "If that email exists, a reset link has been sent", Status = 200 });
-        //    }
-        //    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-        //    var encodedToken = HttpUtility.UrlEncode(token);
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDTO model)
+        {
+            if (!ModelState.IsValid)
+            {
+                Console.WriteLine("⛔ Invalid model state.");
+                return BadRequest(new ApiResponse<object> { Message = "Invalid Email", Status = 400 });
+            }
 
-        //    var resetLink = $"{model.ClientAppUrl}/reset-password?email={user.Email}&token={encodedToken}";
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                Console.WriteLine($"⚠️ No user found with email: {model.Email} or email not confirmed.");
+                return Ok(new ApiResponse<string>
+                {
+                    Message = "If that email exists, a reset link has been sent",
+                    Status = 200
+                });
+            }
 
-        //    await _emailSender.SendEmailAsync(model.Email, "Reset Password",
-        //        $"Click the link to reset your password: <a href='{resetLink}'>Reset Password</a>");
-        //    return Ok(new ApiResponse<string> { Message = "If that email exists, a reset link has been sent", Status = 200 });
-        //}
+            // Generate token and encode it
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var encodedToken = HttpUtility.UrlEncode(token);
+
+            // Build reset link
+            var resetLink = $"{model.ClientAppUrl}/reset-password?email={user.Email}&token={encodedToken}";
+
+            Console.WriteLine($"✅ Sending reset link to: {user.Email}");
+            Console.WriteLine($"🔗 Reset Link: {resetLink}");
+
+            // Create email body
+            string htmlBody = $@"
+            <p>Hello {user.UserName},</p>
+            <p>You requested to reset your password.</p>
+            <p>Click the button below to set a new password:</p>
+            <p><a href='{resetLink}' style='padding:10px 20px;background:#007BFF;color:#fff;text-decoration:none;border-radius:5px;'>Reset Password</a></p>
+            <p>If you didn’t request this, you can ignore this email.</p>
+            <p>Thanks,<br/>Dorak Team</p>";
+
+            try
+            {
+                await _emailSender.SendEmailAsync(user.Email, "Reset Your Password", htmlBody);
+                Console.WriteLine("📨 Email sent successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Failed to send email:");
+                Console.WriteLine(ex.Message);
+                return StatusCode(500, new
+                {
+                    error = "Failed to send email",
+                    details = ex.Message
+                });
+            }
+
+            return Ok(new ApiResponse<string>
+            {
+                Message = "If that email exists, a reset link has been sent",
+                Status = 200
+            });
+        }
+
+
         //Reset Password
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO model)
@@ -335,10 +382,5 @@ namespace API.Controllers
             }
             return Ok(new ApiResponse<object> { Message = "Password has been reset successfully", Status = 200 });
         }
-
-
-
-
-
     }
 }

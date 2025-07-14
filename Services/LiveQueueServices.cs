@@ -3,11 +3,10 @@ using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Hubs;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models.Enums;
 using Repositories;
-using System.Data.Entity;
 using System.Net.Sockets;
 
 namespace Services
@@ -185,7 +184,8 @@ namespace Services
                 Status = lq.AppointmentStatus,
                 AppointmentId = appointmentId,
                 CurrentQueuePosition = lq.CurrentQueuePosition,
-                IsCurrentClient = lq.Appointment.AppointmentId == appointmentId
+                IsCurrentClient = lq.Appointment.AppointmentId == appointmentId,
+                EstimatedDuration = lq.EstimatedDuration
             }).ToList();
 
             return result;
@@ -209,7 +209,8 @@ namespace Services
 
                     CurrentQueuePosition = liveQueue.CurrentQueuePosition,
 
-                    IsCurrentClient = appointment.UserId == userId
+                    IsCurrentClient = appointment.UserId == userId,
+                    EstimatedDuration = liveQueue.EstimatedDuration
                 };
 
                 result.Add(dto);
@@ -230,7 +231,8 @@ namespace Services
                     Status = lq.AppointmentStatus,
                     AppointmentId = lq.AppointmentId,
                     CurrentQueuePosition = lq.CurrentQueuePosition,
-                    IsCurrentClient = false
+                    IsCurrentClient = false,
+                    EstimatedDuration = lq.EstimatedDuration
                 }).ToList();
 
             var ProviderliveQueueList = liveQueueRepository
@@ -295,7 +297,7 @@ namespace Services
                 UserId = user.Id,
                 AppointmentId = appointment.AppointmentId
             };
-            
+
             user.Notifications.Add(turnChangeNotification);
             commitData.SaveChanges();
 
@@ -379,6 +381,7 @@ namespace Services
 
             late.CurrentQueuePosition = positionNumber;
             lq.CurrentQueuePosition = currentQueuePosition;
+            liveQueueRepository.GetAllShiftLiveQueues(shiftId).Where(l => l.CurrentQueuePosition > lq.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.EstimatedTime, l => l.EstimatedTime.AddMinutes(lq.EstimatedDuration)));
 
             liveQueueRepository.Edit(late);
             liveQueueRepository.Edit(lq);
@@ -386,6 +389,66 @@ namespace Services
             commitData.SaveChanges();
 
             NotifyTurnChange(late.LiveQueueId, positionNumber).GetAwaiter().GetResult();
+        }
+        public async Task<List<ProviderLiveQueueViewModel>> editTurnPrevious(int shiftId, int currentQueuePosition)
+        {
+            var shift = shiftRepository.GetShiftById(shiftId);
+            List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition < currentQueuePosition).OrderBy(l => l.CurrentQueuePosition).ToList();
+            var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+
+            bool flag = true;
+
+            if (liveQueues != null && liveQueues.Any())
+            {
+                int position;
+                foreach (LiveQueue lq in liveQueues)
+                {
+                    if (lq.AppointmentStatus == QueueAppointmentStatus.NotChecked)
+                    {
+                        flag = false;
+
+                        position = lq.CurrentQueuePosition ?? 0;
+
+                        reOrder(lq, lq.ShiftId, position, currentQueuePosition);
+                        await NotifyTurnChange(lq.LiveQueueId, position);
+
+                        return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+                    }
+                    if (lq.AppointmentStatus == QueueAppointmentStatus.Waiting && lq.EstimatedTime > currentQueue.EstimatedTime)
+                    {
+                        flag = false;
+
+                        position = lq.CurrentQueuePosition ?? 0;
+
+                        reOrder(lq, lq.ShiftId, position, currentQueuePosition);
+                        await NotifyTurnChange(lq.LiveQueueId, position);
+
+                        return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+                    }
+                }
+
+                if (flag)
+                {
+                  
+                    if (currentQueue != null)
+                    {
+                        await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
+                    }
+                    return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+                }
+
+                return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+
+            }
+            else
+            {
+                
+                if (currentQueue != null)
+                {
+                    await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
+                }
+                return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+            }
         }
     }
 
