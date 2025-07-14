@@ -4,6 +4,7 @@ using Dorak.Models;
 using Dorak.ViewModels;
 using Hubs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Models.Enums;
 using Repositories;
 using System.Net.Sockets;
@@ -183,7 +184,8 @@ namespace Services
                 Status = lq.AppointmentStatus,
                 AppointmentId = appointmentId,
                 CurrentQueuePosition = lq.CurrentQueuePosition,
-                IsCurrentClient = lq.Appointment.AppointmentId == appointmentId
+                IsCurrentClient = lq.Appointment.AppointmentId == appointmentId,
+                EstimatedDuration = lq.EstimatedDuration
             }).ToList();
 
             return result;
@@ -207,7 +209,8 @@ namespace Services
 
                     CurrentQueuePosition = liveQueue.CurrentQueuePosition,
 
-                    IsCurrentClient = appointment.UserId == userId
+                    IsCurrentClient = appointment.UserId == userId,
+                    EstimatedDuration = liveQueue.EstimatedDuration
                 };
 
                 result.Add(dto);
@@ -228,7 +231,8 @@ namespace Services
                     Status = lq.AppointmentStatus,
                     AppointmentId = lq.AppointmentId,
                     CurrentQueuePosition = lq.CurrentQueuePosition,
-                    IsCurrentClient = false
+                    IsCurrentClient = false,
+                    EstimatedDuration = lq.EstimatedDuration
                 }).ToList();
 
             var ProviderliveQueueList = liveQueueRepository
@@ -377,6 +381,7 @@ namespace Services
 
             late.CurrentQueuePosition = positionNumber;
             lq.CurrentQueuePosition = currentQueuePosition;
+            liveQueueRepository.GetAllShiftLiveQueues(shiftId).Where(l => l.CurrentQueuePosition > lq.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.EstimatedTime, l => l.EstimatedTime.AddMinutes(lq.EstimatedDuration)));
 
             liveQueueRepository.Edit(late);
             liveQueueRepository.Edit(lq);
