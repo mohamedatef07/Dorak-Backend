@@ -1,32 +1,22 @@
-using AdminArea.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+using Services;
 
 namespace AdminArea.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly CenterServices centerServices;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(CenterServices _centerServices)
         {
-            _logger = logger;
+            centerServices = _centerServices;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var statistics = centerServices.GetStatisticsViewModel();
+            return View(statistics);
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }

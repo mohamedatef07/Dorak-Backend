@@ -8,6 +8,9 @@
 @section styles {
     <link rel="stylesheet" href="~/css/TableLayout.css" />
 }
+@{
+    ViewData["Title"] = "Centers";
+}
 <div class="col-7 mb-4">
     <form asp-controller="Center" asp-action="Index" method="get" class="g-3 d-flex gap-4" id="searchForm">
         <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
@@ -73,7 +76,7 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 @section scripts {
     <script>
-        let form = document.getElementById("searchForm");
+        let form= document.getElementById("searchForm")
 
         function page(btn) {
             if (btn == "next") {
@@ -95,13 +98,16 @@
                 url: '/center/ToggleStatus',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({ centerId: parseInt(centerId), status })
+                data: JSON.stringify({ centerId: parseInt(centerId), status }),
+                success:function (res){
+                    location.reload();
+                }
             });
         }
         function resetSearchForm() {
         document.getElementById('searchForm').reset();
         document.getElementById('searchForm').submit();
         form.submit();
-        }
+        } 
     </script>
 }

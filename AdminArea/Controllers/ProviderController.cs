@@ -9,42 +9,47 @@ namespace AdminArea.Controllers
 
         private readonly ProviderServices providerService;
 
-        public ProviderController(ProviderServices providerService)
+        public ProviderController(ProviderServices _providerService)
         {
 
-            this.providerService = providerService;
+            providerService = _providerService;
         }
-
-        public IActionResult Index(string searchText = "", int pageNumber = 1,
-            int pageSize = 2)
+        public IActionResult Index(string searchText = "", string providerName = "",
+            string city = "", int pageNumber = 1,
+            int pageSize = 5)
         {
-            var list = providerService.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
-            ViewBag.CurrentPage = pageNumber;
-            return View(list);
+            var searchList = providerService.Search(searchText: searchText, pageNumber: pageNumber, pageSize: pageSize);
+            return View(searchList);
         }
 
         [HttpGet]
-        public IActionResult Edit(string Id)
+        public IActionResult Edit(string providerId)
         {
-            var selected = providerService.GetProviderById(Id);
+            var selected = providerService.GetProviderById(providerId);
             return View(selected);
         }
         [HttpPost]
         public IActionResult Edit(Provider provider)
         {
+            if (provider == null)
+            {
+                return NotFound();
+            }
             providerService.EditProvider(provider);
             return RedirectToAction("Index");
         }
-
-
-        public IActionResult Delete(string Id)
+        public IActionResult Delete(string providerId)
         {
-
-            var selected = providerService.GetProviderById(Id);
-
-            providerService.DeleteProvider(selected);
-
-            return RedirectToAction("Index");
+            var selected = providerService.GetProviderById(providerId);
+            if (selected == null)
+            {
+                return NotFound();
+            }
+            if (providerService.DeleteProvider(selected))
+            {
+                return RedirectToAction("Index");
+            }
+            return NotFound();
         }
     }
 }

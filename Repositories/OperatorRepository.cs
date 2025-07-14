@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data;
+﻿using Data;
 using Dorak.Models;
 using Dorak.ViewModels;
-using Microsoft.Identity.Client;
+using LinqKit;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Repositories
 {
@@ -18,10 +14,29 @@ namespace Repositories
         {
             commitData = _commitData;
         }
-        public Operator GetOperatorById(string operatorId)
+        public PaginationViewModel<OperatorViewModel> Search(string searchText = "", int pageNumber = 1, int pageSize = 5)
         {
-            return GetById(op => op.OperatorId == operatorId);
-        }
+            var builder = PredicateBuilder.New<Operator>();
+            var old = builder;
+            if (!searchText.IsNullOrEmpty())
+            {
+                builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) || i.LastName.ToLower().Contains(searchText.ToLower()) && i.IsDeleted == false));
+            }
 
+            if (old == builder)
+            {
+                builder = null;
+            }
+
+            var count = base.GetList(builder).Count();
+            var resultAfterPagination = base.Get(filter: builder, pageSize: pageSize, pageNumber: pageNumber).Select(p => p.toModelView()).ToList();
+            return new PaginationViewModel<OperatorViewModel>
+            {
+                Data = resultAfterPagination,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Total = count
+            };
+        }
     }
 }

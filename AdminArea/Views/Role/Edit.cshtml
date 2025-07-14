@@ -3,9 +3,12 @@
 @section styles {
     <link rel="stylesheet" href="~/css/components.css" />
 }
+@{
+    ViewData["Title"] = "Edit Role";
+}
 <form asp-controller="Role" asp-action="edit" method="post">
     <input class="form-control" asp-for="Id" hidden />
     <input class="w-50 form-control" asp-for="Name" class="w-75" />
     <input class="btn btn-secondary mt-3" type="submit" value="Edit Role" />
-    <a asp-controller="role" asp-action="add" style="" class="btn btn-primary text-white ms-3 mt-3">Back to List</a>
+    <a asp-controller="role" asp-action="add"  class="btn btn-primary text-white ms-3 mt-3">Back to List</a>
 </form>

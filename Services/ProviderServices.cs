@@ -120,21 +120,32 @@ namespace Services
         }
         public Provider GetProviderById(string providerId)
         {
-            return providerRepository.GetById(p => p.ProviderId == providerId);
+            return providerRepository.GetById(p => p.ProviderId == providerId && p.IsDeleted == false);
         }
         public List<Provider> GetAllProviders()
         {
             return providerRepository.GetAll().ToList();
         }
-        public void EditProvider(Provider provider)
+        public bool EditProvider(Provider provider)
         {
+            if (provider == null)
+            {
+                return false;
+            }
             providerRepository.Edit(provider);
             commitData.SaveChanges();
+            return true;
         }
-        public void DeleteProvider(Provider provider)
+        public bool DeleteProvider(Provider provider)
         {
-            providerRepository.Delete(provider);
+            if (provider == null)
+            {
+                return false;
+            }
+            provider.IsDeleted = true;
+            providerRepository.Edit(provider);
             commitData.SaveChanges();
+            return true;
         }
 
         public IEnumerable<object> GetProviderAssignments(string providerId, int centerId)
