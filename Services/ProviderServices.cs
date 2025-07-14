@@ -661,7 +661,7 @@ namespace Services
                 List<ProviderCenterService> centerServices = center.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == center.CenterId).ToList();
                 GetProviderCenterServicesDTO providerCenterServicesDTO;
                 List<GetProviderSrvicesDTO> providerSrvicesDTO = new List<GetProviderSrvicesDTO>();
-                providerSrvicesDTO = centerServices.Select(service => new GetProviderSrvicesDTO
+                providerSrvicesDTO = centerServices.Where(cs => cs.ServiceId != 3).Select(service => new GetProviderSrvicesDTO
                 {
                     ServiceId = service.ServiceId,
                     ServiceName = service.Service.ServiceName,
