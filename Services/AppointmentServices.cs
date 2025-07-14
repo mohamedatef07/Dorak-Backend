@@ -74,10 +74,10 @@ namespace Services
 
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
+            app.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
 
             Appointment createdAppointment = await appointmentRepository.CreateAppoinment(app);
 
-            createdAppointment.EstimatedTime = CalculateEstimatedTime(app.ShiftId);
 
             commitData.SaveChanges();
 
