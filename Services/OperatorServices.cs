@@ -100,21 +100,16 @@ namespace Services
             commitData.SaveChanges();
             return true;
         }
-
-
-        //public bool DeleteOperator(string operatorId)
-        //{
-        //    var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
-
-        //    if (SelectedOperator != null)
-        //    {
-        //        SelectedOperator.IsDeleted = true;
-        //        operatorRepository.Edit(SelectedOperator);
-        //        commitData.SaveChanges();
-        //        return true;
-        //    }
-        //    return false;
-        //}
+        public bool EditOperator(Operator _operator)
+        {
+            if (_operator == null)
+            {
+                return false;
+            }
+            operatorRepository.Edit(_operator);
+            commitData.SaveChanges();
+            return true;
+        }
         public bool RestoreOperator(string operatorId)
         {
             var SelectedOperator = operatorRepository.GetById(o => o.OperatorId == operatorId);
@@ -425,6 +420,15 @@ namespace Services
         public List<Operator> GetOperatorsByCenterId(int centerId)
         {
             return operatorRepository.GetAll().Where(o => o.CenterId == centerId).ToList();
+        }
+        public PaginationViewModel<OperatorViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                    int pageSize = 5)
+        {
+            return operatorRepository.Search(searchText, pageNumber, pageSize);
+        }
+        public Operator GetOperatorsById(string opertorId)
+        {
+            return operatorRepository.GetById(o => o.OperatorId == opertorId);
         }
     }
 }

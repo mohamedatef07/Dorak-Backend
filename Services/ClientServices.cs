@@ -4,6 +4,7 @@ using Dorak.DataTransferObject.ClientDTO;
 using Dorak.Models;
 using Dorak.ViewModels;
 using Dorak.ViewModels.AccountViewModels;
+using Dorak.ViewModels.ServiceViewModel;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -306,6 +307,36 @@ namespace Services
                 PendingAppointments = client.User.Appointments.Where(app => app.AppointmentStatus == AppointmentStatus.Pending).Count(),
             };
             return appoinmentStatistics;
+        }
+        public Client GetClientById(string clientId)
+        {
+            return clientRepository.GetById(c => c.ClientId == clientId && c.IsDeleted == false);
+        }
+        public PaginationViewModel<ClientViewModel> Search(string searchText = "", int pageNumber = 1,
+                                                    int pageSize = 10)
+        {
+            return clientRepository.Search(searchText, pageNumber, pageSize);
+        }
+        public bool EditClient(Client provider)
+        {
+            if (provider == null)
+            {
+                return false;
+            }
+            clientRepository.Edit(provider);
+            commitData.SaveChanges();
+            return true;
+        }
+        public bool DeleteClient(Client provider)
+        {
+            if (provider == null)
+            {
+                return false;
+            }
+            provider.IsDeleted = true;
+            clientRepository.Edit(provider);
+            commitData.SaveChanges();
+            return true;
         }
 
     }

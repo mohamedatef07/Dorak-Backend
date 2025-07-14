@@ -6,26 +6,27 @@ using LinqKit;
 using Microsoft.AspNetCore.Identity;
 using Models.Enums;
 using Repositories;
-using System.Collections.Generic;
 
 namespace Services
 {
     public class CenterServices
     {
-        private readonly CenterRepository centerRepository;
-        public CommitData commitData;
+        private readonly CommitData commitData;
         private readonly ProviderAssignmentRepository providerAssignmentRepository;
-        private readonly ProviderRepository providerRepository;
         private readonly AccountServices accountServices;
-
         private readonly ShiftRepository shiftRepository;
+        private readonly CenterRepository centerRepository;
         private readonly AppointmentRepository appointmentRepository;
+        private readonly ProviderRepository providerRepository;
+        private readonly ClientRepository clientRepository;
+        private readonly OperatorRepository operatorRepository;
+
 
         public CenterServices(CenterRepository _centerRepository,
             CommitData _commitData,
             ProviderAssignmentRepository _providerAssignmentRepository,
             ProviderRepository _providerRepository,
-            AccountServices _accountServices, ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository)
+            AccountServices _accountServices, ShiftRepository _shiftRepository, AppointmentRepository _appointmentRepository, ClientRepository _clientRepository, OperatorRepository _operatorRepository)
         {
             centerRepository = _centerRepository;
             commitData = _commitData;
@@ -34,6 +35,8 @@ namespace Services
             accountServices = _accountServices;
             shiftRepository = _shiftRepository;
             appointmentRepository = _appointmentRepository;
+            clientRepository = _clientRepository;
+            operatorRepository = _operatorRepository;
         }
 
         //public async Task<bool> CreateCenter(CenterDTO_ center)
@@ -64,7 +67,7 @@ namespace Services
         //}
 
 
-         
+
 
         public List<Center> GetAll()
         {
@@ -488,6 +491,18 @@ namespace Services
                 OperatorsCount = operatorCount,
                 AppointmentsCount = appointmentCount,
                 TotalRevenue = totalRevenue
+            };
+        }
+        public StatisticsViewModel GetStatisticsViewModel()
+        {
+            return new StatisticsViewModel
+            {
+                TotalCenters = centerRepository.GetAll().Count(c => !c.IsDeleted),
+                TotalProviders = providerRepository.GetAll().Count(p => !p.IsDeleted),
+                TotalOperators = operatorRepository.GetAll().Count(o => !o.IsDeleted),
+                TotalClients = clientRepository.GetAll().Count(c => !c.IsDeleted),
+                TotalShifts = shiftRepository.GetAll().Count(s => !s.IsDeleted),
+                TotalAppointments = appointmentRepository.GetAll().Count(a => a.AppointmentStatus != AppointmentStatus.Cancelled),
             };
         }
     }

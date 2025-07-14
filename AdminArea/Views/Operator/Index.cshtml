@@ -2,17 +2,17 @@
     bool canNext = !(Model.PageNumber * Model.PageSize < Model.Total);
     bool canBack = Model.PageNumber <= 1;
     int PageCount = (int)Math.Ceiling((double)Model.Total / Model.PageSize);
-    int providerId = 0;
+    int operatorId = 0;
 }
-@model PaginationViewModel<ProviderViewModel>
+@model PaginationViewModel<OperatorViewModel>
 @section styles {
     <link rel="stylesheet" href="~/css/TableLayout.css" />
 }
 @{
-    ViewData["Title"] = "Providers";
+    ViewData["Title"] = "Operators";
 }
 <div class="col-7 mb-4">
-    <form asp-controller="provider" asp-action="Index" method="get" class="g-3 d-flex gap-4" id="searchForm">
+    <form asp-controller="operator" asp-action="Index" method="get" class="g-3 d-flex gap-4" id="searchForm">
         <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
         <input type="text" class="form form-control" name="searchText" placeholder="Search Text">
         <input type="submit" class="btn text-white btn-success" value="Search" />
@@ -25,9 +25,8 @@
         <tr>
             <th>#</th>
             <th>Name</th>
-            <th>Specialization</th>
-            <th>Experience</th>
-            <th>Address</th>
+            <th>Center</th>
+            <th>Gender</th>
             <th>Edit</th>
             <th>Delete</th>
         </tr>
@@ -36,19 +35,17 @@
 
         @foreach (var item in Model.Data)
         {
-            ++providerId;
+            ++operatorId;
             <tr>
-
-                <td class="p-3">@providerId</td>
+                <td class="p-3">@operatorId</td>
                 <td>@item.FirstName @item.LastName</td>
-                <td>@item.Specialization</td>
-                <td>@item.ExperienceYears</td>
-                <td>@item.City , @item.Country</td>
+                <td>@item?.CenterName</td>
+                <td>@item?.Gender</td>
                 <td>
-                    <a class="btn btn-secondary" asp-action="Edit" asp-controller="Provider" asp-route-ProviderId="@item.ProviderId">Edit </a>
+                    <a class="btn btn-secondary" asp-action="Edit" asp-controller="Operator" asp-route-OperatorId="@item.OperatorId">Edit </a>
                 </td>
                 <td>
-                    <a class="btn btn-danger" asp-action="Delete" asp-controller="Provider" asp-route-ProviderId="@item.ProviderId">Delete </a>
+                    <a class="btn btn-danger" asp-action="Delete" asp-controller="Operator" asp-route-OperatorId="@item.OperatorId">Delete </a>
                 </td>
             </tr>
         }

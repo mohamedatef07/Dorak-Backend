@@ -2,7 +2,6 @@
 using Dorak.Models;
 using Dorak.ViewModels;
 using LinqKit;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Repositories
@@ -12,13 +11,13 @@ namespace Repositories
         public ProviderRepository(DorakContext context) : base(context)
         { }
         public PaginationViewModel<ProviderViewModel> Search(string searchText = "", int pageNumber = 1,
-        int pageSize = 2)
+        int pageSize = 5)
         {
             var builder = PredicateBuilder.New<Provider>();
             var old = builder;
             if (!searchText.IsNullOrEmpty())
             {
-                builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) || i.LastName.ToLower().Contains(searchText.ToLower()) || i.City.ToLower().Contains(searchText.ToLower())&&i.IsDeleted==false));
+                builder = builder.And(i => (i.FirstName.ToLower().Contains(searchText.ToLower()) || i.LastName.ToLower().Contains(searchText.ToLower()) || i.City.ToLower().Contains(searchText.ToLower()) && i.IsDeleted == false));
             }
 
             if (old == builder)
@@ -39,7 +38,7 @@ namespace Repositories
 
         public Provider GetProviderById(string providerId)
         {
-            return GetById(p => p.ProviderId == providerId&&p.IsDeleted==false);
+            return GetById(p => p.ProviderId == providerId && p.IsDeleted == false);
         }
         public void Edit(EditProviderViewModel provider)
         {
@@ -53,7 +52,7 @@ namespace Repositories
             base.Edit(selected);
         }
 
-      
+
     }
 }
 
