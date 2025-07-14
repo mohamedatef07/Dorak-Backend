@@ -75,7 +75,7 @@ namespace Data
                     ServiceId = 3,
                     ServiceName = "Urgent",
                     Description = "Urgent medical visit",
-                    BasePrice = 150,
+                    BasePrice = 200,
                     IsDeleted = false
                 }
             );

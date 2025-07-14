@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Models.Enums;
 
-namespace Dorak.ViewModels.ServiceViewModel
+namespace Dorak.ViewModels
 {
     public class ClientViewModel
     {
+        public string ClientId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public GenderType? Gender { get; set; } = GenderType.none;
+        public string? City { get; set; }
+        public string? Governorate { get; set; }
+        public string? Country { get; set; }
     }
 }

@@ -120,21 +120,32 @@ namespace Services
         }
         public Provider GetProviderById(string providerId)
         {
-            return providerRepository.GetById(p => p.ProviderId == providerId);
+            return providerRepository.GetById(p => p.ProviderId == providerId && p.IsDeleted == false);
         }
         public List<Provider> GetAllProviders()
         {
             return providerRepository.GetAll().ToList();
         }
-        public void EditProvider(Provider provider)
+        public bool EditProvider(Provider provider)
         {
+            if (provider == null)
+            {
+                return false;
+            }
             providerRepository.Edit(provider);
             commitData.SaveChanges();
+            return true;
         }
-        public void DeleteProvider(Provider provider)
+        public bool DeleteProvider(Provider provider)
         {
-            providerRepository.Delete(provider);
+            if (provider == null)
+            {
+                return false;
+            }
+            provider.IsDeleted = true;
+            providerRepository.Edit(provider);
             commitData.SaveChanges();
+            return true;
         }
 
         public IEnumerable<object> GetProviderAssignments(string providerId, int centerId)
@@ -207,7 +218,7 @@ namespace Services
                 ProviderId = model.ProviderId,
                 CenterId = model.CenterId,
                 StartDate = model.StartDate,
-                EndDate = model.EndDate,
+                EndDate = model.EndDate ?? model.StartDate,
                 AssignmentType = model.AssignmentType,
                 IsDeleted = false
             };
@@ -587,7 +598,7 @@ namespace Services
                     {
                         break;
                     }
-                    else if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now))
+                    else if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now) && shift.StartTime >= TimeOnly.FromDateTime(DateTime.Now))
                     {
                         var newShift = new GetProviderBookingInfoDTO()
                         {
@@ -598,6 +609,10 @@ namespace Services
                             Date = shift.ShiftDate
                         };
                         bookingInfo.Add(newShift);
+                    }
+                    else
+                    {
+                        break;
                     }
                 }
             }
@@ -661,7 +676,7 @@ namespace Services
                 List<ProviderCenterService> centerServices = center.ProviderCenterServices.Where(pcs => pcs.ProviderId == provider.ProviderId && pcs.CenterId == center.CenterId).ToList();
                 GetProviderCenterServicesDTO providerCenterServicesDTO;
                 List<GetProviderSrvicesDTO> providerSrvicesDTO = new List<GetProviderSrvicesDTO>();
-                providerSrvicesDTO = centerServices.Select(service => new GetProviderSrvicesDTO
+                providerSrvicesDTO = centerServices.Where(cs => cs.ServiceId != 3).Select(service => new GetProviderSrvicesDTO
                 {
                     ServiceId = service.ServiceId,
                     ServiceName = service.Service.ServiceName,
@@ -776,11 +791,11 @@ namespace Services
                     {
                         existingShift.ShiftType = model.ShiftType;
                         existingShift.MaxPatientsPerDay = model.MaxPatientsPerDay;
-                        existingShift.OperatorId = model.OperatorId;
                         Console.WriteLine($"Updated existing shift for date {model.ShiftDate}");
                     }
                     else
                     {
+                        var providerEstimatedDuration = providerRepository.GetList(p => p.ProviderId == assignment.ProviderId).Select(p => p.EstimatedDuration).FirstOrDefault();
                         var shift = new Shift
                         {
                             ProviderAssignmentId = assignment.AssignmentId,
@@ -790,7 +805,8 @@ namespace Services
                             MaxPatientsPerDay = model.MaxPatientsPerDay,
                             IsDeleted = false,
                             ShiftDate = model.ShiftDate,
-                            OperatorId = model.OperatorId
+                            OperatorId = null,
+                            EstimatedDuration = providerEstimatedDuration
                         };
                         shiftRepository.Add(shift);
                         Console.WriteLine($"Added new shift for date {model.ShiftDate}");
@@ -905,6 +921,7 @@ namespace Services
         {
 
             var predicate = PredicateBuilder.New<Provider>(p => !p.IsDeleted);
+            predicate = predicate.And(p => p.ProviderAssignments.Any());
             if (filter is not null)
             {
                 if (!string.IsNullOrWhiteSpace(filter.SearchText))

@@ -67,12 +67,13 @@ namespace API.Controllers
         {
             try
             {
-                var assignments = providerServices.GetProviderAssignments(providerId, centerId);
+                var assignments = providerServices.GetProviderAssignments(providerId, centerId).ToList();
 
                 if (!assignments.Any() || assignments == null)
                 {
-                    return NotFound(new ApiResponse<object>
+                    return Ok(new ApiResponse<List<object>>
                     {
+                        Data = [],
                         Message = "No assignments found for the given criteria.",
                         Status = 404
                     });
