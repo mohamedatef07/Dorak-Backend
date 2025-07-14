@@ -11,11 +11,13 @@ namespace Dorak.DataTransferObject
     {
         public string ProviderName { get; set; }
         public int ShiftId { get; set; }
+        public ShiftType shiftType { get; set; }
         public DateOnly ShiftDate { get; set; }
         public TimeOnly StartTime { get; set; }
         public TimeOnly EndTime { get; set; }
         public decimal fees { get; set; }
         public List<ServicesDTO> Services { get; set; }
         public string ProviderId { get; set; } = string.Empty;
+        public int AppointmentCount { get; set; }
     }
 }

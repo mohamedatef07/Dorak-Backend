@@ -155,6 +155,8 @@ namespace Services
             var proivderAssignments = center.ProviderAssignments;
             DateOnly dateNow = DateOnly.FromDateTime(DateTime.Now);
 
+
+
             var shifts = proivderAssignments.SelectMany(
                 pa =>
                      pa.Shifts.Where(sh => sh.ShiftType != ShiftType.Cancelled && sh.ShiftDate >= dateNow && sh.ShiftDate <= dateNow.AddDays(30)).Select(shift => new GetAllCenterShiftAndServicesDTO
@@ -162,6 +164,7 @@ namespace Services
                          ProviderName = $"{pa.Provider.FirstName} {pa.Provider.LastName}",
                          ProviderId = pa.Provider.ProviderId,
                          ShiftId = shift.ShiftId,
+                         shiftType = shift.ShiftType,
                          ShiftDate = shift.ShiftDate,
                          StartTime = shift.StartTime,
                          EndTime = shift.EndTime,
@@ -172,7 +175,8 @@ namespace Services
                                  ServiceId = pcs.Service.ServiceId,
                                  ServiceName = pcs.Service.ServiceName,
                                  BasePrice = pcs.Price
-                             }).ToList()
+                             }).ToList(),
+                         AppointmentCount = (shift.MaxPatientsPerDay ?? 0) - appointmentRepository.GetList(app => app.ShiftId == shift.ShiftId && app.AppointmentStatus == AppointmentStatus.Confirmed).Count()
                      })
                             ).ToList();
 

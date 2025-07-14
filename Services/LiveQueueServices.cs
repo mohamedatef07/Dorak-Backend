@@ -394,7 +394,7 @@ namespace Services
         {
             var shift = shiftRepository.GetShiftById(shiftId);
             List<LiveQueue> liveQueues = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition < currentQueuePosition).OrderBy(l => l.CurrentQueuePosition).ToList();
-
+            var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
 
             bool flag = true;
 
@@ -414,11 +414,22 @@ namespace Services
 
                         return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
                     }
+                    if (lq.AppointmentStatus == QueueAppointmentStatus.Waiting && lq.EstimatedTime > currentQueue.EstimatedTime)
+                    {
+                        flag = false;
+
+                        position = lq.CurrentQueuePosition ?? 0;
+
+                        reOrder(lq, lq.ShiftId, position, currentQueuePosition);
+                        await NotifyTurnChange(lq.LiveQueueId, position);
+
+                        return GetLiveQueuesForProvider(shift.ProviderAssignment.CenterId, shiftId);
+                    }
                 }
 
                 if (flag)
                 {
-                    var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+                  
                     if (currentQueue != null)
                     {
                         await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
@@ -431,7 +442,7 @@ namespace Services
             }
             else
             {
-                var currentQueue = liveQueueRepository.GetAll().Where(l => l.ShiftId == shiftId && l.CurrentQueuePosition == currentQueuePosition).FirstOrDefault();
+                
                 if (currentQueue != null)
                 {
                     await NotifyTurnChange(currentQueue.LiveQueueId, currentQueuePosition);
