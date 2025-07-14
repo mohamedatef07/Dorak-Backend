@@ -231,10 +231,11 @@ namespace Services
 
                 }
                 liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
+                liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.EstimatedTime, l => l.EstimatedTime.AddMinutes(FirstLiveQueueWaiting.EstimatedDuration)));
                 var newLiveQueue = new LiveQueue
                 {
                     ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
-                    EstimatedTime = createdAppointment.EstimatedTime,
+                    EstimatedTime = TimeOnly.FromDateTime(DateTime.UtcNow),
                     EstimatedDuration = createdAppointment.ProviderCenterService.Duration,
                     AppointmentStatus = QueueAppointmentStatus.NotChecked,
                     Capacity = createdAppointment.Shift.MaxPatientsPerDay,
