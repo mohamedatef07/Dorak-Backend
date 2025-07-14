@@ -207,6 +207,12 @@ namespace Services
 
             app.ProviderCenterServiceId = pcs.ProviderCenterServiceId;
 
+            var appointmentReserved = appointmentRepository.GetList(ap => ap.ShiftId == app.ShiftId && ap.AppointmentStatus != AppointmentStatus.Cancelled).Count();
+
+            var shiftMaxPatientsPerDay = shiftRepository.Get(shift => shift.ShiftId == app.ShiftId).Select(sh=>sh.MaxPatientsPerDay).FirstOrDefault();
+            if (shiftMaxPatientsPerDay <= appointmentReserved)
+                throw new InvalidOperationException("Cannot reserve an appointment shift is full");
+
             var createdAppointment = await appointmentRepository.CreateAppoinment(app);
             createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
@@ -214,38 +220,64 @@ namespace Services
 
             var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
-            var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
-            if (queuedAppointment != null)
+            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId==reserveApointmentDTO.ShiftId);
+            
+            if (Currentshift.ShiftType==ShiftType.OnGoing)
             {
-                createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
-            }
+                var newLiveQueue = new LiveQueue();
+                int shiftDuration = app.ProviderCenterService.Duration;
 
-            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId == reserveApointmentDTO.ShiftId);
-
-            if (Currentshift.ShiftType == ShiftType.OnGoing)
-            {
-                var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.Waiting);
-                if (FirstLiveQueueWaiting == null)
+                if (createdAppointment.AppointmentType==AppointmentType.Urgent)
                 {
-                    FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
+                    var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l=>l.CurrentQueuePosition).FirstOrDefault(l=>l.AppointmentStatus==QueueAppointmentStatus.Waiting);
+                    if (FirstLiveQueueWaiting==null)
+                    {
+                        FirstLiveQueueWaiting= liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
 
+                    }
+                    liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
+                    liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.EstimatedTime, l => l.EstimatedTime.AddMinutes(l.EstimatedDuration)));
+                    newLiveQueue = new LiveQueue
+                    {
+                        ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
+                        EstimatedTime = FirstLiveQueueWaiting.EstimatedTime,
+                        EstimatedDuration = shiftDuration,
+                        AppointmentStatus = QueueAppointmentStatus.Waiting,
+                        Capacity = shiftMaxPatientsPerDay,
+                        OperatorId = createdAppointment.OperatorId,
+                        AppointmentId = createdAppointment.AppointmentId,
+                        ShiftId = createdAppointment.ShiftId,
+                        CurrentQueuePosition = FirstLiveQueueWaiting.CurrentQueuePosition,
+                    };
+                    FirstLiveQueueWaiting.EstimatedTime.AddMinutes(newLiveQueue.EstimatedDuration);
+                    liveQueueRepository.Edit(newLiveQueue);
+                    liveQueueRepository.Add(newLiveQueue);
                 }
-                liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
-                liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.EstimatedTime, l => l.EstimatedTime.AddMinutes(FirstLiveQueueWaiting.EstimatedDuration)));
-                var newLiveQueue = new LiveQueue
+                else
                 {
-                    ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
-                    EstimatedTime = TimeOnly.FromDateTime(DateTime.UtcNow),
-                    EstimatedDuration = createdAppointment.ProviderCenterService.Duration,
-                    AppointmentStatus = QueueAppointmentStatus.NotChecked,
-                    Capacity = createdAppointment.Shift.MaxPatientsPerDay,
-                    OperatorId = createdAppointment.OperatorId,
-                    AppointmentId = createdAppointment.AppointmentId,
-                    ShiftId = createdAppointment.ShiftId,
-                    CurrentQueuePosition = FirstLiveQueueWaiting.CurrentQueuePosition,
-                };
-                liveQueueRepository.Add(newLiveQueue);
-                commitData.SaveChanges();
+                    var lastLiveQueuePosition = liveQueueRepository.GetLiveQueueDetailsForShift(Currentshift.ShiftId).OrderByDescending(lq=>lq.CurrentQueuePosition).FirstOrDefault();
+
+                    newLiveQueue = new LiveQueue
+                    {
+                        ArrivalTime = TimeOnly.FromDateTime(DateTime.Now),
+                        EstimatedTime = lastLiveQueuePosition.EstimatedTime.AddMinutes(lastLiveQueuePosition.EstimatedDuration),
+                        EstimatedDuration = createdAppointment.ProviderCenterService.Duration,
+                        AppointmentStatus = QueueAppointmentStatus.NotChecked,
+                        Capacity = shiftMaxPatientsPerDay,
+                        OperatorId = createdAppointment.OperatorId,
+                        AppointmentId = createdAppointment.AppointmentId,
+                        ShiftId = createdAppointment.ShiftId,
+                        CurrentQueuePosition = lastLiveQueuePosition.CurrentQueuePosition + 1,
+                    };
+                    liveQueueRepository.Add(newLiveQueue);
+                    
+                }
+                await commitData.SaveChangesAsync();
+                await UpdateQueueStatusAsync(new UpdateQueueStatusViewModel
+                {
+                    LiveQueueId = newLiveQueue.LiveQueueId,
+                    SelectedStatus = "Waiting"
+                });
             }
             return createdAppointment.ToReserveAppointmentResultDTO();
         }
@@ -290,15 +322,19 @@ namespace Services
                 return false;
             }
             IQueryable<Appointment> appointments = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app => app.EstimatedTime);
+            Appointment appointmentDetails = appointmentRepository.GetAllShiftAppointments(ShiftId).OrderBy(app => app.EstimatedTime).FirstOrDefault();
             int count = 0;
+            int shiftDuration = appointmentDetails.ProviderCenterService.Duration;
+            //for shift
+            TimeOnly ExactEstimatedTime = (TimeOnly)shift.ExactStartTime;
             foreach (var appointment in appointments)
             {
                 appointment.OperatorId = operatorId;
                 var livequeue = new LiveQueue
                 {
                     ArrivalTime = null,
-                    EstimatedTime = appointment.EstimatedTime,
-                    EstimatedDuration = appointment.ProviderCenterService.Duration,
+                    EstimatedTime = ExactEstimatedTime.AddMinutes(shiftDuration*count),
+                    EstimatedDuration = shiftDuration,
                     AppointmentStatus = QueueAppointmentStatus.NotChecked,
                     Capacity = appointment.Shift.MaxPatientsPerDay,
                     OperatorId = appointment.OperatorId,
