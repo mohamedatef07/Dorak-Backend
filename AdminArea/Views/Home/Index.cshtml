@@ -4,7 +4,7 @@
 @model StatisticsViewModel
 <p class="fw-bold m-0 pb-4 fs-5">Dashboard</p>
 <section class="general-statistics pb-4">
-    <div class="total-appointments p-3">
+    <div class="total-centers p-3">
         <div class="statistic-info fw-semibold">
             <span class="info-name">Total Centers</span>
             <span class="info-value">
@@ -17,7 +17,7 @@
             </svg>
         </div>
     </div>
-    <div class="total-urgent-cases p-3">
+    <div class="total-providers p-3">
         <div class="statistic-info fw-semibold">
             <span class="info-name">Total Providers</span>
             <span class="info-value">
@@ -30,7 +30,7 @@
             </svg>
         </div>
     </div>
-    <div class="patients-in-queue p-3">
+    <div class="total-clients p-3">
         <div class="statistic-info fw-semibold">
             <span class="info-name">Total Clients</span>
             <span class="info-value">
@@ -41,7 +41,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 448 512"><path fill="#ECF0F1" d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464l349.5 0c-8.9-63.3-63.3-112-129-112l-91.4 0c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3z" /></svg>
         </div>
     </div>
-    <div class="patients-treated-tody p-3">
+    <div class="total-providers p-3">
         <div class="statistic-info fw-semibold">
             <span class="info-name">Total Operators</span>
             <span class="info-value">
@@ -54,14 +54,14 @@
             </svg>
         </div>
     </div>
-    <div class="patients-treated-tody p-3">
-        <div class=".statistic-info fw-semibold">
+    <div class="total-shifts p-3">
+        <div class="statistic-info fw-semibold">
             <span class="info-name">Total Shifts</span>
             <span class="info-value">
                 @Model.TotalShifts
             </span>
         </div>
-        <div class="total-shifts-icon fw-semibold">
+        <div class="statistic-icon fw-semibold">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 640 512"><path fill="#ECF0F1" d="M184 48l144 0c4.4 0 8 3.6 8 8l0 40L176 96l0-40c0-4.4 3.6-8 8-8zm-56 8l0 40L64 96C28.7 96 0 124.7 0 160l0 96 192 0 160 0 8.2 0c32.3-39.1 81.1-64 135.8-64c5.4 0 10.7 .2 16 .7l0-32.7c0-35.3-28.7-64-64-64l-64 0 0-40c0-30.9-25.1-56-56-56L184 0c-30.9 0-56 25.1-56 56zM320 352l-96 0c-17.7 0-32-14.3-32-32l0-32L0 288 0 416c0 35.3 28.7 64 64 64l296.2 0C335.1 449.6 320 410.5 320 368c0-5.4 .2-10.7 .7-16l-.7 0zm320 16a144 144 0 1 0 -288 0 144 144 0 1 0 288 0zM496 288c8.8 0 16 7.2 16 16l0 48 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-48 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16z" /></svg>
         </div>
     </div>
@@ -72,7 +72,7 @@
                 @Model.TotalAppointments
             </span>
         </div>
-        <div class="total-appointments-icon fw-semibold">
+        <div class="statistic-icon fw-semibold">
             <svg width="52"
                  height="27"
                  viewBox="0 0 52 27"
@@ -134,10 +134,11 @@
                 }
 
         main .container .general-statistics .total-appointments .statistic-icon,
-        main .container .general-statistics .patients-in-queue .statistic-icon,
-        main .container .general-statistics .average-estimated-time .statistic-icon,
-        main .container .general-statistics .total-urgent-cases .statistic-icon,
-        main .container .general-statistics .patients-treated-tody .statistic-icon {
+        main .container .general-statistics .total-providers .statistic-icon,
+        main .container .general-statistics .total-centers .statistic-icon,
+        main .container .general-statistics .total-clients .statistic-icon,
+        main .container .general-statistics .total-operators .statistic-icon,
+        main .container .general-statistics .total-shifts .statistic-icon {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -149,16 +150,19 @@
         main .container .general-statistics .total-appointments .statistic-icon {
             background-color: #2ecc71;
         }
+        main .container .general-statistics .total-clients .statistic-icon {
+            background-color: #2a6f96;
+        }
 
-        main .container .general-statistics .patients-in-queue .statistic-icon {
+        main .container .general-statistics .total-centers .statistic-icon {
             background-color: #4880ff;
         }
 
-        main .container .general-statistics .total-urgent-cases .statistic-icon {
+        main .container .general-statistics .total-shifts .statistic-icon {
             background-color: #e74c3c;
         }
 
-        main .container .general-statistics .patients-treated-tody .total-shifts-icon {
+        main .container .general-statistics .total-providers .statistic-icon {
             background-color: #f29c11;
         }
 </style>
