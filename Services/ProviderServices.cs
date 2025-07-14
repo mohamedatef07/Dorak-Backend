@@ -598,7 +598,7 @@ namespace Services
                     {
                         break;
                     }
-                    else if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now))//&& shift.StartTime >= TimeOnly.FromDateTime(DateTime.Now))
+                    else if (shift.ShiftDate >= DateOnly.FromDateTime(DateTime.Now) && shift.StartTime >= TimeOnly.FromDateTime(DateTime.Now))
                     {
                         var newShift = new GetProviderBookingInfoDTO()
                         {
