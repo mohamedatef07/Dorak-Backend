@@ -1,8 +1,9 @@
-﻿
-using Data;
+﻿using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using System.Data;
+using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace API
 {
@@ -16,28 +17,41 @@ namespace API
             this.context = context;
             this.logger = logger;
         }
-        public async Task InvokeAsync(HttpContext httpcontext, RequestDelegate next)
+
+        public async Task InvokeAsync(HttpContext httpContext, RequestDelegate next)
         {
-            if (httpcontext.Request.Method=="GET")
+            if (httpContext.Request.Method == HttpMethods.Get)
             {
-                await next(httpcontext);
+                await next(httpContext);
                 return;
             }
 
-            IDbContextTransaction transaction=null;
+            IDbContextTransaction transaction = null;
+
             try
             {
                 transaction = await context.Database.BeginTransactionAsync();
-                await next(httpcontext);
 
-                 await transaction.CommitAsync();
+                await next(httpContext);
+
+                await transaction.CommitAsync();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                logger.LogError(ex.Message);
-                throw;
+                if (transaction != null)
+                {
+                    await transaction.RollbackAsync();
+                }
 
+                logger.LogError(ex, "An unhandled exception occurred during request execution.");
+                throw;
+            }
+            finally
+            {
+                if (transaction != null)
+                {
+                    await transaction.DisposeAsync();
+                }
             }
         }
     }

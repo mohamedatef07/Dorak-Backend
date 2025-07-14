@@ -405,7 +405,7 @@ namespace Services
                 {
                     if (lq.AppointmentStatus == QueueAppointmentStatus.NotChecked)
                     {
-                        flag = false;
+                        flag = false;   
 
                         position = lq.CurrentQueuePosition ?? 0;
 
