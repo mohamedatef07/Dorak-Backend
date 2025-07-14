@@ -204,30 +204,30 @@ namespace Services
 
             var appointmentReserved = appointmentRepository.GetList(ap => ap.ShiftId == app.ShiftId && ap.AppointmentStatus != AppointmentStatus.Cancelled).Count();
 
-            var shiftMaxPatientsPerDay = shiftRepository.Get(shift => shift.ShiftId == app.ShiftId).Select(sh=>sh.MaxPatientsPerDay).FirstOrDefault();
+            var shiftMaxPatientsPerDay = shiftRepository.Get(shift => shift.ShiftId == app.ShiftId).Select(sh => sh.MaxPatientsPerDay).FirstOrDefault();
             if (shiftMaxPatientsPerDay <= appointmentReserved)
                 throw new InvalidOperationException("Cannot reserve an appointment shift is full");
 
+            app.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
             var createdAppointment = await appointmentRepository.CreateAppoinment(app);
-            createdAppointment.EstimatedTime = appointmentServices.CalculateEstimatedTime(app.ShiftId);
 
             commitData.SaveChanges();
 
             var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
-            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId==reserveApointmentDTO.ShiftId);
-            
-            if (Currentshift.ShiftType==ShiftType.OnGoing)
+            var Currentshift = shiftRepository.GetById(shift => shift.ShiftId == reserveApointmentDTO.ShiftId);
+
+            if (Currentshift.ShiftType == ShiftType.OnGoing)
             {
                 var newLiveQueue = new LiveQueue();
                 int shiftDuration = app.ProviderCenterService.Duration;
 
-                if (createdAppointment.AppointmentType==AppointmentType.Urgent)
+                if (createdAppointment.AppointmentType == AppointmentType.Urgent)
                 {
-                    var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l=>l.CurrentQueuePosition).FirstOrDefault(l=>l.AppointmentStatus==QueueAppointmentStatus.Waiting);
-                    if (FirstLiveQueueWaiting==null)
+                    var FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.Waiting);
+                    if (FirstLiveQueueWaiting == null)
                     {
-                        FirstLiveQueueWaiting= liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
+                        FirstLiveQueueWaiting = liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).OrderBy(l => l.CurrentQueuePosition).FirstOrDefault(l => l.AppointmentStatus == QueueAppointmentStatus.NotChecked);
 
                     }
                     liveQueueRepository.GetAllShiftLiveQueues(createdAppointment.ShiftId).Where(l => l.CurrentQueuePosition >= FirstLiveQueueWaiting.CurrentQueuePosition).ExecuteUpdate(p => p.SetProperty(l => l.CurrentQueuePosition, l => l.CurrentQueuePosition + 1));
@@ -250,7 +250,7 @@ namespace Services
                 }
                 else
                 {
-                    var lastLiveQueuePosition = liveQueueRepository.GetLiveQueueDetailsForShift(Currentshift.ShiftId).OrderByDescending(lq=>lq.CurrentQueuePosition).FirstOrDefault();
+                    var lastLiveQueuePosition = liveQueueRepository.GetLiveQueueDetailsForShift(Currentshift.ShiftId).OrderByDescending(lq => lq.CurrentQueuePosition).FirstOrDefault();
 
                     newLiveQueue = new LiveQueue
                     {
@@ -265,7 +265,7 @@ namespace Services
                         CurrentQueuePosition = lastLiveQueuePosition.CurrentQueuePosition + 1,
                     };
                     liveQueueRepository.Add(newLiveQueue);
-                    
+
                 }
                 await commitData.SaveChangesAsync();
                 await UpdateQueueStatusAsync(new UpdateQueueStatusViewModel
@@ -328,7 +328,7 @@ namespace Services
                 var livequeue = new LiveQueue
                 {
                     ArrivalTime = null,
-                    EstimatedTime = ExactEstimatedTime.AddMinutes(shiftDuration*count),
+                    EstimatedTime = ExactEstimatedTime.AddMinutes(shiftDuration * count),
                     EstimatedDuration = shiftDuration,
                     AppointmentStatus = QueueAppointmentStatus.NotChecked,
                     Capacity = appointment.Shift.MaxPatientsPerDay,
@@ -441,7 +441,7 @@ namespace Services
                     liveQueue.ArrivalTime = TimeOnly.FromDateTime(now);
                     appointment.ArrivalTime = TimeOnly.FromDateTime(now);
                     position = liveQueue.CurrentQueuePosition ?? 0;
-                    await liveQueueServices.editTurnPrevious(liveQueue.ShiftId, position);
+                    await liveQueueServices.ReorderQueue(liveQueue.ShiftId);
                     break;
 
                 case "InProgress":
@@ -465,7 +465,8 @@ namespace Services
                     appointment.AdditionalFees = model.AdditionalFees ?? 0m;
                     appointment.AppointmentStatus = AppointmentStatus.Completed;
                     position = liveQueue.CurrentQueuePosition ?? 0;
-                    await liveQueueServices.editTurn(liveQueue.ShiftId, position);
+                    await liveQueueServices.ReorderQueue(liveQueue.ShiftId);
+
                     break;
 
                 default:

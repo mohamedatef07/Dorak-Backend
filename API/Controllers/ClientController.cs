@@ -72,7 +72,7 @@ namespace API.Controllers
             List<GetProviderBookingInfoDTO> providerBookingInfo = providerServices.GetProviderBookingInfo(provider);
             if (providerBookingInfo == null || !providerBookingInfo.Any())
             {
-                return NotFound(new ApiResponse<object> { Message = "Provider booking info not found", Status = 404 });
+                return Ok(new ApiResponse<List<GetProviderBookingInfoDTO>> { Data = [], Message = "Provider booking info not found", Status = 404 });
             }
             return Ok(new ApiResponse<List<GetProviderBookingInfoDTO>>
             {
