@@ -1,8 +1,168 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
+@model StatisticsViewModel
+<p class="fw-bold m-0 pb-4 fs-5">Dashboard</p>
+<section class="general-statistics pb-4">
+    <div class="total-centers p-3">
+        <div class="statistic-info fw-semibold">
+            <span class="info-name">Total Centers</span>
+            <span class="info-value">
+                @Model.TotalCenters
+            </span>
+        </div>
+        <div class="statistic-icon fw-semibold">
+            <svg b-x9kqrb01db="" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 640 512" data--h-bstatus="0OBSERVED">
+                <path b-x9kqrb01db="" fill="#ECF0F1" d="M0 48C0 21.5 21.5 0 48 0L336 0c26.5 0 48 21.5 48 48l0 184.2c-39.1 32.3-64 81.1-64 135.8c0 49.5 20.4 94.2 53.3 126.2C364.5 505.1 351.1 512 336 512l-96 0 0-80c0-26.5-21.5-48-48-48s-48 21.5-48 48l0 80-96 0c-26.5 0-48-21.5-48-48L0 48zM80 224c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm80 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm112-16c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zM64 112l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16L80 96c-8.8 0-16 7.2-16 16zM176 96c-8.8 0-16 7.2-16 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0zm80 16l0 32c0 8.8 7.2 16 16 16l32 0c8.8 0 16-7.2 16-16l0-32c0-8.8-7.2-16-16-16l-32 0c-8.8 0-16 7.2-16 16zm96 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm140.7-67.3c-6.2 6.2-6.2 16.4 0 22.6L521.4 352 432 352c-8.8 0-16 7.2-16 16s7.2 16 16 16l89.4 0-28.7 28.7c-6.2 6.2-6.2 16.4 0 22.6s16.4 6.2 22.6 0l56-56c6.2-6.2 6.2-16.4 0-22.6l-56-56c-6.2-6.2-16.4-6.2-22.6 0z" data--h-bstatus="0OBSERVED"></path>
+            </svg>
+        </div>
+    </div>
+    <div class="total-providers p-3">
+        <div class="statistic-info fw-semibold">
+            <span class="info-name">Total Providers</span>
+            <span class="info-value">
+                @Model.TotalProviders
+            </span>
+        </div>
+        <div class="statistic-icon fw-semibold">
+            <svg b-x9kqrb01db="" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 448 512" data--h-bstatus="0OBSERVED">
+                <path b-x9kqrb01db="" fill="#ECF0F1" d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-96 55.2C54 332.9 0 401.3 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7c0-81-54-149.4-128-171.1l0 50.8c27.6 7.1 48 32.2 48 62l0 40c0 8.8-7.2 16-16 16l-16 0c-8.8 0-16-7.2-16-16s7.2-16 16-16l0-24c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 24c8.8 0 16 7.2 16 16s-7.2 16-16 16l-16 0c-8.8 0-16-7.2-16-16l0-40c0-29.8 20.4-54.9 48-62l0-57.1c-6-.6-12.1-.9-18.3-.9l-91.4 0c-6.2 0-12.3 .3-18.3 .9l0 65.4c23.1 6.9 40 28.3 40 53.7c0 30.9-25.1 56-56 56s-56-25.1-56-56c0-25.4 16.9-46.8 40-53.7l0-59.1zM144 448a24 24 0 1 0 0-48 24 24 0 1 0 0 48z" data--h-bstatus="0OBSERVED"></path>
+            </svg>
+        </div>
+    </div>
+    <div class="total-clients p-3">
+        <div class="statistic-info fw-semibold">
+            <span class="info-name">Total Clients</span>
+            <span class="info-value">
+                @Model.TotalClients
+            </span>
+        </div>
+        <div class="statistic-icon fw-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 448 512"><path fill="#ECF0F1" d="M304 128a80 80 0 1 0 -160 0 80 80 0 1 0 160 0zM96 128a128 128 0 1 1 256 0A128 128 0 1 1 96 128zM49.3 464l349.5 0c-8.9-63.3-63.3-112-129-112l-91.4 0c-65.7 0-120.1 48.7-129 112zM0 482.3C0 383.8 79.8 304 178.3 304l91.4 0C368.2 304 448 383.8 448 482.3c0 16.4-13.3 29.7-29.7 29.7L29.7 512C13.3 512 0 498.7 0 482.3z" /></svg>
+        </div>
+    </div>
+    <div class="total-providers p-3">
+        <div class="statistic-info fw-semibold">
+            <span class="info-name">Total Operators</span>
+            <span class="info-value">
+                @Model.TotalOperators
+            </span>
+        </div>
+        <div class="statistic-icon fw-semibold">
+            <svg b-x9kqrb01db="" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="30" data--h-bstatus="0OBSERVED">
+                <path b-x9kqrb01db="" fill="#ECF0F1" d="M256 48C141.1 48 48 141.1 48 256l0 40c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-40C0 114.6 114.6 0 256 0S512 114.6 512 256l0 144.1c0 48.6-39.4 88-88.1 88L313.6 488c-8.3 14.3-23.8 24-41.6 24l-32 0c-26.5 0-48-21.5-48-48s21.5-48 48-48l32 0c17.8 0 33.3 9.7 41.6 24l110.4 .1c22.1 0 40-17.9 40-40L464 256c0-114.9-93.1-208-208-208zM144 208l16 0c17.7 0 32 14.3 32 32l0 112c0 17.7-14.3 32-32 32l-16 0c-35.3 0-64-28.7-64-64l0-48c0-35.3 28.7-64 64-64zm224 0c35.3 0 64 28.7 64 64l0 48c0 35.3-28.7 64-64 64l-16 0c-17.7 0-32-14.3-32-32l0-112c0-17.7 14.3-32 32-32l16 0z" data--h-bstatus="0OBSERVED"></path>
+            </svg>
+        </div>
+    </div>
+    <div class="total-shifts p-3">
+        <div class="statistic-info fw-semibold">
+            <span class="info-name">Total Shifts</span>
+            <span class="info-value">
+                @Model.TotalShifts
+            </span>
+        </div>
+        <div class="statistic-icon fw-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 640 512"><path fill="#ECF0F1" d="M184 48l144 0c4.4 0 8 3.6 8 8l0 40L176 96l0-40c0-4.4 3.6-8 8-8zm-56 8l0 40L64 96C28.7 96 0 124.7 0 160l0 96 192 0 160 0 8.2 0c32.3-39.1 81.1-64 135.8-64c5.4 0 10.7 .2 16 .7l0-32.7c0-35.3-28.7-64-64-64l-64 0 0-40c0-30.9-25.1-56-56-56L184 0c-30.9 0-56 25.1-56 56zM320 352l-96 0c-17.7 0-32-14.3-32-32l0-32L0 288 0 416c0 35.3 28.7 64 64 64l296.2 0C335.1 449.6 320 410.5 320 368c0-5.4 .2-10.7 .7-16l-.7 0zm320 16a144 144 0 1 0 -288 0 144 144 0 1 0 288 0zM496 288c8.8 0 16 7.2 16 16l0 48 32 0c8.8 0 16 7.2 16 16s-7.2 16-16 16l-48 0c-8.8 0-16-7.2-16-16l0-64c0-8.8 7.2-16 16-16z" /></svg>
+        </div>
+    </div>
+    <div class="total-appointments p-3">
+        <div class="statistic-info fw-semibold">
+            <span class="info-name">Total Appoinments</span>
+            <span class="info-value">
+                @Model.TotalAppointments
+            </span>
+        </div>
+        <div class="statistic-icon fw-semibold">
+            <svg width="52"
+                 height="27"
+                 viewBox="0 0 52 27"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12C11.7614 12 14 9.7614 14 7C14 4.23858 11.7614 2 9 2C6.23858 2 4 4.23858 4 7C4 9.7614 6.23858 12 9 12Z"
+                      stroke="#ECF0F1"
+                      stroke-width="2.5" />
+                <path d="M2 25C3 19 6.5 15 9 15C11.5 15 15 19 16 25"
+                      stroke="#ECF0F1"
+                      stroke-width="2.5"
+                      stroke-linecap="round" />
+                <path d="M16 15H22M19 12V18"
+                      stroke="#ECF0F1"
+                      stroke-width="2.5"
+                      stroke-linecap="round" />
+                <path d="M37 12C39.7614 12 42 9.7614 42 7C42 4.23858 39.7614 2 37 2C34.2386 2 32 4.23858 32 7C32 9.7614 34.2386 12 37 12Z"
+                      stroke="#ECF0F1"
+                      stroke-width="2.5" />
+                <path d="M30 25C31 19 34.5 15 37 15C39.5 15 43 19 44 25"
+                      stroke="#ECF0F1"
+                      stroke-width="2.5"
+                      stroke-linecap="round" />
+                <path d="M44 15H50M47 12V18"
+                      stroke="#ECF0F1"
+                      stroke-width="2.5"
+                      stroke-linecap="round" />
+            </svg>
+        </div>
+    </div>
+    </section>
+<style>
+    main .container .general-statistics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+        main .container .general-statistics div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: white;
+            width: calc(100% / 3 - 1rem);
+            border-radius: var(--border-radius);
+        }
+
+            main .container .general-statistics div .statistic-info {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                flex: 1;
+                gap: 2rem;
+            }
+
+                main .container .general-statistics div .statistic-info span {
+                    color: var(--text-color-Light);
+                    font-size: 1.25rem;
+                }
+
+        main .container .general-statistics .total-appointments .statistic-icon,
+        main .container .general-statistics .total-providers .statistic-icon,
+        main .container .general-statistics .total-centers .statistic-icon,
+        main .container .general-statistics .total-clients .statistic-icon,
+        main .container .general-statistics .total-operators .statistic-icon,
+        main .container .general-statistics .total-shifts .statistic-icon {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 5rem;
+            width: 5rem;
+            border-radius: 50%;
+        }
+
+        main .container .general-statistics .total-appointments .statistic-icon {
+            background-color: #2ecc71;
+        }
+        main .container .general-statistics .total-clients .statistic-icon {
+            background-color: #2a6f96;
+        }
+
+        main .container .general-statistics .total-centers .statistic-icon {
+            background-color: #4880ff;
+        }
+
+        main .container .general-statistics .total-shifts .statistic-icon {
+            background-color: #e74c3c;
+        }
+
+        main .container .general-statistics .total-providers .statistic-icon {
+            background-color: #f29c11;
+        }
+</style>

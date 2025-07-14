@@ -1,5 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using Data;
+﻿using Data;
 using Dorak.DataTransferObject;
 using Dorak.Models;
 using Dorak.ViewModels;
@@ -44,7 +43,7 @@ namespace Repositories
         }
 
         public PaginationViewModel<CenterViewModel> Search(string searchText = "", int pageNumber = 1,
-        int pageSize = 2)
+        int pageSize = 5)
         {
             var builder = PredicateBuilder.New<Center>();
             var old = builder;

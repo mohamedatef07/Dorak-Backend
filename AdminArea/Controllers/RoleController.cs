@@ -1,10 +1,8 @@
 ﻿using Dorak.ViewModels;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Repositories;
-using System.Threading.Tasks;
 
 namespace AdminArea.Controllers
 {
@@ -26,7 +24,6 @@ namespace AdminArea.Controllers
                 Name = r.Name,
             }).ToList();
 
-            //ViewBag.Invalid = 0;
             return View(list);
         }
         [HttpPost]
@@ -73,7 +70,7 @@ namespace AdminArea.Controllers
         public async Task<IActionResult> Edit(IdentityRole role)
         {
 
-            var result = await roleRepository.UpdateRoleAsync(role.Id,role.Name);
+            var result = await roleRepository.UpdateRoleAsync(role.Id, role.Name);
             if (result.Succeeded)
             {
                 return RedirectToAction("Add");
