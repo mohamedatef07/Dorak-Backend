@@ -227,6 +227,7 @@ namespace Services
         public async Task<LoginResult> LoginWithGenerateJWTToken(UserLoginViewModel UserVM)
         {
             var result = await accountRepository.Login(UserVM);
+
             if (!result.Succeeded)
             {
                 return new LoginResult
@@ -248,7 +249,7 @@ namespace Services
                 };
             }
 
-            if (user.LockoutEnabled || !user.EmailConfirmed) // customize your logic
+            if ((user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow) || !user.EmailConfirmed)
             {
                 return new LoginResult
                 {
@@ -257,17 +258,18 @@ namespace Services
                 };
             }
 
-            // Generate Claims
+            // Claims
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, user.UserName),
-        new Claim(ClaimTypes.Email, user.Email),
-        new Claim(ClaimTypes.NameIdentifier, user.Id)
-    };
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
 
             var roles = await accountRepository.GetUserRoles(user);
             roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
 
+            // Add role's specific claims
             if (roles.Contains("Operator"))
             {
                 var Operator = operatorRepository.GetById(o => o.OperatorId == user.Id);
@@ -300,7 +302,7 @@ namespace Services
                 claims.Add(new Claim("Image", user.Provider.Image));
             }
 
-            // Create JWT Token
+            // Generate JWT Token
             var jwtToken = new JwtSecurityToken(
                 claims: claims,
                 expires: DateTime.UtcNow.AddMinutes(120),
@@ -312,7 +314,7 @@ namespace Services
 
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
 
-            // Refresh Token
+            // Generate Refresh Token
             var refreshToken = GenetrateRefreshToken();
             user.RefreshToken = refreshToken;
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
@@ -329,7 +331,6 @@ namespace Services
                 Roles = roles.ToList()
             };
         }
-
 
         public async Task<(string NewAccessToken, string NewRefreshToken)> RefreshTokenAsync(RefreshTokenRequest request)
         {
