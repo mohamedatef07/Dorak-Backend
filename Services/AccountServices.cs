@@ -224,98 +224,112 @@ namespace Services
             await accountRepository.Signout();
         }
 
-        public async Task<(string Token, string RefreshToken)> LoginWithGenerateJWTToken(UserLoginViewModel UserVM)
+        public async Task<LoginResult> LoginWithGenerateJWTToken(UserLoginViewModel UserVM)
         {
             var result = await accountRepository.Login(UserVM);
-            if (result.Succeeded)
+
+            if (!result.Succeeded)
             {
-                var user = await accountRepository.FindByUserName(UserVM.UserName) ?? await accountRepository.FindByEmail(UserVM.UserName);
-                if (user == null)
-                    return (null, null);
-
-                var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, user.UserName),
-                        new Claim(ClaimTypes.Email, user.Email),
-                        new Claim(ClaimTypes.NameIdentifier, user.Id)
-                    };
-
-                var roles = await accountRepository.GetUserRoles(user);
-                roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
-
-                if (roles.Contains("Operator"))
+                return new LoginResult
                 {
-                    var Operator = operatorRepository.GetById(o => o.OperatorId == user.Id);
-                    if (Operator != null && Operator.CenterId != null)
-                    {
-                        claims.Add(new Claim("CenterId", Operator.CenterId.ToString()));
-
-                        if (Operator.Image != null)
-                        {
-                            claims.Add(new Claim("Image", Operator.Image));
-                        }
-                    }
-                }
-
-                if (roles.Contains("Admin"))
-                {
-                    var Admin = adminCenterRepository.GetById(a => a.AdminId == user.Id);
-                    if (Admin != null && Admin.CenterId != null)
-                    {
-                        claims.Add(new Claim("CenterId", Admin.CenterId.ToString()));
-
-                        if (Admin.Image != null)
-                        {
-                            claims.Add(new Claim("Image", Admin.Image));
-                        }
-                    }
-                }
-
-                if (roles.Contains("Client"))
-                {
-                    var Image = user.Client.Image;
-                    if (Image != null)
-                    {
-                        claims.Add(new Claim("Image", Image));
-                    }
-                }
-                else if (roles.Contains("Provider"))
-                {
-                    var Image = user.Provider.Image;
-                    if (Image != null)
-                    {
-                        claims.Add(new Claim("Image", Image));
-                    }
-                }
-                //else if (roles.Contains("Operator"))
-                //{
-
-                //}
-
-                // Create JWT Token
-                var jwtToken = new JwtSecurityToken(
-                    claims: claims,
-                    expires: DateTime.UtcNow.AddMinutes(100),
-                    signingCredentials: new SigningCredentials(
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
-                        SecurityAlgorithms.HmacSha256
-                    )
-                );
-
-                var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
-
-                // Generate and Store Refresh Token
-                var refreshToken = GenetrateRefreshToken();
-                user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-
-                accountRepository.Edit(user);
-                CommitData.SaveChanges();
-
-                return (accessToken, refreshToken);
+                    Succeeded = false,
+                    Message = "Invalid username or password."
+                };
             }
 
-            return (null, null);
+            var user = await accountRepository.FindByUserName(UserVM.UserName)
+                       ?? await accountRepository.FindByEmail(UserVM.UserName);
+
+            if (user == null)
+            {
+                return new LoginResult
+                {
+                    Succeeded = false,
+                    Message = "User not found."
+                };
+            }
+
+            if ((user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow) || !user.EmailConfirmed)
+            {
+                return new LoginResult
+                {
+                    Succeeded = false,
+                    Message = "Account is locked or disabled."
+                };
+            }
+
+            // Claims
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+
+            var roles = await accountRepository.GetUserRoles(user);
+            roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role)));
+
+            // Add role's specific claims
+            if (roles.Contains("Operator"))
+            {
+                var Operator = operatorRepository.GetById(o => o.OperatorId == user.Id);
+                if (Operator?.CenterId != null)
+                {
+                    claims.Add(new Claim("CenterId", Operator.CenterId.ToString()));
+                    if (Operator.Image != null)
+                        claims.Add(new Claim("Image", Operator.Image));
+                }
+            }
+
+            if (roles.Contains("Admin"))
+            {
+                var Admin = adminCenterRepository.GetById(a => a.AdminId == user.Id);
+                if (Admin?.CenterId != null)
+                {
+                    claims.Add(new Claim("CenterId", Admin.CenterId.ToString()));
+                    if (Admin.Image != null)
+                        claims.Add(new Claim("Image", Admin.Image));
+                }
+            }
+
+            if (roles.Contains("Client") && user.Client?.Image != null)
+            {
+                claims.Add(new Claim("Image", user.Client.Image));
+            }
+
+            if (roles.Contains("Provider") && user.Provider?.Image != null)
+            {
+                claims.Add(new Claim("Image", user.Provider.Image));
+            }
+
+            // Generate JWT Token
+            var jwtToken = new JwtSecurityToken(
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(120),
+                signingCredentials: new SigningCredentials(
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:PrivateKey"])),
+                    SecurityAlgorithms.HmacSha256
+                )
+            );
+
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            // Generate Refresh Token
+            var refreshToken = GenetrateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            accountRepository.Edit(user);
+            CommitData.SaveChanges();
+
+            return new LoginResult
+            {
+                Succeeded = true,
+                Message = "Login successful.",
+                Token = accessToken,
+                RefreshToken = refreshToken,
+                Roles = roles.ToList()
+            };
         }
 
         public async Task<(string NewAccessToken, string NewRefreshToken)> RefreshTokenAsync(RefreshTokenRequest request)

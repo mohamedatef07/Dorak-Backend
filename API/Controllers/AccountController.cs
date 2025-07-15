@@ -166,7 +166,6 @@ namespace API.Controllers
             {
                 var errors = ModelState.Values.SelectMany(v => v.Errors)
                                               .Select(e => e.ErrorMessage);
-
                 return BadRequest(new ApiResponse<object>
                 {
                     Message = string.Join(" ", errors),
@@ -175,34 +174,53 @@ namespace API.Controllers
                 });
             }
 
-            var (token, refreshToken) = await _accountServices.LoginWithGenerateJWTToken(user);
+            var loginResult = await _accountServices.LoginWithGenerateJWTToken(user);
 
-            if (string.IsNullOrEmpty(token))
+            if (!loginResult.Succeeded)
             {
+                var lowerMessage = loginResult.Message.ToLower();
+
+                if (lowerMessage.Contains("not found"))
+                {
+                    return NotFound(new ApiResponse<object>
+                    {
+                        Message = loginResult.Message,
+                        Status = 404,
+                        Data = null
+                    });
+                }
+
+                if (lowerMessage.Contains("locked") || lowerMessage.Contains("disabled"))
+                {
+                    return StatusCode(403, new ApiResponse<object>
+                    {
+                        Message = loginResult.Message,
+                        Status = 403,
+                        Data = null
+                    });
+                }
+
                 return Unauthorized(new ApiResponse<object>
                 {
-                    Message = "Invalid Email, Username, or Password",
+                    Message = loginResult.Message,
                     Status = 401,
                     Data = null
                 });
             }
 
-            var roles = await _accountServices.GetUserRolesAsync(user.UserName);
-
-            var responseData = new
-            {
-                Token = token,
-                RefreshToken = refreshToken,
-                Roles = roles
-            };
-
             return Ok(new ApiResponse<object>
             {
                 Message = "Logged In Successfully",
                 Status = 200,
-                Data = responseData
+                Data = new
+                {
+                    Token = loginResult.Token,
+                    RefreshToken = loginResult.RefreshToken,
+                    Roles = loginResult.Roles
+                }
             });
         }
+
 
         [HttpPost("RefreshToken")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
