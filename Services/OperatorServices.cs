@@ -213,7 +213,7 @@ namespace Services
 
             commitData.SaveChanges();
 
-            var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
+            //var queue = appointmentServices.AssignToQueue(app.ProviderCenterServiceId, app.AppointmentDate, createdAppointment.AppointmentId);
 
             var Currentshift = shiftRepository.GetById(shift => shift.ShiftId == reserveApointmentDTO.ShiftId);
 

@@ -81,16 +81,12 @@ namespace Services
 
             commitData.SaveChanges();
 
-            var queue = AssignToQueue(
-                app.ProviderCenterServiceId,
-                app.AppointmentDate,
-                createdAppointment.AppointmentId);
+            //var queue = AssignToQueue(
+            //    app.ProviderCenterServiceId,
+            //    app.AppointmentDate,
+            //    createdAppointment.AppointmentId);
 
-            var queuedAppointment = queue.FirstOrDefault(a => a.AppointmentId == createdAppointment.AppointmentId);
-            if (queuedAppointment != null)
-            {
-                createdAppointment.EstimatedTime = queuedAppointment.EstimatedTime;
-            }
+
             CheckoutRequest checkoutRequest = new CheckoutRequest()
             {
                 AppointmentId = createdAppointment.AppointmentId,
